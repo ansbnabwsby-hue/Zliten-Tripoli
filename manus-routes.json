@@ -1,0 +1,1 @@
+{"routes":[{"path":"/","title":"زلطن تريبول"},{"path":"/store/:id","title":"المتجر"},{"path":"/orders","title":"طلباتي"},{"path":"/cart","title":"السلة"},{"path":"/driver","title":"التوصيل"},{"path":"/merchant","title":"متجري"},{"path":"/admin","title":"الإدارة"},{"path":"/profile","title":"الملف الشخصي"}]}

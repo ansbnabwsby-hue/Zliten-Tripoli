@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#071a2e">
+  <meta name="description" content="زلطن تريبول — سوق وتوصيل محلي سريع لأهل زلطن">
+  <title>زلطن تريبول</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <div id="toast-region" class="toast-region" aria-live="polite"></div>
+    <header class="topbar">
+      <button class="icon-button mobile-menu-button" data-action="toggle-menu" aria-label="فتح القائمة">☰</button>
+      <button class="brand" data-action="go-home" aria-label="الرئيسية">
+        <span class="brand-mark">ϟ</span>
+        <span><strong>زلطن</strong><small>تريبول</small></span>
+      </button>
+      <div class="topbar-actions">
+        <button class="icon-button" data-action="toggle-theme" aria-label="تبديل المظهر"><span id="theme-icon">☾</span></button>
+        <button class="icon-button notification-button" data-action="show-notifications" aria-label="الإشعارات">♢<b id="notification-count" class="counter">3</b></button>
+        <button class="avatar-button" data-action="go-profile" aria-label="الملف الشخصي"><span id="avatar-letter">م</span></button>
+      </div>
+    </header>
+
+    <div id="mobile-menu" class="mobile-menu" hidden>
+      <div class="mobile-menu-head"><span>القائمة السريعة</span><button class="icon-button" data-action="toggle-menu">×</button></div>
+      <button data-page="profile" class="menu-item">◉ الملف الشخصي</button>
+      <button data-page="favorites" class="menu-item">♡ المفضلة</button>
+      <button data-page="offers" class="menu-item">✦ العروض</button>
+      <button data-page="support" class="menu-item">? الدعم والمساعدة</button>
+      <div class="menu-divider"></div>
+      <button data-action="open-role-switcher" class="menu-item">⇄ تبديل الدور التجريبي</button>
+    </div>
+
+    <main id="main-content" class="main-content"></main>
+
+    <nav id="bottom-nav" class="bottom-nav" aria-label="التنقل الرئيسي">
+      <button class="nav-item active" data-page="home"><span>⌂</span><small>الرئيسية</small></button>
+      <button class="nav-item" data-page="orders"><span>▣</span><small>طلباتي</small><b class="nav-dot">2</b></button>
+      <button class="nav-item nav-center" data-action="open-cart"><span class="cart-bubble">🛒<b id="cart-count">0</b></span><small>السلة</small></button>
+      <button class="nav-item" data-page="role"><span id="role-nav-icon">♧</span><small id="role-nav-label">مساحتي</small></button>
+      <button class="nav-item" data-page="profile"><span>◉</span><small>حسابي</small></button>
+    </nav>
+  </div>
+  <div id="modal-root"></div>
+  <script src="app.js"></script>
+</body>
+</html>
