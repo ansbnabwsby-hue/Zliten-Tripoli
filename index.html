@@ -436,7 +436,8 @@ function renderDatabaseError(error) {
     var isPermission = code === 'PERMISSION_DENIED' || (error && String(error.message || '').toLowerCase().indexOf('permission') !== -1);
     if (isPermission && !firebaseAuth.currentUser) { renderAuth(); return; }
     var title = isPermission ? 'تعذر الوصول إلى البيانات' : 'تعذر الاتصال بقاعدة البيانات';
-    var message = isPermission ? 'تم تسجيل الدخول، لكن قواعد Firebase لا تسمح لهذا الحساب بقراءة البيانات. راجع قواعد Realtime Database.' : 'تحقق من الإنترنت وإعدادات Firebase ثم حاول مرة أخرى.';
+    var signedEmail = firebaseAuth.currentUser && firebaseAuth.currentUser.email ? firebaseAuth.currentUser.email : 'لا يوجد حساب موثق';
+    var message = isPermission ? 'تم تسجيل الدخول بالحساب: ' + signedEmail + '<br>لكن قواعد Firebase لا تسمح بقراءة البيانات لهذا الحساب. انشر قواعد Realtime Database من ملف firebase.database.rules.final.json، وتأكد من وجود البيانات في appData/stores أو stores.' : 'تحقق من الإنترنت وإعدادات Firebase ثم حاول مرة أخرى.';
     document.getElementById('main-header').style.display = 'none';
     document.getElementById('main-nav').style.display = 'none';
     document.getElementById('report-btn').style.display = 'none';
@@ -2096,7 +2097,7 @@ window.addEventListener('appinstalled', function() {
 <script>
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js', { scope: './' }).then(function(registration) {
+    navigator.serviceWorker.register('sw.js?v=2', { scope: './' }).then(function(registration) {
       registration.addEventListener('updatefound', function() {
         var worker = registration.installing;
         if (worker) worker.addEventListener('statechange', function() {
