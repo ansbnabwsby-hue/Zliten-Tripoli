@@ -262,6 +262,7 @@ let db = {
     ]
 };
 let currentUser = null, cart = [], tempImageBase64 = "", currentLocation = null;
+let firebaseDataLoaded = false;
 let currentCategory = 'all', searchQuery = '';
 let favorites = JSON.parse(localStorage.getItem('z_favorites') || '[]');
 let usedCoupons = JSON.parse(localStorage.getItem('z_used_coupons') || '[]');
@@ -305,6 +306,10 @@ function toggleQuickMenu() {
 }
 
 function sync() {
+    if (!firebaseAuth.currentUser || !firebaseDataLoaded) {
+        showToast('انتظر اكتمال تحميل بيانات Firebase قبل الحفظ', 'warning', 3500);
+        return;
+    }
     var payload = {
         users: db.users, stores: db.stores, orders: db.orders,
         chats: db.chats, reports: db.reports || [], ad: db.ad, policy: db.policy,
@@ -414,18 +419,18 @@ function loadData() {
     database.ref('appData').on('value', function(snap) {
         let data = snap.val();
         if (data) {
-            applyAppData(data); cacheAppData();
+            applyAppData(data); firebaseDataLoaded = true; cacheAppData();
             if (!db.stores.length) loadLegacyRootData(function(){ checkAuth(); });
             else checkAuth();
         } else if (!loadCachedAppData()) {
-            loadLegacyRootData(function(found) { if (!found) showToast('لم نجد بيانات في appData أو المسارات القديمة. تحقق من مكان stores داخل Firebase.', 'warning', 7000); checkAuth(); });
+            loadLegacyRootData(function(found) { firebaseDataLoaded = found; if (!found) showToast('لم نجد بيانات في appData أو المسارات القديمة. تحقق من مكان stores داخل Firebase.', 'warning', 7000); checkAuth(); });
         } else {
-            loadLegacyRootData(function(){ checkAuth(); });
+            loadLegacyRootData(function(){ firebaseDataLoaded = true; checkAuth(); });
         }
     }, function(error) {
         loadLegacyRootData(function(found) {
-            if (found) { checkAuth(); showToast('تم تحميل المتاجر من المسار القديم في Firebase', 'info', 5000); }
-            else if (loadCachedAppData()) { checkAuth(); showToast('نعرض آخر نسخة محفوظة من المتاجر مؤقتاً', 'warning', 5000); }
+            if (found) { firebaseDataLoaded = true; checkAuth(); showToast('تم تحميل المتاجر من المسار القديم في Firebase', 'info', 5000); }
+            else if (loadCachedAppData()) { firebaseDataLoaded = true; checkAuth(); showToast('نعرض آخر نسخة محفوظة من المتاجر مؤقتاً', 'warning', 5000); }
             else renderDatabaseError(error);
         });
     });
@@ -599,7 +604,8 @@ function handleAuth() {
         var profile = db.users.find(function(u) { return u.authUid === authUser.uid || (u.email && u.email.toLowerCase() === email); });
         if (!profile && email === DEVELOPER_EMAIL) {
             profile = { id:'AUTH_' + authUser.uid, authUid:authUser.uid, name:'moad', email:email, pass:'', type:'developer', role:'developer', isDeveloper:true, phone:phone, cashCollected:0, notifications:[], wallet:0, addresses:[], createdAt:new Date().toLocaleString('ar-LY'), avatar:'', bio:'', rating:0, ratingCount:0 };
-            db.users.push(profile); sync();
+            db.users.push(profile);
+            database.ref('appData/users/' + profile.id).set(profile).catch(function(){ });
         }
         if (!profile) { showToast('تم تسجيل الدخول، لكن حسابك غير مربوط بملف مستخدم داخل التطبيق', 'warning', 5000); return; }
         currentUser = profile; localStorage.setItem('z_user_id', profile.id); updateUI(); database.ref('appData').off(); loadData();
@@ -620,7 +626,8 @@ function createFirebaseAccount() {
         var u = result.user;
         var developer = email === DEVELOPER_EMAIL;
         var profile = { id:'AUTH_' + u.uid, authUid:u.uid, name:developer ? 'moad' : email.split('@')[0], email:email, pass:'', type:developer ? 'developer' : type, role:developer ? 'developer' : type, isDeveloper:developer, phone:phone, cashCollected:0, notifications:[], wallet:0, addresses:[], createdAt:new Date().toLocaleString('ar-LY'), avatar:'', bio:'', rating:0, ratingCount:0 };
-        db.users.push(profile); currentUser = profile; localStorage.setItem('z_user_id', profile.id); updateUI(); sync(); loadData();
+        db.users.push(profile); currentUser = profile; localStorage.setItem('z_user_id', profile.id); updateUI();
+        database.ref('appData/users/' + profile.id).set(profile).then(function(){ loadData(); }).catch(function(){ loadData(); });
         showToast('تم إنشاء الحساب وتسجيل الدخول بنجاح');
     }).catch(function(error) {
         var message = error && error.code === 'auth/email-already-in-use' ? 'هذا البريد مسجل مسبقاً. استخدم تسجيل الدخول.' : error && error.code === 'auth/invalid-email' ? 'صيغة البريد الإلكتروني غير صحيحة.' : error && error.code === 'auth/weak-password' ? 'كلمة المرور ضعيفة. استخدم 6 أحرف أو أكثر.' : (error.message || 'تعذر إنشاء الحساب');

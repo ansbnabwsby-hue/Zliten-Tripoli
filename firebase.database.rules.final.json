@@ -13,6 +13,9 @@
       },
       "users": {
         ".indexOn": ["id", "type", "role"]
+        ,"$userKey": {
+          ".write": "auth != null && (auth.uid == newData.child('authUid').val() || auth.token.developer === true || auth.token.admin === true || auth.token.email == 'muhammadmoad5@gmail.com')"
+        }
       }
     },
     "stores": {
