@@ -305,10 +305,14 @@ function toggleQuickMenu() {
 }
 
 function sync() {
-    database.ref('appData').set({
+    var payload = {
         users: db.users, stores: db.stores, orders: db.orders,
         chats: db.chats, reports: db.reports || [], ad: db.ad, policy: db.policy,
         coupons: db.coupons || [], faq: db.faq || [], categories: db.categories
+    };
+    database.ref('appData').set(payload).then(function() { cacheAppData(); }).catch(function(error) {
+        if (error && error.code === 'PERMISSION_DENIED') showToast('تم التعديل محلياً، لكن Firebase رفض الحفظ لهذا الحساب', 'error', 5000);
+        else showToast('تعذر حفظ التعديلات في قاعدة البيانات', 'error', 4000);
     });
 }
 
@@ -357,23 +361,45 @@ function notifyAllDrivers(text) {
 }
 
 // ==================== تحميل البيانات ====================
+function dataArray(value) {
+    if (Array.isArray(value)) return value;
+    if (value && typeof value === 'object') return Object.keys(value).map(function(k) { return value[k]; }).filter(Boolean);
+    return [];
+}
+
+function applyAppData(data) {
+    if (!data || typeof data !== 'object') return false;
+    db.users = dataArray(data.users); db.stores = dataArray(data.stores);
+    db.orders = dataArray(data.orders); db.chats = dataArray(data.chats);
+    db.reports = dataArray(data.reports); db.ad = data.ad || db.ad;
+    db.policy = data.policy || db.policy; db.coupons = dataArray(data.coupons);
+    db.faq = dataArray(data.faq); db.categories = dataArray(data.categories);
+    db.orders.forEach(function(o) { if (!o.orderChat) o.orderChat = []; });
+    return true;
+}
+
+function cacheAppData() {
+    try { localStorage.setItem('z_appdata_cache', JSON.stringify({ users:db.users, stores:db.stores, orders:db.orders, chats:db.chats, reports:db.reports, ad:db.ad, policy:db.policy, coupons:db.coupons, faq:db.faq, categories:db.categories })); } catch (e) {}
+}
+
+function loadCachedAppData() {
+    try { var cached = JSON.parse(localStorage.getItem('z_appdata_cache') || 'null'); return applyAppData(cached); } catch (e) { return false; }
+}
+
 function loadData() {
     if (!firebaseAuth.currentUser) { renderAuth(); return; }
     database.ref('appData').off();
     database.ref('appData').on('value', function(snap) {
         let data = snap.val();
         if (data) {
-            db.users = data.users || []; db.stores = data.stores || [];
-            db.orders = data.orders || []; db.chats = data.chats || [];
-            db.reports = data.reports || []; db.ad = data.ad || db.ad;
-            db.policy = data.policy || db.policy; db.coupons = data.coupons || [];
-            db.faq = data.faq || db.faq;
-            db.categories = data.categories || db.categories;
-            db.orders.forEach(function(o) { if (!o.orderChat) o.orderChat = []; });
-        } else { sync(); }
+            applyAppData(data); cacheAppData();
+        } else if (!loadCachedAppData()) {
+            showToast('قاعدة البيانات متصلة لكن لا توجد بيانات appData بعد', 'warning', 5000);
+        }
         checkAuth();
     }, function(error) {
-        renderDatabaseError(error);
+        if (loadCachedAppData()) { checkAuth(); showToast('نعرض آخر نسخة محفوظة من المتاجر مؤقتاً', 'warning', 5000); }
+        else renderDatabaseError(error);
     });
 }
 
