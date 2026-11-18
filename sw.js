@@ -1,10 +1,10 @@
 const CACHE_NAME = 'zliten-tripoli-v1';
 const APP_SHELL = [
-  '/',
-  '/index.html',
-  '/manifest.webmanifest',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  './',
+  './index.html',
+  './manifest.webmanifest',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
 ];
 
 self.addEventListener('install', event => {
@@ -23,7 +23,7 @@ self.addEventListener('fetch', event => {
     const copy = response.clone();
     caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
     return response;
-  }).catch(() => caches.match(event.request).then(cached => cached || caches.match('/index.html'))));
+  }).catch(() => caches.match(event.request).then(cached => cached || caches.match('./index.html'))));
 });
 
 self.addEventListener('message', event => {
