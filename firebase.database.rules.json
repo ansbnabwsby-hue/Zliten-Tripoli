@@ -1,0 +1,31 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "appData": {
+      ".read": "auth != null",
+      ".write": "auth != null && (auth.token.developer === true || auth.token.admin === true)"
+    },
+    "liveLocations": {
+      "$orderId": {
+        ".read": "auth != null && (auth.token.developer === true || data.child('driverId').val() === auth.uid || data.child('customerId').val() === auth.uid || data.child('storeOwnerId').val() === auth.uid)",
+        ".write": "auth != null && (auth.token.developer === true || (newData.child('driverId').val() === auth.uid && newData.child('lat').isNumber() && newData.child('lng').isNumber() && newData.child('updatedAt').isNumber()))",
+        ".validate": "newData.hasChildren(['lat', 'lng', 'updatedAt', 'driverId']) && newData.child('lat').val() >= -90 && newData.child('lat').val() <= 90 && newData.child('lng').val() >= -180 && newData.child('lng').val() <= 180 && newData.child('updatedAt').val() <= now + 120000"
+      }
+    },
+    "users": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || auth.token.developer === true || auth.token.admin === true)",
+        ".write": "auth != null && (auth.uid === $uid || auth.token.developer === true || auth.token.admin === true)",
+        ".validate": "newData.hasChildren(['id', 'name'])"
+      }
+    },
+    "orders": {
+      "$orderId": {
+        ".read": "auth != null && (auth.token.developer === true || data.child('userId').val() === auth.uid || data.child('driverId').val() === auth.uid || data.child('storeOwnerId').val() === auth.uid)",
+        ".write": "auth != null && (auth.token.developer === true || data.child('userId').val() === auth.uid || data.child('driverId').val() === auth.uid || data.child('storeOwnerId').val() === auth.uid)",
+        ".validate": "newData.hasChildren(['id', 'userId', 'status', 'total'])"
+      }
+    }
+  }
+}

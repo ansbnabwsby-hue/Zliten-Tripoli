@@ -1,0 +1,19 @@
+{
+  "name": "zliten-tripol-android",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "web:prepare": "rm -rf dist && mkdir -p dist/icons && cp index.html manus-routes.json manifest.webmanifest sw.js dist/ && cp public/icons/* dist/icons/",
+    "android:sync": "npm run web:prepare && npx cap sync android",
+    "android:debug": "npm run android:sync && cd android && ./gradlew assembleDebug",
+    "check": "node --check app.js && python3 -m json.tool manus-routes.json >/dev/null"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.6.2",
+    "@capacitor/core": "8.6.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.2",
+    "typescript": "^7.0.2"
+  }
+}

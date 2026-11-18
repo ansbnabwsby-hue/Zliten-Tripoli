@@ -1,0 +1,26 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "appData": {
+      ".read": "auth != null",
+      ".write": "auth != null && (auth.token.developer === true || auth.token.admin === true || auth.token.email == 'muhammadmoad5@gmail.com')",
+      "stores": {
+        ".indexOn": ["id", "ownerId", "approved"]
+      },
+      "orders": {
+        ".indexOn": ["id", "userId", "storeId", "driverId", "status"]
+      },
+      "users": {
+        ".indexOn": ["id", "type", "role"]
+      }
+    },
+    "liveLocations": {
+      "$orderId": {
+        ".read": "auth != null && (auth.token.developer === true || auth.token.email == 'muhammadmoad5@gmail.com' || data.child('driverId').val() === auth.uid || data.child('customerId').val() === auth.uid || data.child('storeOwnerId').val() === auth.uid)",
+        ".write": "auth != null && (auth.token.developer === true || auth.token.email == 'muhammadmoad5@gmail.com' || (newData.child('driverId').val() === auth.uid && newData.child('lat').isNumber() && newData.child('lng').isNumber() && newData.child('updatedAt').isNumber()))",
+        ".validate": "newData.hasChildren(['lat', 'lng', 'updatedAt', 'driverId']) && newData.child('lat').val() >= -90 && newData.child('lat').val() <= 90 && newData.child('lng').val() >= -180 && newData.child('lng').val() <= 180 && newData.child('updatedAt').val() <= now + 120000"
+      }
+    }
+  }
+}
