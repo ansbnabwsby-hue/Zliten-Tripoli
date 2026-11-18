@@ -155,7 +155,7 @@ header { padding:16px 20px; display:flex; justify-content:space-between; align-i
 /* ===== تحسين شاشة الدخول ===== */
 .auth-modern { margin-top:24px; padding:0; overflow:hidden; border:1px solid rgba(0,212,255,.28); background:linear-gradient(160deg,rgba(17,25,54,.98),rgba(6,8,24,.98)); }
 .auth-hero { padding:28px 22px 24px; text-align:center; background:radial-gradient(circle at 50% 0%,rgba(0,212,255,.24),transparent 62%),linear-gradient(135deg,#101d4a,#071126); }
-.auth-logo-modern { width:82px;height:82px;border-radius:27px;margin:0 auto 15px;display:flex;align-items:center;justify-content:center;font-size:2.7rem;background:var(--gradient-1);box-shadow:0 12px 30px rgba(0,212,255,.3); }
+	.auth-logo-modern { width:82px;height:82px;border-radius:27px;margin:0 auto 15px;display:block;object-fit:cover;background:var(--gradient-1);box-shadow:0 12px 30px rgba(0,212,255,.3); }
 .auth-hero h2 { font-size:1.75rem; margin-bottom:5px; color:#fff; }
 .auth-hero p { color:#b6c7df; font-size:.88rem; }
 .auth-form { padding:20px 20px 22px; }
@@ -169,7 +169,13 @@ header { padding:16px 20px; display:flex; justify-content:space-between; align-i
 .auth-type.active { border-color:var(--primary);background:rgba(0,212,255,.12);color:var(--primary);box-shadow:0 0 0 2px rgba(0,212,255,.08); }
 .auth-type i { display:block;font-size:1.25rem;margin-bottom:4px; }
 .auth-type:active { transform:scale(.97); }
-.auth-hint { text-align:center;color:var(--text-muted);font-size:.74rem;margin-top:12px;line-height:1.7; }
+	.auth-hint { text-align:center;color:var(--text-muted);font-size:.74rem;margin-top:12px;line-height:1.7; }
+	.brand-mark { width:34px;height:34px;border-radius:10px;object-fit:cover;vertical-align:middle;box-shadow:0 0 16px rgba(0,212,255,.28); }
+	.section-toolbar { display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px; }
+	.section-toolbar h3 { margin:0; }
+	.app-promo { background:linear-gradient(135deg,rgba(0,212,255,.16),rgba(0,119,182,.12));border-color:rgba(0,212,255,.35); }
+	.app-promo-logo { width:64px;height:64px;border-radius:18px;object-fit:cover;box-shadow:0 8px 20px rgba(0,212,255,.25); }
+	.permission-row { display:flex;gap:8px;flex-wrap:wrap;margin-top:12px; }
 @media(max-width:400px){.auth-types{gap:5px}.auth-type{font-size:.68rem}}
 
 .live-map-card { padding:14px; }
@@ -197,7 +203,7 @@ header { padding:16px 20px; display:flex; justify-content:space-between; align-i
   </div>
 </div>
 <header id="main-header" style="display:none">
-  <div class="logo-text" onclick="navigate('home')"><i class="fas fa-bolt"></i> زلطن تريبول</div>
+  <div class="logo-text" onclick="navigate('home')"><img src="icons/icon-192.png" class="brand-mark" alt="زلطن تريبول"> زلطن تريبول</div>
   <div style="display:flex; gap:16px; align-items:center;">
     <div onclick="toggleTheme()" style="cursor:pointer;"><i class="fas fa-moon fa-lg" id="theme-icon" style="color:var(--text-muted);"></i></div>
     <div onclick="navigate('mail')" style="position:relative; cursor:pointer;"><i class="fas fa-bell fa-lg" style="color:var(--text-muted);"></i><span class="badge" id="notify-badge" style="display:none;">0</span></div>
@@ -263,6 +269,7 @@ let selectedRating = 0, appliedCoupon = null;
 let isLightTheme = localStorage.getItem('z_theme') === 'light';
 let activeLocationWatchId = null, activeLocationOrderId = null, liveLocationRef = null, liveLocationListener = null;
 let liveMap = null, liveMarker = null, liveMapOrderId = null;
+let deferredInstallPrompt = null;
 
 // ==================== Theme ====================
 function applyTheme() {
@@ -493,7 +500,7 @@ function renderAuth() {
     document.getElementById('app-content').innerHTML =
         '<div class="animate-fade">' +
         '<div class="card auth-modern">' +
-        '<div class="auth-hero"><div class="auth-logo-modern">⚡</div>' +
+        '<div class="auth-hero"><img src="icons/icon-192.png" class="auth-logo-modern" alt="هوية زلطن تريبول">' +
         '<h2>زلطن تريبول</h2><p>سوقك المحلي في مكان واحد</p></div>' +
         '<div class="auth-form">' +
         '<div class="auth-label">البريد الإلكتروني</div>' +
@@ -568,6 +575,37 @@ function createFirebaseAccount() {
 
 function showPolicy() { showModal("📜 سياسة الاستخدام", db.policy || "التطبيق غير مسؤول قانونياً عن أي أضرار."); }
 
+function renderSectionToolbar(title, icon, backPage) {
+    var action = backPage === 'auth' ? 'renderAuth()' : 'navigate(\'' + (backPage || 'home') + '\')';
+    return '<div class="section-toolbar"><h3>' + icon + ' ' + title + '</h3><button class="btn btn-outline btn-sm" onclick="' + action + '"><i class="fas fa-arrow-right"></i> خروج</button></div>';
+}
+
+function shareApp() {
+    var url = window.location.href;
+    var data = { title:'زلطن تريبول', text:'حمّل تطبيق زلطن تريبول للطلب والتوصيل داخل زلطن', url:url };
+    if (navigator.share) navigator.share(data).then(function(){ showToast('تمت مشاركة التطبيق'); }).catch(function(){});
+    else if (navigator.clipboard) navigator.clipboard.writeText(url).then(function(){ showToast('تم نسخ رابط التطبيق'); });
+    else showToast(url, 'info', 6000);
+}
+
+function installApp() {
+    if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return showToast('التطبيق مثبت على جهازك بالفعل');
+    if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        deferredInstallPrompt.userChoice.then(function(choice){ if (choice.outcome === 'accepted') showToast('تم بدء تثبيت التطبيق'); deferredInstallPrompt = null; updateInstallButtons(); });
+    } else showToast('من قائمة المتصفح اختر «إضافة إلى الشاشة الرئيسية» لتثبيت التطبيق', 'info', 6000);
+}
+
+function requestAppPermissions() {
+    requestNotificationPermission();
+    if (navigator.geolocation) getCurrentLocation(function(){ showToast('تم تفعيل الموقع والإشعارات حسب اختيارك'); });
+    else showToast('الموقع غير مدعوم على هذا الجهاز', 'warning');
+}
+
+function updateInstallButtons() {
+    document.querySelectorAll('[data-install-app]').forEach(function(btn){ btn.style.display = deferredInstallPrompt ? 'flex' : 'flex'; });
+}
+
 function getCategoryName(catId) {
     let cat = db.categories.find(function(c) { return c.id === catId; });
     return cat ? cat.name : catId;
@@ -608,6 +646,7 @@ function renderHome(container) {
     }).join('');
 
     container.innerHTML = '<div class="animate-fade">' +
+        '<div class="card app-promo"><div style="display:flex;gap:14px;align-items:center;"><img src="icons/icon-192.png" class="app-promo-logo" alt="زلطن تريبول"><div><h3 style="margin-bottom:4px;">تطبيق زلطن تريبول</h3><p style="color:var(--text-muted);font-size:.85rem;">ثبّت التطبيق ووصل لطلباتك بسرعة.</p></div></div><div class="permission-row"><button class="btn btn-primary btn-sm" data-install-app onclick="installApp()"><i class="fas fa-download"></i> تثبيت التطبيق</button><button class="btn btn-outline btn-sm" onclick="shareApp()"><i class="fas fa-share-alt"></i> مشاركة</button><button class="btn btn-ghost btn-sm" onclick="requestAppPermissions()"><i class="fas fa-bell"></i> تفعيل الأذونات</button></div><small style="display:block;color:var(--text-muted);margin-top:10px;">فعّل الموقع لتحديد عنوانك على الخريطة، والإشعارات لمعرفة حالة الطلب.</small></div>' +
         '<div class="card card-gradient-1" style="text-align:center;margin-bottom:20px;"><div style="font-size:1.1rem;font-weight:700;">📢 ' + db.ad + '</div></div>' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin:15px 0;flex-wrap:wrap;gap:10px;">' +
         '<div><span style="color:var(--text-muted);">مرحباً،</span><b style="color:var(--primary);">' + currentUser.name + '</b>' +
@@ -1540,7 +1579,7 @@ function copyCoupon(code) {
 
 // ==================== الدعم والمساعدة (بوت) ====================
 function renderSupport(container) {
-    container.innerHTML = '<div class="animate-fade"><h3 style="margin-bottom:16px;">🤖 الدعم والمساعدة</h3>' +
+    container.innerHTML = '<div class="animate-fade">' + renderSectionToolbar('الدعم والمساعدة', '🤖', 'home') +
         '<div class="card"><h4 style="margin-bottom:12px;">❓ الأسئلة الشائعة</h4>' +
         (db.faq || []).map(function(q, i) {
             return '<div style="border-bottom:1px solid var(--border);padding:12px 0;cursor:pointer;" onclick="toggleFaq(' + i + ')">' +
@@ -1592,7 +1631,7 @@ function getBotReply(msg) {
 function renderGuide(container) {
     var role = currentUser ? currentUser.type : 'customer';
     var roleName = role === 'driver' ? 'السائق' : role === 'store_owner' ? 'التاجر' : 'الزبون';
-    container.innerHTML = '<div class="animate-fade"><h3 style="margin-bottom:16px;">📚 طريقة استخدام زلطن تريبول</h3>' +
+    container.innerHTML = '<div class="animate-fade">' + renderSectionToolbar('طريقة استخدام زلطن تريبول', '📚', currentUser ? 'home' : 'auth') +
         '<div class="card card-gradient-1"><h3>أهلاً بك في زلطن تريبول 👋</h3><p>هذا الدليل يشرح لك الخطوات الأساسية حسب نوع حسابك. أنت الآن تشاهد تعليمات: <b>' + roleName + '</b>.</p></div>' +
         '<div class="card"><h4 style="color:var(--primary);margin-bottom:10px;">👤 للزبون: كيف تطلب؟</h4>' +
         '<p>1. افتح قسم المتاجر واختر المتجر المناسب.</p><p>2. تصفح المنتجات واضغط إضافة للسلة.</p><p>3. افتح السلة، راجع المنتجات والمبلغ، ثم اكتب العنوان ورقم الهاتف.</p><p>4. اضغط تأكيد الطلب وانتظر قبول المتجر.</p><p>5. من «طلباتي» اضغط «تتبع» لمتابعة حالة الطلب وموقع السائق مباشرة أثناء التوصيل.</p><p>6. بعد التسليم يمكنك تقييم السائق.</p></div>' +
@@ -1979,7 +2018,15 @@ function sendLocalNotification(title, body) {
         new Notification(title, { body: body, icon: 'https://cdn-icons-png.flaticon.com/512/3081/3081840.png' });
     }
 }
-
+window.addEventListener('beforeinstallprompt', function(event) {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    updateInstallButtons();
+});
+window.addEventListener('appinstalled', function() {
+    deferredInstallPrompt = null;
+    showToast('تم تثبيت زلطن تريبول بنجاح ✅');
+});
 // ==================== تحديث navigate ليشمل الصفحات الجديدة ====================
 
 </script>
