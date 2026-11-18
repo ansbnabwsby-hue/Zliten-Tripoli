@@ -15,6 +15,27 @@
         ".indexOn": ["id", "type", "role"]
       }
     },
+    "stores": {
+      ".read": "auth != null",
+      ".indexOn": ["id", "ownerId", "approved"]
+    },
+    "users": {
+      ".read": "auth != null",
+      ".indexOn": ["id", "type", "role", "email", "authUid"]
+    },
+    "orders": {
+      ".read": "auth != null",
+      ".indexOn": ["id", "userId", "storeId", "driverId", "status"]
+    },
+    "categories": {
+      ".read": "auth != null"
+    },
+    "reports": {
+      ".read": "auth != null"
+    },
+    "chats": {
+      ".read": "auth != null"
+    },
     "liveLocations": {
       "$orderId": {
         ".read": "auth != null && (auth.token.developer === true || auth.token.email == 'muhammadmoad5@gmail.com' || data.child('driverId').val() === auth.uid || data.child('customerId').val() === auth.uid || data.child('storeOwnerId').val() === auth.uid)",

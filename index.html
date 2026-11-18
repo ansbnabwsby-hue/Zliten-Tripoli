@@ -386,6 +386,28 @@ function loadCachedAppData() {
     try { var cached = JSON.parse(localStorage.getItem('z_appdata_cache') || 'null'); return applyAppData(cached); } catch (e) { return false; }
 }
 
+function loadLegacyRootData(done) {
+    var paths = ['stores', 'users', 'orders', 'categories', 'reports', 'chats'];
+    Promise.all(paths.map(function(path) { return database.ref(path).once('value'); })).then(function(snaps) {
+        var values = {}; var found = false;
+        paths.forEach(function(path, index) {
+            var value = snaps[index].val();
+            if (value !== null && value !== undefined) { values[path] = value; found = true; }
+        });
+        if (found) {
+            if (values.stores) db.stores = dataArray(values.stores);
+            if (values.users) db.users = dataArray(values.users);
+            if (values.orders) db.orders = dataArray(values.orders);
+            if (values.categories) db.categories = dataArray(values.categories);
+            if (values.reports) db.reports = dataArray(values.reports);
+            if (values.chats) db.chats = dataArray(values.chats);
+            db.orders.forEach(function(o) { if (!o.orderChat) o.orderChat = []; });
+            cacheAppData();
+        }
+        if (typeof done === 'function') done(found);
+    }).catch(function() { if (typeof done === 'function') done(false); });
+}
+
 function loadData() {
     if (!firebaseAuth.currentUser) { renderAuth(); return; }
     database.ref('appData').off();
@@ -393,13 +415,19 @@ function loadData() {
         let data = snap.val();
         if (data) {
             applyAppData(data); cacheAppData();
+            if (!db.stores.length) loadLegacyRootData(function(){ checkAuth(); });
+            else checkAuth();
         } else if (!loadCachedAppData()) {
-            showToast('قاعدة البيانات متصلة لكن لا توجد بيانات appData بعد', 'warning', 5000);
+            loadLegacyRootData(function(found) { if (!found) showToast('لم نجد بيانات في appData أو المسارات القديمة. تحقق من مكان stores داخل Firebase.', 'warning', 7000); checkAuth(); });
+        } else {
+            loadLegacyRootData(function(){ checkAuth(); });
         }
-        checkAuth();
     }, function(error) {
-        if (loadCachedAppData()) { checkAuth(); showToast('نعرض آخر نسخة محفوظة من المتاجر مؤقتاً', 'warning', 5000); }
-        else renderDatabaseError(error);
+        loadLegacyRootData(function(found) {
+            if (found) { checkAuth(); showToast('تم تحميل المتاجر من المسار القديم في Firebase', 'info', 5000); }
+            else if (loadCachedAppData()) { checkAuth(); showToast('نعرض آخر نسخة محفوظة من المتاجر مؤقتاً', 'warning', 5000); }
+            else renderDatabaseError(error);
+        });
     });
 }
 
@@ -614,6 +642,15 @@ function shareApp() {
     else showToast(url, 'info', 6000);
 }
 
+function isNativeApp() {
+    return !!(window.Capacitor || location.protocol === 'capacitor:' || location.protocol === 'file:');
+}
+
+function renderAppPromo() {
+    if (isNativeApp()) return '<div class="card app-promo"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;"><div style="display:flex;align-items:center;gap:10px;"><img src="icons/icon-192.png" class="brand-mark" alt="زلطن تريبول"><b>زلطن تريبول</b></div><button class="btn btn-outline btn-sm" onclick="shareApp()"><i class="fas fa-share-alt"></i> مشاركة</button></div></div>';
+    return '<div class="card app-promo"><div style="display:flex;gap:14px;align-items:center;"><img src="icons/icon-192.png" class="app-promo-logo" alt="زلطن تريبول"><div><h3 style="margin-bottom:4px;">تطبيق زلطن تريبول</h3><p style="color:var(--text-muted);font-size:.85rem;">ثبّت التطبيق ووصل لطلباتك بسرعة.</p></div></div><div class="permission-row"><button class="btn btn-primary btn-sm" data-install-app onclick="installApp()"><i class="fas fa-download"></i> تثبيت التطبيق</button><button class="btn btn-outline btn-sm" onclick="shareApp()"><i class="fas fa-share-alt"></i> مشاركة</button><button class="btn btn-ghost btn-sm" onclick="requestAppPermissions()"><i class="fas fa-bell"></i> تفعيل الأذونات</button></div><small style="display:block;color:var(--text-muted);margin-top:10px;">فعّل الموقع لتحديد عنوانك على الخريطة، والإشعارات لمعرفة حالة الطلب.</small></div>';
+}
+
 function installApp() {
     if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return showToast('التطبيق مثبت على جهازك بالفعل');
     if (deferredInstallPrompt) {
@@ -672,7 +709,7 @@ function renderHome(container) {
     }).join('');
 
     container.innerHTML = '<div class="animate-fade">' +
-        '<div class="card app-promo"><div style="display:flex;gap:14px;align-items:center;"><img src="icons/icon-192.png" class="app-promo-logo" alt="زلطن تريبول"><div><h3 style="margin-bottom:4px;">تطبيق زلطن تريبول</h3><p style="color:var(--text-muted);font-size:.85rem;">ثبّت التطبيق ووصل لطلباتك بسرعة.</p></div></div><div class="permission-row"><button class="btn btn-primary btn-sm" data-install-app onclick="installApp()"><i class="fas fa-download"></i> تثبيت التطبيق</button><button class="btn btn-outline btn-sm" onclick="shareApp()"><i class="fas fa-share-alt"></i> مشاركة</button><button class="btn btn-ghost btn-sm" onclick="requestAppPermissions()"><i class="fas fa-bell"></i> تفعيل الأذونات</button></div><small style="display:block;color:var(--text-muted);margin-top:10px;">فعّل الموقع لتحديد عنوانك على الخريطة، والإشعارات لمعرفة حالة الطلب.</small></div>' +
+        renderAppPromo() +
         '<div class="card card-gradient-1" style="text-align:center;margin-bottom:20px;"><div style="font-size:1.1rem;font-weight:700;">📢 ' + db.ad + '</div></div>' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin:15px 0;flex-wrap:wrap;gap:10px;">' +
         '<div><span style="color:var(--text-muted);">مرحباً،</span><b style="color:var(--primary);">' + currentUser.name + '</b>' +
