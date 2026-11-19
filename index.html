@@ -292,6 +292,7 @@ let appInstalledThisSession = false;
 let authMode = 'email';
 let pendingAuthProfile = null;
 let authBusy = false;
+let loadedAuthUid = '';
 
 // ==================== Theme ====================
 function applyTheme() {
@@ -436,6 +437,9 @@ function loadLegacyRootData(done) {
 
 function loadData() {
     if (!firebaseAuth.currentUser) { renderAuth(); return; }
+    var authUid = firebaseAuth.currentUser.uid;
+    if (loadedAuthUid === authUid && firebaseDataLoaded && currentUser) return;
+    loadedAuthUid = authUid;
     database.ref('appData').off();
     database.ref('appData').on('value', function(snap) {
         let data = snap.val();
@@ -557,6 +561,7 @@ function checkAuth() {
         }
         currentUser = authProfile;
         pendingAuthProfile = null;
+        authBusy = false;
         localStorage.removeItem('z_pending_role');
         localStorage.setItem('z_user_id', authProfile.id);
         updateUI();
@@ -574,7 +579,7 @@ function checkAuth() {
 function logout() {
     stopLiveLocationTracking(true);
     firebaseAuth.signOut().catch(function(){});
-    localStorage.removeItem('z_user_id'); localStorage.removeItem('z_developer_session'); localStorage.removeItem('z_pending_role'); currentUser = null; pendingAuthProfile = null; authMode = 'email'; setAuthBusy(false); cart = []; appliedCoupon = null; currentLocation = null;
+    localStorage.removeItem('z_user_id'); localStorage.removeItem('z_developer_session'); localStorage.removeItem('z_pending_role'); currentUser = null; pendingAuthProfile = null; authMode = 'email'; authBusy = false; loadedAuthUid = ''; firebaseDataLoaded = false; setAuthBusy(false); cart = []; appliedCoupon = null; currentLocation = null;
     hideAppShell();
     document.getElementById('quick-menu').style.display = 'none';
     document.getElementById('cart-count').style.display = 'none';
