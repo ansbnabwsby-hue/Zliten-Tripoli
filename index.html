@@ -210,6 +210,117 @@ header { padding:16px 20px; display:flex; justify-content:space-between; align-i
 	.delivery-actions { display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;align-items:center; }
 	.delivery-actions .btn { flex:1 1 auto;min-width:92px; }
 
+/* مركز التواصل */
+.mail-page,.chat-page,.dev-panel { display:flex; flex-direction:column; gap:14px; }
+.mail-heading,.mail-section-title,.chat-header,.chat-list-title,.dev-panel-heading,.dev-record-title { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.mail-heading h3,.dev-panel-heading h3 { margin:3px 0; }
+.eyebrow { color:var(--primary); font-size:.72rem; font-weight:800; letter-spacing:.04em; }
+.mail-summary,.mail-section-title>span { color:var(--text-muted); font-size:.74rem; }
+.mail-section,.dev-section-content,.dev-form-card { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:14px; }
+.mail-section-title { margin-bottom:11px; }
+.mail-section-title h4 { margin:0; }
+.mail-search,.dev-search { display:flex; align-items:center; gap:9px; min-height:44px; border:1px solid var(--border); border-radius:13px; padding:0 12px; background:rgba(255,255,255,.035); color:var(--text-muted); }
+.mail-search input,.dev-search input { min-width:0; width:100%; padding:10px 0; margin:0; border:0; outline:0; background:transparent; color:var(--text); box-shadow:none; }
+.mail-search input:focus,.dev-search input:focus { box-shadow:none; }
+.chat-list,.notification-list,.dev-list { display:flex; flex-direction:column; gap:9px; margin-top:10px; }
+.chat-list-item { display:flex; align-items:center; gap:8px; border:1px solid var(--border); border-radius:15px; padding:8px; background:rgba(255,255,255,.025); transition:border-color .2s,background .2s; }
+.chat-list-item:hover { border-color:rgba(0,212,255,.45); background:rgba(0,212,255,.045); }
+.chat-open-button { display:flex; align-items:center; gap:11px; flex:1; min-width:0; padding:2px; border:0; background:transparent; color:var(--text); text-align:right; cursor:pointer; }
+.chat-list-copy { display:flex; flex-direction:column; gap:4px; flex:1; min-width:0; }
+.chat-list-title { font-size:.88rem; }
+.chat-list-title small { color:var(--text-muted); font-size:.68rem; }
+.chat-list-preview { color:var(--text-muted); font-size:.76rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.chat-unread-badge { display:inline-flex; align-items:center; justify-content:center; min-width:23px; height:23px; padding:0 6px; border-radius:20px; background:var(--primary); color:#071126; font-size:.68rem; font-weight:900; }
+.chat-delete-button { width:34px; height:34px; border:0; border-radius:10px; background:transparent; color:var(--text-muted); cursor:pointer; }
+.chat-delete-button:hover { background:rgba(255,107,107,.12); color:var(--danger); }
+.notification-card { display:flex; align-items:center; gap:11px; width:100%; padding:12px; border:1px solid var(--border); border-radius:14px; background:rgba(255,255,255,.03); color:var(--text); text-align:right; cursor:pointer; }
+.notification-card:hover { border-color:rgba(0,212,255,.4); }
+.notification-card.is-read { opacity:.66; }
+.notification-dot { flex:0 0 9px; width:9px; height:9px; border-radius:50%; background:var(--primary); }
+.notification-card.is-read .notification-dot { background:var(--text-muted); }
+.notification-copy { display:flex; flex-direction:column; gap:4px; min-width:0; }
+.notification-copy b { font-size:.8rem; font-weight:600; }
+.notification-copy small,.muted-empty,.empty-search { color:var(--text-muted); font-size:.73rem; }
+.empty-state,.chat-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; min-height:160px; color:var(--text-muted); text-align:center; }
+.empty-state i,.chat-empty i { color:var(--primary); font-size:1.7rem; }
+.empty-state p { margin:0; color:var(--text); font-weight:700; }
+.chat-header { justify-content:flex-start; padding:8px 2px; }
+.chat-header .btn { display:flex; align-items:center; gap:7px; }
+.chat-contact { display:flex; flex-direction:column; gap:3px; }
+.chat-contact small,.chat-hint { color:var(--text-muted); font-size:.69rem; }
+.chat-box { display:flex; flex-direction:column; gap:10px; min-height:280px; height:min(58vh,560px); overflow-y:auto; padding:14px; border:1px solid var(--border); border-radius:18px; background:rgba(0,0,0,.22); overscroll-behavior:contain; }
+.chat-message-text { white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.55; }
+.chat-message-meta { display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-top:5px; color:var(--text-muted); font-size:.62rem; }
+.chat-read-state { color:var(--primary); }
+.chat-quick-replies { display:flex; gap:7px; overflow-x:auto; padding:1px 0 4px; }
+.chat-quick-replies button { flex:0 0 auto; border:1px solid var(--border); border-radius:20px; padding:7px 11px; background:rgba(255,255,255,.035); color:var(--text-muted); font-size:.72rem; cursor:pointer; }
+.chat-quick-replies button:hover { color:var(--primary); border-color:var(--primary); }
+.chat-composer { display:flex; align-items:flex-end; gap:9px; }
+.chat-composer textarea { flex:1; min-width:0; min-height:46px; max-height:120px; margin:0; resize:none; line-height:1.45; }
+.chat-composer button { flex:0 0 48px; width:48px; height:46px; padding:0; }
+.track-chat-composer { display:flex; gap:8px; margin-top:10px; }
+.track-chat-composer input { flex:1; min-width:0; margin:0; }
+.track-chat-composer button { width:auto; flex:0 0 auto; padding:9px 14px; }
+.chat-hint { text-align:center; }
+.chat-list-item[hidden],.dev-record[hidden] { display:none !important; }
+
+/* مركز إدارة المطور */
+.dev-panel-heading { align-items:flex-start; }
+.dev-panel-heading p { margin:4px 0 0; color:var(--text-muted); font-size:.76rem; }
+.dev-heading-actions { display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+.dev-source-pill { display:inline-flex; align-items:center; gap:6px; padding:6px 9px; border-radius:20px; font-size:.65rem; white-space:nowrap; }
+.dev-source-pill i { font-size:.48rem; }
+.dev-source-pill.is-online { color:var(--success); background:rgba(46,204,113,.12); }
+.dev-source-pill.is-offline { color:var(--warning); background:rgba(243,156,18,.13); }
+.dev-stats-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+.dev-stat { position:relative; min-height:78px; display:flex; flex-direction:column; gap:6px; padding:13px; border:1px solid var(--border); border-radius:15px; background:linear-gradient(140deg,rgba(0,212,255,.07),rgba(255,255,255,.02)); overflow:hidden; }
+.dev-stat span { color:var(--text-muted); font-size:.72rem; }
+.dev-stat b { font-size:1.35rem; }
+.dev-stat>i { position:absolute; left:12px; bottom:12px; color:rgba(0,212,255,.27); font-size:1.15rem; }
+.dev-tabs { display:flex; gap:7px; overflow-x:auto; padding:2px 0 5px; }
+.dev-tab { display:inline-flex; align-items:center; gap:7px; flex:0 0 auto; border:1px solid var(--border); border-radius:12px; padding:9px 11px; background:var(--card); color:var(--text-muted); font-size:.73rem; cursor:pointer; }
+.dev-tab.active { border-color:var(--primary); background:rgba(0,212,255,.11); color:var(--primary); }
+.dev-tab b { min-width:19px; height:19px; display:inline-flex; align-items:center; justify-content:center; border-radius:20px; background:rgba(255,107,107,.18); color:var(--danger); font-size:.62rem; }
+.dev-section-content { min-height:140px; }
+.dev-alert-grid { display:flex; flex-direction:column; gap:8px; }
+.dev-alert-card { display:flex; align-items:center; gap:10px; width:100%; padding:12px; border:1px solid var(--border); border-radius:14px; background:rgba(255,255,255,.025); color:var(--text); text-align:right; cursor:pointer; }
+.dev-alert-card.needs-action { border-color:rgba(243,156,18,.4); background:rgba(243,156,18,.06); }
+.dev-alert-card>span:nth-child(2) { display:flex; flex:1; flex-direction:column; gap:4px; }
+.dev-alert-card b { font-size:.79rem; }
+.dev-alert-card small { color:var(--text-muted); font-size:.68rem; }
+.dev-alert-icon { display:grid; place-items:center; width:36px; height:36px; border-radius:12px; background:rgba(0,212,255,.1); color:var(--primary); }
+.dev-alert-card>i { color:var(--text-muted); font-size:.7rem; }
+.dev-panel-note { display:flex; align-items:flex-start; gap:8px; margin:12px 0; padding:10px; border-radius:12px; background:rgba(0,212,255,.06); color:var(--text-muted); font-size:.69rem; line-height:1.5; }
+.dev-panel-note i { color:var(--primary); margin-top:2px; }
+.dev-search { margin:4px 0 10px; }
+.dev-search small { white-space:nowrap; font-size:.66rem; }
+.dev-record { display:flex; align-items:center; gap:10px; padding:11px; border:1px solid var(--border); border-radius:14px; background:rgba(255,255,255,.025); }
+.dev-record-main { flex:1; min-width:0; }
+.dev-record-title { justify-content:flex-start; flex-wrap:wrap; }
+.dev-record-title>b { font-size:.81rem; }
+.dev-record-main p { margin:5px 0; color:var(--text-muted); font-size:.72rem; overflow-wrap:anywhere; }
+.dev-record-main small,.dev-product-row small { display:block; color:var(--text-muted); font-size:.66rem; overflow-wrap:anywhere; }
+.dev-record-actions { display:flex; align-items:center; gap:6px; flex:0 0 auto; }
+.dev-record-actions .btn { min-width:34px; }
+.dev-status-tag { display:inline-flex; align-items:center; border-radius:20px; padding:4px 8px; font-size:.63rem; white-space:nowrap; }
+.dev-status-tag.pending { color:var(--warning); background:rgba(243,156,18,.13); }
+.dev-status-tag.normal { color:var(--success); background:rgba(46,204,113,.12); }
+.dev-report-type { color:var(--primary); font-weight:700; }
+.dev-report-image { display:inline-block; margin:2px 0 5px; color:var(--primary); font-size:.69rem; }
+.dev-content-grid { display:grid; grid-template-columns:1fr; gap:10px; }
+.dev-form-card { margin-bottom:10px; }
+.dev-form-card h4 { display:flex; align-items:center; gap:8px; margin:0 0 10px; font-size:.84rem; }
+.dev-form-card h4:not(:first-child) { margin-top:18px; }
+.dev-form-card h4 i { color:var(--primary); }
+.dev-form-card textarea { resize:vertical; min-height:70px; }
+.dev-form-card .btn { margin-top:8px; }
+.dev-inline-form { display:flex; flex-direction:column; gap:8px; }
+.dev-product-row { padding:8px 10px; }
+.dev-product-row .dev-record-main>b { display:block; margin-bottom:4px; font-size:.76rem; }
+.muted-empty { padding:9px 2px; text-align:center; }
+@media(min-width:520px) { .dev-content-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .dev-inline-form { flex-direction:row; align-items:center; } .dev-inline-form input { flex:1; min-width:0; } }
+@media(max-width:390px) { .dev-panel-heading { flex-direction:column; } .dev-heading-actions { flex-direction:row; align-items:center; } .dev-record { align-items:flex-start; } .dev-record-actions { flex-direction:column; } .chat-box { min-height:250px; } }
+
 </style>
 </head>
 <body>
@@ -261,6 +372,7 @@ firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 const firebaseAuth = firebase.auth();
 const googleProvider = new firebase.auth.GoogleAuthProvider();
+let firebaseConnected = false;
 const DEVELOPER_EMAIL = 'muhammadmoad5@gmail.com';
 
 // ==================== البيانات العامة ====================
@@ -287,6 +399,10 @@ let db = {
 };
 let currentUser = null, cart = [], tempImageBase64 = "", currentLocation = null;
 let firebaseDataLoaded = false;
+let activePage = 'home', activePageParam = null;
+let devPanelTab = 'overview', devPanelSearch = '';
+let chatDrafts = Object.create(null);
+let pendingSync = Promise.resolve(), syncPendingCount = 0;
 let currentCategory = 'all', searchQuery = '';
 let favorites = JSON.parse(localStorage.getItem('z_favorites') || '[]');
 let usedCoupons = JSON.parse(localStorage.getItem('z_used_coupons') || '[]');
@@ -305,6 +421,15 @@ let locationPermissionState = 'unknown';
 
 const ZLITEN_MAP_BOUNDS = [[32.38, 14.38], [32.60, 14.78]];
 const ZLITEN_AREAS = ['وسط زلطن', 'سوق الثلاثاء', 'الدافنية', 'ماجر', 'كعام', 'رأس جدير', 'المنارة', 'العلوص'];
+
+database.ref('.info/connected').on('value', function(snapshot) {
+    firebaseConnected = !!snapshot.val();
+    if (!firebaseConnected) firebaseDataLoaded = false;
+    updateDeveloperConnectionBadge();
+    if (firebaseConnected && firebaseAuth.currentUser) setTimeout(function() {
+        if (firebaseConnected && !firebaseDataLoaded) loadData();
+    }, 120);
+});
 
 // ==================== Theme ====================
 function applyTheme() {
@@ -334,24 +459,83 @@ function showToast(message, type, duration) {
     setTimeout(function() { toast.style.opacity = '0'; toast.style.transform = 'translateX(100px)'; setTimeout(function() { toast.remove(); }, 300); }, duration);
 }
 
+function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function(char) {
+        return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char];
+    });
+}
+
+function getChatMessages(chat) {
+    return Array.isArray(chat && chat.msgs) ? chat.msgs.filter(function(message) { return message && typeof message === 'object'; }) : dataArray(chat && chat.msgs);
+}
+
+function getChatLastMessage(chat) {
+    var messages = getChatMessages(chat);
+    return messages.length ? messages[messages.length - 1] : null;
+}
+
+function getChatTimestamp(chat) {
+    var last = getChatLastMessage(chat);
+    return Number((chat && chat.lastMessageAt) || (last && last.ts)) || 0;
+}
+
+function getChatUnreadCount(chat) {
+    if (!currentUser) return 0;
+    var readAt = Number(chat && chat.lastReadAt && chat.lastReadAt[currentUser.id]) || 0;
+    return getChatMessages(chat).filter(function(message) {
+        return message.s !== currentUser.id && message.s !== 'system' && Number(message.ts) > readAt;
+    }).length;
+}
+
+function formatChatTime(timestamp) {
+    var time = Number(timestamp);
+    if (!time || !isFinite(time)) return 'وقت غير متوفر';
+    return new Date(time).toLocaleTimeString('ar-LY', { hour:'2-digit', minute:'2-digit' });
+}
+
 function toggleQuickMenu() {
     let menu = document.getElementById('quick-menu');
     menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
 }
 
+function getFirebaseStatus() {
+    if (!firebaseDataLoaded) return { label:firebaseConnected ? 'جارٍ تحميل البيانات — الحفظ متوقف' : 'نسخة مؤقتة — الحفظ متوقف', className:'is-offline' };
+    if (!firebaseConnected) return { label:'الاتصال منقطع — الحفظ متوقف', className:'is-offline' };
+    if (syncPendingCount > 0) return { label:'جارٍ الحفظ (' + syncPendingCount + ')', className:'is-online' };
+    return { label:'متصل — جاهز للحفظ', className:'is-online' };
+}
+
+function updateDeveloperConnectionBadge() {
+    let badge = document.getElementById('dev-source-pill');
+    if (!badge) return;
+    let status = getFirebaseStatus();
+    badge.className = 'dev-source-pill ' + status.className;
+    badge.innerHTML = '<i class="fas fa-circle"></i>' + status.label;
+}
+
 function sync() {
-    if (!firebaseAuth.currentUser || !firebaseDataLoaded) {
-        showToast('انتظر اكتمال تحميل بيانات Firebase قبل الحفظ', 'warning', 3500);
-        return;
+    if (!firebaseAuth.currentUser || !firebaseDataLoaded || !firebaseConnected) {
+        showToast(!firebaseConnected ? 'الحفظ متوقف حتى عودة الاتصال بقاعدة البيانات.' : 'انتظر اكتمال تحميل بيانات Firebase قبل الحفظ', 'warning', 3500);
+        return Promise.resolve(false);
     }
     var payload = {
         users: db.users, stores: db.stores, orders: db.orders,
         chats: db.chats, reports: db.reports || [], ad: db.ad, policy: db.policy,
         coupons: db.coupons || [], faq: db.faq || [], categories: db.categories
     };
-    database.ref('appData').set(payload).then(function() { cacheAppData(); }).catch(function(error) {
-        if (error && error.code === 'PERMISSION_DENIED') showToast('تم التعديل محلياً، لكن Firebase رفض الحفظ لهذا الحساب', 'error', 5000);
+    syncPendingCount++;
+    updateDeveloperConnectionBadge();
+    var write = pendingSync.catch(function() {}).then(function() {
+        if (!firebaseConnected) { var disconnected = new Error('Firebase disconnected'); disconnected.code = 'NETWORK_DISCONNECTED'; throw disconnected; }
+        return database.ref('appData').update(payload);
+    });
+    pendingSync = write.catch(function() {});
+    return write.then(function() { cacheAppData(); syncPendingCount = Math.max(0, syncPendingCount - 1); updateDeveloperConnectionBadge(); return true; }).catch(function(error) {
+        syncPendingCount = Math.max(0, syncPendingCount - 1);
+        updateDeveloperConnectionBadge();
+        if (error && error.code === 'PERMISSION_DENIED') showToast('رفضت قواعد Firebase حفظ التعديل لهذا الحساب؛ لا تعتبره محفوظاً حتى تُراجع صلاحيات قاعدة البيانات.', 'error', 6000);
         else showToast('تعذر حفظ التعديلات في قاعدة البيانات', 'error', 4000);
+        return false;
     });
 }
 
@@ -386,13 +570,16 @@ function encodeImage(input) {
     }
 }
 
-function addNotification(userId, text, link) {
+function addNotification(userId, text, link, deferSync) {
     link = link || '';
     let user = db.users.find(function(u) { return u.id === userId; });
     if (!user) return;
     if (!user.notifications) user.notifications = [];
-    user.notifications.unshift({ id: Date.now().toString(), text: text, link: link, date: new Date().toLocaleString('ar-LY'), read: false });
-    sync();
+    var timestamp = Date.now();
+    var notification = { id: timestamp.toString() + '-' + Math.random().toString(36).slice(2, 7), text: text, link: link, date: new Date(timestamp).toLocaleString('ar-LY'), ts:timestamp, read:false };
+    user.notifications.unshift(notification);
+    if (!deferSync) sync();
+    return notification;
 }
 
 function notifyAllDrivers(text) {
@@ -411,7 +598,6 @@ function userRecordArray(value) {
         return value.map(function(user, index) {
             if (!user || typeof user !== 'object') return null;
             var copy = Object.assign({}, user);
-            if (!copy.id) copy.id = 'USER_' + index;
             return copy;
         }).filter(Boolean);
     }
@@ -426,7 +612,13 @@ function userRecordArray(value) {
 }
 
 function stableUserId(user, index) {
-    var seed = [user.authUid, user.email, user.loginName, user.name, user.phone, index].filter(Boolean).join('|');
+    var seed = user.authUid ? 'uid:' + String(user.authUid).trim().toLowerCase() :
+        (user.email || user.authEmail) ? 'email:' + String(user.email || user.authEmail).trim().toLowerCase() :
+        user.loginName ? 'login:' + String(user.loginName).trim().toLowerCase() :
+        user.phone ? 'phone:' + String(user.phone).replace(/\s+/g, '') + '|' + String(user.createdAt || user.name || '') :
+        user.createdAt ? 'created:' + String(user.createdAt) + '|' + String(user.name || '') :
+        user.name ? 'legacy-name:' + String(user.name).trim().toLowerCase() + '|' + String(user.type || '') :
+        'legacy-index:' + index;
     var hash = 0;
     for (var i = 0; i < seed.length; i++) hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
     return 'USR_' + Math.abs(hash).toString(36).toUpperCase();
@@ -486,6 +678,7 @@ function applyAppData(data) {
     db.reports = dataArray(data.reports); db.ad = data.ad || db.ad;
     db.policy = data.policy || db.policy; db.coupons = dataArray(data.coupons);
     db.faq = dataArray(data.faq); db.categories = dataArray(data.categories);
+    db.chats.forEach(function(chat) { if (chat && !Array.isArray(chat.msgs)) chat.msgs = dataArray(chat.msgs); });
     db.orders.forEach(function(o) { if (!o.orderChat) o.orderChat = []; });
     if (currentUser && currentUser.type === 'driver') {
         var refreshed = db.users.find(function(u) { return u.id === currentUser.id; });
@@ -531,6 +724,12 @@ function loadData() {
     loadedAuthUid = authUid;
     database.ref('appData').off();
     database.ref('appData').on('value', function(snap) {
+        if (!firebaseConnected) {
+            firebaseDataLoaded = false;
+            if (loadCachedAppData()) checkAuth();
+            updateDeveloperConnectionBadge();
+            return;
+        }
         let data = snap.val();
         if (data) {
             applyAppData(data); firebaseDataLoaded = true; cacheAppData();
@@ -539,14 +738,43 @@ function loadData() {
         } else if (!loadCachedAppData()) {
             loadLegacyRootData(function(found) { firebaseDataLoaded = found; if (!found) showToast('لم نجد بيانات في appData أو المسارات القديمة. تحقق من مكان stores داخل Firebase.', 'warning', 7000); checkAuth(); });
         } else {
-            loadLegacyRootData(function(){ firebaseDataLoaded = true; checkAuth(); });
+            loadLegacyRootData(function(found){ firebaseDataLoaded = found; if (!found) showToast('نعرض نسخة محفوظة مؤقتاً؛ الحفظ متوقف حتى الاتصال بقاعدة البيانات.', 'warning', 5000); checkAuth(); });
         }
     }, function(error) {
         loadLegacyRootData(function(found) {
-            if (found) { firebaseDataLoaded = true; checkAuth(); showToast('تم تحميل المتاجر من المسار القديم في Firebase', 'info', 5000); }
-            else if (loadCachedAppData()) { firebaseDataLoaded = true; checkAuth(); showToast('نعرض آخر نسخة محفوظة من المتاجر مؤقتاً', 'warning', 5000); }
+            if (found && firebaseConnected) { firebaseDataLoaded = true; checkAuth(); showToast('تم تحميل المتاجر من المسار القديم في Firebase', 'info', 5000); }
+            else if (loadCachedAppData()) { firebaseDataLoaded = false; checkAuth(); showToast('نعرض آخر نسخة محفوظة من المتاجر مؤقتاً؛ الحفظ متوقف حتى عودة الاتصال', 'warning', 5000); }
             else renderDatabaseError(error);
         });
+    });
+}
+
+function ensureFreshAppData() {
+    return database.ref('.info/connected').once('value').then(function(connectionSnapshot) {
+        if (!connectionSnapshot.val()) return false;
+        firebaseConnected = true;
+        if (firebaseDataLoaded) return true;
+        return database.ref('appData').once('value').then(function(snapshot) {
+            if (snapshot.exists()) { applyAppData(snapshot.val()); cacheAppData(); }
+            firebaseDataLoaded = true;
+            return true;
+        });
+    }).catch(function() { return false; });
+}
+
+function saveAuthProfile(profile) {
+    return ensureFreshAppData().then(function(ready) {
+        if (!ready) return false;
+        return database.ref('appData/users/' + profile.id).set(profile).then(function() {
+            var existingIndex = db.users.findIndex(function(user) { return user.id === profile.id; });
+            if (existingIndex === -1) db.users.push(profile);
+            else db.users[existingIndex] = profile;
+            cacheAppData();
+            return true;
+        });
+    }).catch(function(error) {
+        showToast('تعذر حفظ ملف الحساب في Firebase. تحقق من الاتصال ثم أعد المحاولة.', 'error', 5000);
+        return false;
     });
 }
 
@@ -612,9 +840,7 @@ function authProfileTemplate(authUser, overrides) {
 
 function persistAuthProfile(profile) {
     if (!profile || !profile.id) return;
-    database.ref('appData/users/' + profile.id).set(profile).catch(function() {
-        // بعض نسخ قواعد Firebase تمنع الكتابة للمستخدم العادي، لكن الجلسة نفسها تبقى صالحة.
-    });
+    return saveAuthProfile(profile);
 }
 
 function finishAuthenticatedUser(authUser, overrides) {
@@ -676,6 +902,7 @@ function logout() {
     firebaseAuth.signOut().catch(function(){});
     localStorage.removeItem('z_user_id'); localStorage.removeItem('z_developer_session'); localStorage.removeItem('z_pending_role'); currentUser = null; pendingAuthProfile = null; authMode = 'email'; authBusy = false; loadedAuthUid = ''; firebaseDataLoaded = false; setAuthBusy(false); cart = []; appliedCoupon = null; currentLocation = null;
     hideAppShell();
+    activePage = 'home'; activePageParam = null; devPanelTab = 'overview'; devPanelSearch = '';
     document.getElementById('quick-menu').style.display = 'none';
     document.getElementById('cart-count').style.display = 'none';
     document.getElementById('notify-badge').style.display = 'none';
@@ -690,11 +917,17 @@ function updateUI() {
     document.getElementById('report-btn').style.display = 'flex';
     let devNav = document.getElementById('nav-dev');
     if (devNav) devNav.style.display = isDeveloperUser() ? 'block' : 'none';
-    updateCartBadge(); updateNotifyBadge(); navigate('home');
+    updateCartBadge(); updateNotifyBadge(); navigate(activePage || 'home', activePageParam, { preserveScroll:true, scrollY:window.scrollY || window.pageYOffset || 0 });
 }
 
 function isDeveloperUser() {
     return !!currentUser && (currentUser.type === 'developer' || currentUser.role === 'developer' || currentUser.isDeveloper === true);
+}
+
+function requireDeveloperWrite() {
+    if (!isDeveloperUser()) { showToast('غير مصرح بهذا الإجراء', 'error'); return false; }
+    if (!firebaseDataLoaded) { showToast('الحفظ متوقف لأن البيانات المباشرة غير متاحة. أعد الاتصال أولاً.', 'warning', 4500); return false; }
+    return true;
 }
 
 function canManageOrders() {
@@ -715,8 +948,10 @@ function updateNotifyBadge() {
 }
 
 // ==================== التنقل ====================
-function navigate(page, param) {
+function navigate(page, param, options) {
     if (!currentUser && page !== 'guide') return renderAuth();
+    activePage = page; activePageParam = param || null;
+    let scrollPosition = options && options.preserveScroll ? Number(options.scrollY) || 0 : 0;
     let content = document.getElementById('app-content');
     content.innerHTML = '';
     document.querySelectorAll('.nav-link').forEach(function(l) { l.classList.remove('active'); });
@@ -748,7 +983,7 @@ function navigate(page, param) {
     else if (page === 'quick-reorder') renderQuickReorder(content);
     else if (page === 'driver-stats') renderDriverStats(content);
     else if (page === 'wishlist') renderWishlist(content);
-    window.scrollTo(0, 0);
+    window.scrollTo(0, scrollPosition);
 }
 
 // ==================== المصادقة ====================
@@ -1531,10 +1766,37 @@ function acceptOrder(orderId) {
     let store = db.stores.find(function(s) { return s.id === order.storeId; });
     if (!isDeveloperUser() && (!store || store.ownerId !== currentUser.id)) return showToast('هذا الطلب ليس تابعاً لمتجرك', 'error');
     if (order.status !== 'قيد الانتظار ⏳') return showToast('الطلب لم يعد في حالة انتظار', 'warning');
-    order.status = 'تم القبول ✅ (بانتظار سائق)';
-    addNotification(order.userId, 'تم قبول طلبك من المتجر وهو الآن بانتظار سائق');
-    notifyAllDrivers('🚀 طلب جديد في منطقتك من ' + order.userName);
-    sync(); navigate(isDeveloperUser() ? 'dev' : 'my-store'); showToast('تم قبول الطلب من لوحة ' + (isDeveloperUser() ? 'المطور' : 'المتجر'));
+    if (!firebaseDataLoaded || !firebaseConnected) return showToast('الحفظ متوقف حتى اكتمال الاتصال بقاعدة البيانات.', 'warning', 4000);
+    var previousStatus = order.status;
+    var acceptedStatus = 'تم القبول ✅ (بانتظار سائق)';
+    var queuedNotifications = [];
+    function queueNotification(userId, text) {
+        var notification = addNotification(userId, text, '', true);
+        if (notification) queuedNotifications.push({ userId:userId, notificationId:notification.id });
+    }
+    order.status = acceptedStatus;
+    queueNotification(order.userId, 'تم قبول طلبك من المتجر وهو الآن بانتظار سائق');
+    db.users.filter(function(user) { return user.type === 'driver'; }).forEach(function(driver) {
+        queueNotification(driver.id, '🚀 طلب جديد في منطقتك من ' + order.userName);
+    });
+    sync().then(function(saved) {
+        if (!saved) {
+            var liveOrder = db.orders.find(function(item) { return item.id === orderId; });
+            if (liveOrder && liveOrder.status === acceptedStatus) liveOrder.status = previousStatus;
+            queuedNotifications.forEach(function(entry) {
+                var target = db.users.find(function(user) { return user.id === entry.userId; });
+                if (!target || !Array.isArray(target.notifications)) return;
+                target.notifications = target.notifications.filter(function(item) { return item.id !== entry.notificationId; });
+                if (!target.notifications.length) delete target.notifications;
+            });
+            if (isDeveloperUser()) renderSuperAdminPanel();
+            else navigate('my-store');
+            showToast('لم يؤكد Firebase حفظ الطلب، لذلك أُلغيت الحالة والإشعارات محلياً.', 'warning', 5000);
+            return;
+        }
+        navigate(isDeveloperUser() ? 'dev' : 'my-store');
+        showToast('تم قبول الطلب وحفظه بنجاح من لوحة ' + (isDeveloperUser() ? 'المطور' : 'المتجر'));
+    });
 }
 
 function deleteProduct(pid) {
@@ -1783,6 +2045,7 @@ function renderOrderTracking(container, orderId) {
         return showModal("غير مسموح", "ليس لديك صلاحية عرض هذا الطلب", 'alert', function() { navigate('home'); });
     }
     if (!order.orderChat) order.orderChat = [];
+    if (!Array.isArray(order.orderChat)) order.orderChat = dataArray(order.orderChat);
     let driver = order.driverId ? db.users.find(function(u) { return u.id === order.driverId; }) : null;
     let mapLink = order.coordinates ? 'https://www.google.com/maps?q=' + order.coordinates.lat + ',' + order.coordinates.lng : '#';
     let step1 = order.status.indexOf('انتظار') !== -1;
@@ -1790,9 +2053,12 @@ function renderOrderTracking(container, orderId) {
     let step3 = order.status.indexOf('توصيل') !== -1 || order.status.indexOf('تسليم') !== -1;
     let step4 = order.status.indexOf('تسليم') !== -1;
     let chatHtml = order.orderChat.map(function(m) {
-        if (m.sender === 'system') return '<div class="chat-bubble bubble-system">' + m.text + '</div>';
-        let senderName = m.sender === currentUser.id ? 'أنت' : (db.users.find(function(u){return u.id===m.sender;}) ? db.users.find(function(u){return u.id===m.sender;}).name : 'مستخدم');
-        return '<div class="chat-bubble ' + (m.sender === currentUser.id ? 'bubble-left' : 'bubble-right') + '"><b>' + senderName + ':</b> ' + m.text + '</div>';
+        let messageText = escapeHtml(m.text || '');
+        let messageTime = escapeHtml(formatChatTime(m.ts));
+        if (m.sender === 'system') return '<div class="chat-bubble bubble-system"><span class="chat-message-text">' + messageText + '</span><small class="chat-message-meta">' + messageTime + '</small></div>';
+        let sender = m.sender === currentUser.id ? null : db.users.find(function(u) { return u.id === m.sender; });
+        let senderName = m.sender === currentUser.id ? 'أنت' : (sender ? sender.name : 'مستخدم');
+        return '<div class="chat-bubble ' + (m.sender === currentUser.id ? 'bubble-left' : 'bubble-right') + '"><span class="chat-message-text"><b>' + escapeHtml(senderName) + ':</b> ' + messageText + '</span><small class="chat-message-meta">' + messageTime + '</small></div>';
     }).join('');
 
     container.innerHTML = '<div class="animate-fade">' +
@@ -1818,10 +2084,12 @@ function renderOrderTracking(container, orderId) {
         '<div class="card">' +
         '<h4 style="margin-bottom:12px;">💬 دردشة الطلب (مشتركة)</h4>' +
         '<div id="track-chat-box" style="height:250px;overflow-y:auto;display:flex;flex-direction:column;padding:8px;background:rgba(0,0,0,0.4);border-radius:12px;">' + chatHtml + '</div>' +
-        '<div style="display:flex;gap:8px;margin-top:10px">' +
-        '<input id="track-msg-input" placeholder="اكتب رسالة...">' +
-        '<button class="btn btn-primary btn-sm" onclick="sendTrackMsg(\'' + order.id + '\')">إرسال</button>' +
-        '</div></div></div>';
+        '<form id="track-msg-form" class="track-chat-composer">' +
+        '<input id="track-msg-input" maxlength="1000" placeholder="اكتب رسالة..." aria-label="اكتب رسالة للطلب">' +
+        '<button type="submit" class="btn btn-primary btn-sm">إرسال</button>' +
+        '</form></div></div>';
+    let trackForm = container.querySelector('#track-msg-form');
+    if (trackForm) trackForm.addEventListener('submit', function(event) { event.preventDefault(); sendTrackMsg(orderId); });
     if (driver && !step4) {
         setTimeout(function() {
             initLiveMap(orderId, isDriver);
@@ -1842,89 +2110,257 @@ function goBackFromOrder() {
 
 function sendTrackMsg(orderId) {
     let inp = document.getElementById('track-msg-input');
-    if (!inp.value.trim()) return;
+    if (!inp || !currentUser) return;
+    if (!firebaseDataLoaded) return showToast('الاتصال غير متاح. أعد المحاولة بعد عودة المزامنة.', 'warning', 4000);
+    let text = inp.value.trim();
+    if (!text) return;
     let order = db.orders.find(function(o) { return o.id === orderId; });
-    if (!order.orderChat) order.orderChat = [];
-    order.orderChat.push({ sender: currentUser.id, text: inp.value.trim() });
+    if (!order) return showToast('الطلب غير موجود', 'error');
     let store = db.stores.find(function(s) { return s.id === order.storeId; });
-    if (order.userId !== currentUser.id) addNotification(order.userId, 'رسالة جديدة في الطلب #' + orderId.slice(-6));
-    if (store && store.ownerId !== currentUser.id) addNotification(store.ownerId, 'رسالة جديدة في الطلب #' + orderId.slice(-6));
-    if (order.driverId && order.driverId !== currentUser.id) addNotification(order.driverId, 'رسالة جديدة في الطلب #' + orderId.slice(-6));
-    sync(); navigate('track', orderId);
+    let isParticipant = order.userId === currentUser.id || (store && store.ownerId === currentUser.id) || order.driverId === currentUser.id;
+    if (!isParticipant) return showToast('غير مصرح بإرسال رسالة لهذا الطلب', 'error');
+    if (!Array.isArray(order.orderChat)) order.orderChat = dataArray(order.orderChat);
+    let timestamp = Date.now();
+    let message = { id:'OM' + timestamp + Math.random().toString(36).slice(2, 7), sender:currentUser.id, text:text, ts:timestamp };
+    order.orderChat.push(message);
+    let recipientIds = [order.userId, store && store.ownerId, order.driverId].filter(function(id, index, list) { return id && id !== currentUser.id && list.indexOf(id) === index; });
+    let notifications = [];
+    recipientIds.forEach(function(userId) {
+        let notification = addNotification(userId, 'رسالة جديدة في الطلب #' + String(orderId).slice(-6), 'track:' + orderId, true);
+        if (notification) notifications.push({ userId:userId, id:notification.id });
+    });
+    let saveResult = sync();
+    navigate('track', orderId);
+    saveResult.then(function(saved) {
+        if (!saved) {
+            let currentOrder = db.orders.find(function(item) { return item.id === orderId; });
+            if (currentOrder && Array.isArray(currentOrder.orderChat)) currentOrder.orderChat = currentOrder.orderChat.filter(function(item) { return item.id !== message.id; });
+            notifications.forEach(function(entry) {
+                let recipient = db.users.find(function(user) { return user.id === entry.userId; });
+                if (recipient && Array.isArray(recipient.notifications)) recipient.notifications = recipient.notifications.filter(function(item) { return item.id !== entry.id; });
+            });
+            navigate('track', orderId);
+            return;
+        }
+        showToast('تم إرسال رسالة الطلب', 'success', 1800);
+    });
 }
 
 // ==================== البريد والمحادثات ====================
 function renderMail(container) {
-    let notifs = currentUser.notifications || [];
-    let chats = db.chats.filter(function(c) { return c.u1 === currentUser.id || c.u2 === currentUser.id; });
+    let notifs = (currentUser.notifications || []).slice().sort(function(a, b) { return (Number(b.ts) || 0) - (Number(a.ts) || 0); });
+    let chats = db.chats.filter(function(chat) { return chat.u1 === currentUser.id || chat.u2 === currentUser.id; })
+        .slice().sort(function(a, b) { return getChatTimestamp(b) - getChatTimestamp(a); });
+    let unreadChats = chats.reduce(function(total, chat) { return total + getChatUnreadCount(chat); }, 0);
     let notifHtml = notifs.map(function(n) {
-        return '<div class="card animate-fade" style="padding:10px;' + (n.read ? 'opacity:0.6' : '') + '" onclick="markNotifRead(\'' + n.id + '\')">' +
-            '<div style="display:flex;align-items:center;gap:10px;">' +
-            '<div style="width:8px;height:8px;border-radius:50%;background:' + (n.read ? 'var(--text-muted)' : 'var(--primary)') + ';flex-shrink:0;"></div>' +
-            '<div style="flex:1;"><div>🔔 ' + n.text + '</div><small style="color:var(--text-muted)">' + n.date + '</small></div></div></div>';
+        return '<button type="button" class="notification-card ' + (n.read ? 'is-read' : '') + '" data-notification-id="' + escapeHtml(n.id) + '">' +
+            '<span class="notification-dot" aria-hidden="true"></span><span class="notification-copy"><b>🔔 ' + escapeHtml(n.text) + '</b>' +
+            '<small>' + escapeHtml(n.date || '') + '</small></span></button>';
     }).join('');
-    let chatHtml = chats.map(function(c) {
-        let otherId = c.u1 === currentUser.id ? c.u2 : c.u1;
-        let other = db.users.find(function(u) { return u.id === otherId; }) || {name: 'مستخدم'};
-        let last = c.msgs[c.msgs.length-1];
-        return '<div class="card animate-fade" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="navigate(\'chat\',\'' + otherId + '\')">' +
-            '<div style="display:flex;align-items:center;gap:12px;">' +
-            '<div class="avatar-circle">' + other.name.charAt(0) + '</div>' +
-            '<div><b>' + other.name + '</b><br><small style="color:var(--text-muted)">' + (last ? last.txt.substring(0,20) : '') + '</small></div></div>' +
-            '<i class="fas fa-trash" style="color:var(--danger);cursor:pointer;padding:8px;" onclick="event.stopPropagation();deleteChat(\'' + c.id + '\')"></i></div>';
+    let chatHtml = chats.map(function(chat) {
+        let otherId = chat.u1 === currentUser.id ? chat.u2 : chat.u1;
+        let other = db.users.find(function(user) { return user.id === otherId; }) || {name:'مستخدم'};
+        let last = getChatLastMessage(chat);
+        let preview = last ? String(last.txt || last.text || '') : 'ابدأ المحادثة';
+        let unread = getChatUnreadCount(chat);
+        let time = getChatTimestamp(chat) ? formatChatTime(getChatTimestamp(chat)) : '';
+        return '<div class="chat-list-item" data-chat-item>' +
+            '<button type="button" class="chat-open-button" data-open-chat="' + escapeHtml(otherId) + '">' +
+            '<span class="avatar-circle">' + escapeHtml((other.name || 'م').charAt(0)) + '</span>' +
+            '<span class="chat-list-copy"><span class="chat-list-title"><b>' + escapeHtml(other.name || 'مستخدم') + '</b>' +
+            '<small>' + escapeHtml(time) + '</small></span><span class="chat-list-preview">' + escapeHtml(preview.slice(0, 72)) + '</span></span>' +
+            (unread ? '<span class="chat-unread-badge" aria-label="رسائل غير مقروءة">' + unread + '</span>' : '') + '</button>' +
+            '<button type="button" class="chat-delete-button" data-delete-chat="' + escapeHtml(chat.id) + '" aria-label="حذف المحادثة" title="حذف المحادثة"><i class="fas fa-trash"></i></button></div>';
     }).join('');
-    container.innerHTML = '<div class="animate-fade"><h3 style="margin-bottom:16px;">📬 الإشعارات والرسائل</h3>' +
-        '<button class="btn btn-sm btn-outline" style="margin-bottom:16px;" onclick="markAllNotifRead()"><i class="fas fa-check-double"></i> تعليم الكل مقروء</button>' +
-        '<h4 style="margin-bottom:12px;">🔔 الإشعارات (' + notifs.length + ')</h4>' + (notifHtml || '<p style="color:var(--text-muted)">لا توجد إشعارات</p>') +
-        '<h4 style="margin:20px 0 12px;">💬 المحادثات (' + chats.length + ')</h4>' + (chatHtml || '<p style="color:var(--text-muted)">لا توجد محادثات</p>') + '</div>';
+    container.innerHTML = '<div class="animate-fade mail-page"><div class="mail-heading"><div><span class="eyebrow">مركز التواصل</span><h3>الرسائل والإشعارات</h3></div>' +
+        '<span class="mail-summary">' + unreadChats + ' رسالة غير مقروءة</span></div>' +
+        '<section class="mail-section"><div class="mail-section-title"><h4>المحادثات</h4><span>' + chats.length + '</span></div>' +
+        '<label class="mail-search"><i class="fas fa-search" aria-hidden="true"></i><input id="chat-search" type="search" placeholder="ابحث باسم أو رسالة..."></label>' +
+        '<div id="chat-list" class="chat-list">' + (chatHtml || '<div class="empty-state"><i class="fas fa-comments"></i><p>لا توجد محادثات بعد</p><small>تواصل مع متجر أو مستخدم لبدء محادثة.</small></div>') +
+        '</div><p id="chat-search-empty" class="empty-search" hidden>لا توجد محادثة تطابق البحث.</p></section>' +
+        '<section class="mail-section"><div class="mail-section-title"><h4>الإشعارات</h4><span>' + notifs.filter(function(n) { return !n.read; }).length + ' غير مقروءة</span></div>' +
+        '<button type="button" class="btn btn-sm btn-outline" id="mark-all-notifications"><i class="fas fa-check-double"></i> تعليم الكل كمقروء</button>' +
+        '<div class="notification-list">' + (notifHtml || '<p class="muted-empty">لا توجد إشعارات جديدة.</p>') + '</div></section></div>';
+
+    let searchInput = container.querySelector('#chat-search');
+    if (searchInput) searchInput.addEventListener('input', function() { filterChatCards(this.value); });
+    container.querySelectorAll('[data-open-chat]').forEach(function(button) {
+        button.addEventListener('click', function() { navigate('chat', button.getAttribute('data-open-chat')); });
+    });
+    container.querySelectorAll('[data-delete-chat]').forEach(function(button) {
+        button.addEventListener('click', function() { deleteChat(button.getAttribute('data-delete-chat')); });
+    });
+    container.querySelectorAll('[data-notification-id]').forEach(function(button) {
+        button.addEventListener('click', function() { markNotifRead(button.getAttribute('data-notification-id')); });
+    });
+    let markAllButton = container.querySelector('#mark-all-notifications');
+    if (markAllButton) markAllButton.addEventListener('click', markAllNotifRead);
+}
+
+function filterChatCards(query) {
+    let normalized = String(query || '').trim().toLocaleLowerCase('ar');
+    let visible = 0;
+    document.querySelectorAll('#chat-list [data-chat-item]').forEach(function(item) {
+        let matches = item.textContent.toLocaleLowerCase('ar').indexOf(normalized) !== -1;
+        item.hidden = !matches;
+        if (matches) visible++;
+    });
+    let empty = document.getElementById('chat-search-empty');
+    if (empty) empty.hidden = visible > 0 || !normalized;
 }
 
 function markNotifRead(id) {
+    if (!firebaseDataLoaded) return showToast('الاتصال غير متاح؛ تعذر حفظ حالة القراءة.', 'warning');
+    if (!Array.isArray(currentUser.notifications)) currentUser.notifications = dataArray(currentUser.notifications);
     let notif = currentUser.notifications.find(function(n) { return n.id === id; });
+    let wasRead = notif ? !!notif.read : false;
     if (notif) notif.read = true;
     let u = db.users.find(function(u) { return u.id === currentUser.id; });
     if (u) u.notifications = currentUser.notifications;
-    sync(); updateNotifyBadge(); navigate('mail');
+    sync().then(function(saved) {
+        if (!saved && notif) notif.read = wasRead;
+        updateNotifyBadge();
+        if (notif && notif.link && notif.link.indexOf('chat:') === 0) navigate('chat', notif.link.slice(5));
+        else if (notif && notif.link && notif.link.indexOf('track:') === 0) navigate('track', notif.link.slice(6));
+        else navigate('mail');
+    });
 }
 
 function markAllNotifRead() {
+    if (!firebaseDataLoaded) return showToast('الاتصال غير متاح؛ تعذر حفظ حالة القراءة.', 'warning');
+    if (!Array.isArray(currentUser.notifications)) currentUser.notifications = dataArray(currentUser.notifications);
+    let previous = (currentUser.notifications || []).map(function(n) { return !!n.read; });
     currentUser.notifications.forEach(function(n) { n.read = true; });
-    sync(); updateNotifyBadge(); navigate('mail'); showToast('تم تعليم جميع الإشعارات كمقروءة');
+    sync().then(function(saved) {
+        if (!saved) currentUser.notifications.forEach(function(n, index) { n.read = previous[index]; });
+        updateNotifyBadge(); navigate('mail');
+        if (saved) showToast('تم تعليم جميع الإشعارات كمقروءة');
+    });
 }
 
 function renderFullChat(container, otherId) {
-    let chatId = [currentUser.id, otherId].sort().join('_');
-    let chat = db.chats.find(function(c) { return c.id === chatId; });
-    if (!chat) { chat = { id: chatId, u1: currentUser.id, u2: otherId, msgs: [{s:'system', txt:'بداية المحادثة'}] }; db.chats.push(chat); sync(); }
+    if (!otherId || otherId === currentUser.id) { showToast('المستخدم المطلوب غير صالح', 'error'); return navigate('mail'); }
+    let chat = db.chats.find(function(item) { return (item.u1 === currentUser.id && item.u2 === otherId) || (item.u2 === currentUser.id && item.u1 === otherId); });
+    if (!chat) {
+        let chatId = [currentUser.id, otherId].sort().join('_');
+        chat = { id:chatId, u1:currentUser.id, u2:otherId, msgs:[], lastReadAt:{} };
+        db.chats.push(chat);
+    }
+    if (!Array.isArray(chat.msgs)) chat.msgs = dataArray(chat.msgs);
     let other = db.users.find(function(u) { return u.id === otherId; }) || {name: 'مستخدم'};
-    container.innerHTML = '<div class="animate-fade">' +
-        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">' +
-        '<button class="btn btn-sm btn-outline" onclick="navigate(\'mail\')"><i class="fas fa-arrow-right"></i></button>' +
-        '<div class="avatar-circle">' + other.name.charAt(0) + '</div>' +
-        '<h4 style="margin:0">' + other.name + '</h4></div>' +
-        '<div id="chat-box" style="height:380px;overflow-y:auto;display:flex;flex-direction:column;padding:10px;background:rgba(0,0,0,0.4);border-radius:16px;">' +
-        chat.msgs.map(function(m) { return m.s === 'system' ? '<div class="chat-bubble bubble-system">' + m.txt + '</div>' : '<div class="chat-bubble ' + (m.s === currentUser.id ? 'bubble-left' : 'bubble-right') + '">' + m.txt + '</div>'; }).join('') + '</div>' +
-        '<div style="display:flex;margin-top:10px;gap:8px">' +
-        '<input id="msg-input" placeholder="رسالتك...">' +
-        '<button class="btn btn-primary btn-sm" onclick="sendMsg(\'' + chatId + '\')">إرسال</button>' +
-        '</div></div>';
-    setTimeout(function() { let box = document.getElementById('chat-box'); if(box) box.scrollTop = box.scrollHeight; }, 100);
+    let previousBox = document.getElementById('chat-box');
+    let keepAtBottom = !previousBox || previousBox.scrollHeight - previousBox.scrollTop - previousBox.clientHeight < 90;
+    let previousScrollTop = previousBox ? previousBox.scrollTop : 0;
+    let previousInput = document.getElementById('msg-input');
+    let draft = previousInput ? previousInput.value : (chatDrafts[chat.id] || '');
+    let messages = getChatMessages(chat);
+    let readAt = Number(chat.lastReadAt && chat.lastReadAt[currentUser.id]) || 0;
+    let previousReadAt = readAt;
+    let newestUnread = messages.reduce(function(latest, message) {
+        return message.s !== currentUser.id && message.s !== 'system' && Number(message.ts) > latest ? Number(message.ts) : latest;
+    }, readAt);
+    let hadUnread = newestUnread > readAt;
+    let canMarkRead = hadUnread && firebaseDataLoaded && firebaseConnected;
+    if (canMarkRead) {
+        if (!chat.lastReadAt || typeof chat.lastReadAt !== 'object') chat.lastReadAt = {};
+        chat.lastReadAt[currentUser.id] = newestUnread;
+    }
+    let messageHtml = messages.map(function(message) {
+        let text = escapeHtml(message.txt || message.text || '');
+        if (message.s === 'system') return '<div class="chat-bubble bubble-system">' + text + '</div>';
+        let mine = message.s === currentUser.id;
+        let seen = mine && Number(chat.lastReadAt && chat.lastReadAt[otherId]) >= Number(message.ts) && Number(message.ts) > 0;
+        return '<div class="chat-bubble ' + (mine ? 'bubble-left' : 'bubble-right') + '"><span class="chat-message-text">' + text + '</span>' +
+            '<span class="chat-message-meta">' + escapeHtml(formatChatTime(message.ts)) + (mine ? '<span class="chat-read-state">' + (seen ? 'مقروءة ✓✓' : 'أُرسلت ✓') + '</span>' : '') + '</span></div>';
+    }).join('');
+    container.innerHTML = '<div class="animate-fade chat-page"><div class="chat-header"><button type="button" class="btn btn-sm btn-outline" id="chat-back"><i class="fas fa-arrow-right"></i><span>الرسائل</span></button>' +
+        '<span class="avatar-circle">' + escapeHtml((other.name || 'م').charAt(0)) + '</span><div class="chat-contact"><b>' + escapeHtml(other.name || 'مستخدم') + '</b><small>' + escapeHtml(other.type || 'مستخدم') + '</small></div></div>' +
+        '<div id="chat-box" class="chat-box" aria-live="polite">' + (messageHtml || '<div class="chat-empty"><i class="fas fa-comment-dots"></i><b>ابدأ المحادثة</b><span>اكتب رسالتك، وستظهر للطرف الآخر بعد المزامنة.</span></div>') + '</div>' +
+        '<div class="chat-quick-replies"><button type="button" data-chat-reply="السلام عليكم">السلام عليكم</button><button type="button" data-chat-reply="تمام، شكراً">تمام، شكراً</button><button type="button" data-chat-reply="هل ما زال متاحاً؟">هل ما زال متاحاً؟</button></div>' +
+        '<form id="chat-form" class="chat-composer"><textarea id="msg-input" rows="1" maxlength="1000" placeholder="اكتب رسالتك..." aria-label="اكتب رسالتك"></textarea>' +
+        '<button type="submit" class="btn btn-primary" id="send-chat-button" aria-label="إرسال الرسالة"><i class="fas fa-paper-plane"></i></button></form>' +
+        '<small class="chat-hint">Enter للإرسال · Shift+Enter لسطر جديد · الرسائل القديمة لا تحمل وقتاً دقيقاً.</small></div>';
+    let input = container.querySelector('#msg-input');
+    let sendButton = container.querySelector('#send-chat-button');
+    input.value = draft;
+    input.addEventListener('input', function() {
+        chatDrafts[chat.id] = input.value;
+        input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+        sendButton.disabled = !input.value.trim();
+    });
+    sendButton.disabled = !input.value.trim();
+    container.querySelector('#chat-form').addEventListener('submit', function(event) { event.preventDefault(); sendMsg(chat.id); });
+    input.addEventListener('keydown', function(event) { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMsg(chat.id); } });
+    container.querySelector('#chat-back').addEventListener('click', function() { navigate('mail'); });
+    container.querySelectorAll('[data-chat-reply]').forEach(function(button) {
+        button.addEventListener('click', function() { input.value = button.getAttribute('data-chat-reply'); input.dispatchEvent(new Event('input', {bubbles:true})); sendMsg(chat.id); });
+    });
+    setTimeout(function() {
+        let box = document.getElementById('chat-box');
+        if (box) box.scrollTop = keepAtBottom ? box.scrollHeight : previousScrollTop;
+    }, 0);
+    if (canMarkRead) sync().then(function(saved) {
+        if (saved) return;
+        let liveChat = db.chats.find(function(item) { return item.id === chat.id; });
+        if (liveChat && liveChat.lastReadAt) {
+            if (previousReadAt) liveChat.lastReadAt[currentUser.id] = previousReadAt;
+            else delete liveChat.lastReadAt[currentUser.id];
+        }
+        if (activePage === 'chat' && activePageParam === otherId) navigate('chat', otherId);
+    });
 }
 
 function sendMsg(cid) {
     let inp = document.getElementById('msg-input');
-    if (!inp.value) return;
+    if (!inp || !currentUser) return;
+    if (!firebaseDataLoaded) return showToast('الاتصال غير متاح. أعد المحاولة بعد عودة المزامنة.', 'warning', 4000);
+    let text = inp.value.trim();
+    if (!text) return;
     let chat = db.chats.find(function(c) { return c.id === cid; });
-    chat.msgs.push({ s: currentUser.id, txt: inp.value });
-    let otherId = cid.replace(currentUser.id, '').replace('_', '');
-    addNotification(otherId, 'رسالة جديدة من ' + currentUser.name, '');
-    sync(); navigate('chat', otherId);
+    if (!chat || (chat.u1 !== currentUser.id && chat.u2 !== currentUser.id)) return showToast('تعذر العثور على المحادثة', 'error');
+    let otherId = chat.u1 === currentUser.id ? chat.u2 : chat.u1;
+    if (!Array.isArray(chat.msgs)) chat.msgs = dataArray(chat.msgs);
+    let timestamp = Date.now();
+    let message = { id:'M' + timestamp + Math.random().toString(36).slice(2, 7), s:currentUser.id, txt:text, ts:timestamp };
+    let previousLastMessageAt = chat.lastMessageAt;
+    chat.msgs.push(message);
+    chat.lastMessageAt = timestamp;
+    chatDrafts[chat.id] = '';
+    let notification = addNotification(otherId, 'رسالة جديدة من ' + currentUser.name, 'chat:' + currentUser.id, true);
+    let saveResult = sync();
+    navigate('chat', otherId);
+    saveResult.then(function(saved) {
+        if (saved) { showToast('تم إرسال الرسالة', 'success', 1800); return; }
+        let liveChat = db.chats.find(function(item) { return item.id === cid; });
+        if (liveChat) {
+            liveChat.msgs = getChatMessages(liveChat).filter(function(item) { return item.id !== message.id; });
+            if (liveChat.lastMessageAt === timestamp) {
+                let lastRemaining = getChatLastMessage(liveChat);
+                if (previousLastMessageAt) liveChat.lastMessageAt = previousLastMessageAt;
+                else if (lastRemaining && lastRemaining.ts) liveChat.lastMessageAt = lastRemaining.ts;
+                else delete liveChat.lastMessageAt;
+            }
+        }
+        if (notification) {
+            let recipient = db.users.find(function(user) { return user.id === otherId; });
+            if (recipient) recipient.notifications = (recipient.notifications || []).filter(function(item) { return item.id !== notification.id; });
+        }
+        chatDrafts[cid] = text;
+        if (activePage === 'chat' && activePageParam === otherId) navigate('chat', otherId);
+    });
 }
 
 function deleteChat(cid) {
-    showModal("حذف", "حذف المحادثة؟", "confirm", function() {
+    let chat = db.chats.find(function(item) { return item.id === cid; });
+    if (!chat || (chat.u1 !== currentUser.id && chat.u2 !== currentUser.id)) return showToast('المحادثة غير موجودة', 'error');
+    if (!firebaseDataLoaded) return showToast('لا يمكن حذف المحادثة دون اتصال مباشر بقاعدة البيانات.', 'warning', 4500);
+    showModal("حذف المحادثة نهائياً", "سيؤدي الحذف إلى إزالة سجل المحادثة للطرفين. هل تريد المتابعة؟", "confirm", function() {
+        let previous = db.chats;
         db.chats = db.chats.filter(function(c) { return c.id !== cid; });
-        sync(); navigate('mail'); showToast('تم حذف المحادثة');
+        sync().then(function(saved) {
+            if (!saved) { db.chats = previous; navigate('mail'); return; }
+            navigate('mail'); showToast('تم حذف المحادثة للطرفين');
+        });
     });
 }
 
@@ -2117,104 +2553,240 @@ function checkDevPass() {
 }
 
 function repairUserIds() {
-    if (!isDeveloperUser()) return showToast('غير مصرح', 'error');
+    if (!requireDeveloperWrite()) return;
+    var previousUsers = db.users.map(function(user) { return Object.assign({}, user); });
+    var previousUser = currentUser;
+    var previousStoredId = localStorage.getItem('z_user_id');
     db.users = uniqueUserRecords(db.users);
-    sync();
-    renderSuperAdminPanel();
-    showToast('تم إنشاء ID ثابت لكل مستخدم وحفظه بنجاح', 'success', 4500);
+    if (currentUser) {
+        var email = String(currentUser.email || currentUser.authEmail || '').toLowerCase();
+        var updatedCurrentUser = currentUser.authUid ? db.users.find(function(user) { return user.authUid === currentUser.authUid; }) : null;
+        if (!updatedCurrentUser && email) updatedCurrentUser = db.users.find(function(user) { return String(user.email || user.authEmail || '').toLowerCase() === email; });
+        if (!updatedCurrentUser) updatedCurrentUser = db.users.find(function(user) { return user.id === currentUser.id; });
+        if (updatedCurrentUser) {
+            currentUser = updatedCurrentUser;
+            localStorage.setItem('z_user_id', updatedCurrentUser.id);
+        }
+    }
+    persistDevChange('تم إنشاء IDs ثابتة للمستخدمين وحفظها', function() {
+        db.users = previousUsers;
+        if (previousUser) {
+            var previousEmail = String(previousUser.email || previousUser.authEmail || '').toLowerCase();
+            var restoredUser = previousUser.authUid ? db.users.find(function(user) { return user.authUid === previousUser.authUid; }) : null;
+            if (!restoredUser && previousEmail) restoredUser = db.users.find(function(user) { return String(user.email || user.authEmail || '').toLowerCase() === previousEmail; });
+            if (!restoredUser) restoredUser = db.users.find(function(user) { return user.id === previousUser.id; });
+            currentUser = restoredUser || previousUser;
+        } else currentUser = null;
+        if (previousStoredId) localStorage.setItem('z_user_id', previousStoredId);
+        else localStorage.removeItem('z_user_id');
+    });
+}
+
+function setDevPanelTab(tab) {
+    var allowed = ['overview', 'orders', 'reports', 'catalog', 'users'];
+    if (!allowed.includes(tab) || !isDeveloperUser()) return;
+    devPanelTab = tab; devPanelSearch = ''; renderSuperAdminPanel();
+}
+
+function persistDevChange(successMessage, rollback) {
+    return sync().then(function(saved) {
+        if (saved) showToast(successMessage);
+        else if (typeof rollback === 'function') rollback();
+        renderSuperAdminPanel();
+        return saved;
+    });
+}
+
+function filterDevPanel(query) {
+    devPanelSearch = String(query || '');
+    var normalized = devPanelSearch.trim().toLocaleLowerCase('ar');
+    var rows = Array.from(document.querySelectorAll('#dev-list [data-dev-searchable]'));
+    var visible = 0;
+    rows.forEach(function(row) {
+        var matches = row.textContent.toLocaleLowerCase('ar').indexOf(normalized) !== -1;
+        row.hidden = !matches;
+        if (matches) visible++;
+    });
+    var count = document.getElementById('dev-results-count');
+    if (count) count.textContent = visible + ' نتيجة';
+    var empty = document.getElementById('dev-no-results');
+    if (empty) empty.hidden = visible > 0 || !rows.length;
+}
+
+function bindDevPanelActions(root) {
+    root.querySelectorAll('[data-dev-tab]').forEach(function(button) {
+        if (button.dataset.devBound) return;
+        button.dataset.devBound = 'true';
+        button.addEventListener('click', function() { setDevPanelTab(button.getAttribute('data-dev-tab')); });
+    });
+    root.querySelectorAll('[data-dev-action]').forEach(function(button) {
+        if (button.dataset.devBound) return;
+        button.dataset.devBound = 'true';
+        button.addEventListener('click', function() {
+            var action = button.getAttribute('data-dev-action');
+            var id = button.getAttribute('data-id');
+            if (action === 'accept-order') devAcceptOrder(id);
+            else if (action === 'delete-order') devDeleteOrder(id);
+            else if (action === 'report-status') devUpdateReportStatus(id);
+            else if (action === 'delete-report') devDeleteReport(id);
+            else if (action === 'toggle-store') devToggleStore(id);
+            else if (action === 'delete-store') devDeleteStore(id);
+            else if (action === 'edit-product') devEditProduct(button.getAttribute('data-store-id'), button.getAttribute('data-product-id'));
+            else if (action === 'delete-product') devDeleteProduct(button.getAttribute('data-store-id'), button.getAttribute('data-product-id'));
+            else if (action === 'save-ad') saveDevAnnouncement();
+            else if (action === 'save-policy') saveDevPolicy();
+            else if (action === 'send-notification') sendDevNotification();
+            else if (action === 'add-coupon') devAddCoupon();
+            else if (action === 'add-store') devAddStore();
+            else if (action === 'add-product') devShowAddProduct();
+            else if (action === 'refresh') loadData();
+        });
+    });
+    var search = root.querySelector('#dev-panel-search');
+    if (search && !search.dataset.devBound) {
+        search.dataset.devBound = 'true';
+        search.value = devPanelSearch;
+        search.addEventListener('input', function() { filterDevPanel(search.value); });
+        filterDevPanel(search.value);
+    }
 }
 
 function renderSuperAdminPanel() {
+    if (!isDeveloperUser()) return showToast('غير مصرح بفتح لوحة المطور', 'error');
     let v = document.getElementById('app-content');
-    let storesOptions = db.stores.map(function(s) { return '<option value="' + s.id + '">' + s.name + '</option>'; }).join('');
-    let uniqueUsers = uniqueUserRecords(db.users);
-    let usersOptions = uniqueUsers.map(function(u) { return '<option value="' + u.id + '">' + u.name + ' (' + u.type + ')</option>'; }).join('');
-    let usersList = uniqueUsers.slice().reverse().map(function(u) {
-        var role = u.type === 'driver' ? '🛵 سائق' : u.type === 'store_owner' ? '🏪 تاجر' : u.type === 'developer' ? '🛡️ مطور' : '👤 زبون';
-        var contact = u.email || u.authEmail || (u.loginName ? 'اسم الدخول: ' + u.loginName : 'بدون بريد');
-        return '<div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;margin-bottom:8px;">' +
-            '<div style="min-width:0;"><b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (u.name || 'مستخدم بدون اسم') + '</b><small style="color:var(--text-muted);display:block;margin-top:4px;">ID: ' + u.id + ' • ' + contact + (u.phone ? ' • ' + u.phone : '') + '</small></div>' +
-            '<span class="tag ' + (u.type === 'driver' ? 'tag-success' : u.type === 'store_owner' ? 'tag-warning' : 'tag-primary') + '" style="white-space:nowrap;">' + role + '</span></div>';
-    }).join('');
-    let ordersList = db.orders.slice().reverse().map(function(o) {
-        let acceptButton = o.status === 'قيد الانتظار ⏳' ? '<button class="btn btn-sm btn-success" style="margin-top:8px;margin-left:6px" onclick="devAcceptOrder(\'' + o.id + '\')"><i class="fas fa-check"></i> قبول الطلب</button>' : '';
-        return '<div class="card">' +
-            '<b>#' + o.id.slice(-6) + '</b> - ' + o.status + '<br>' +
-            '<small>زبون: ' + o.userName + ' | متجر: ' + (db.stores.find(function(s){return s.id===o.storeId;}) ? db.stores.find(function(s){return s.id===o.storeId;}).name : '?') + '</small>' +
-            '<div style="margin-top:8px">' + acceptButton + '<button class="btn btn-sm btn-danger" onclick="devDeleteOrder(\'' + o.id + '\')">🗑️ حذف</button></div></div>';
-    }).join('');
-    let reportsList = (db.reports || []).slice().reverse().map(function(r) {
-        return '<div class="card" style="border-right:4px solid var(--danger);">' +
-            '<div style="display:flex;justify-content:space-between;"><b>' + r.userName + '</b><span class="tag tag-warning">' + r.type + '</span></div>' +
-            '<p style="margin:8px 0;color:var(--text-muted);">' + r.text + '</p>' +
-            (r.img ? '<img src="' + r.img + '" style="max-width:100%;border-radius:8px;margin:8px 0;">' : '') +
-            '<small style="color:var(--text-muted);">' + r.date + '</small>' +
-            '<div style="margin-top:10px;"><button class="btn btn-sm btn-danger" onclick="devDeleteReport(\'' + r.id + '\')"><i class="fas fa-trash"></i> إزالة البلاغ</button></div></div>';
+    var pendingOrders = db.orders.filter(function(order) { return String(order.status || '').indexOf('انتظار') !== -1; });
+    var openReports = (db.reports || []).filter(function(report) { return ['تم الحل', 'محلول', 'مغلق'].indexOf(report.status) === -1; });
+    var uniqueUsers = uniqueUserRecords(db.users);
+    var storesOptions = db.stores.map(function(store) { return '<option value="' + escapeHtml(store.id) + '">' + escapeHtml(store.name) + '</option>'; }).join('');
+    var firebaseStatus = getFirebaseStatus();
+    var sourceLabel = firebaseStatus.label;
+    var sourceClass = firebaseStatus.className;
+    var tabs = [{id:'overview', label:'نظرة عامة', icon:'fa-gauge-high'}, {id:'orders', label:'الطلبات', icon:'fa-box'}, {id:'reports', label:'البلاغات', icon:'fa-flag'}, {id:'catalog', label:'المتاجر والمحتوى', icon:'fa-store'}, {id:'users', label:'المستخدمون', icon:'fa-users'}];
+    var tabsHtml = tabs.map(function(tab) { return '<button type="button" class="dev-tab ' + (devPanelTab === tab.id ? 'active' : '') + '" data-dev-tab="' + tab.id + '"><i class="fas ' + tab.icon + '"></i><span>' + tab.label + '</span>' + (tab.id === 'orders' && pendingOrders.length ? '<b>' + pendingOrders.length + '</b>' : '') + (tab.id === 'reports' && openReports.length ? '<b>' + openReports.length + '</b>' : '') + '</button>'; }).join('');
+    var searchHtml = devPanelTab === 'overview' ? '' : '<label class="dev-search"><i class="fas fa-search"></i><input id="dev-panel-search" type="search" placeholder="ابحث في هذه القائمة..." value="' + escapeHtml(devPanelSearch) + '"><small id="dev-results-count"></small></label>';
+
+    var overviewHtml = '<div class="dev-alert-grid">' +
+        '<button type="button" class="dev-alert-card ' + (pendingOrders.length ? 'needs-action' : '') + '" data-dev-tab="orders"><span class="dev-alert-icon"><i class="fas fa-box-open"></i></span><span><b>' + pendingOrders.length + ' طلبات تنتظر الإجراء</b><small>راجع الحالات قبل قبول أو متابعة الطلب.</small></span><i class="fas fa-chevron-left"></i></button>' +
+        '<button type="button" class="dev-alert-card ' + (openReports.length ? 'needs-action' : '') + '" data-dev-tab="reports"><span class="dev-alert-icon"><i class="fas fa-flag"></i></span><span><b>' + openReports.length + ' بلاغات مفتوحة</b><small>حدّث حالة البلاغ بعد مراجعته.</small></span><i class="fas fa-chevron-left"></i></button></div>' +
+        '<div class="dev-panel-note"><i class="fas fa-circle-info"></i><span>الإحصاءات محسوبة من البيانات المحمّلة في هذا الجهاز؛ لا تُعرض كأرقام تقديرية.</span></div>' +
+        '<div class="dev-stats-grid"><div class="dev-stat"><span>المستخدمون</span><b>' + uniqueUsers.length + '</b><i class="fas fa-users"></i></div><div class="dev-stat"><span>المتاجر المفتوحة</span><b>' + db.stores.filter(function(store) { return store.isOpen !== false; }).length + ' / ' + db.stores.length + '</b><i class="fas fa-store"></i></div><div class="dev-stat"><span>إجمالي الطلبات</span><b>' + db.orders.length + '</b><i class="fas fa-box"></i></div><div class="dev-stat"><span>البلاغات المفتوحة</span><b>' + openReports.length + '</b><i class="fas fa-flag"></i></div></div>';
+
+    var ordersHtml = '<div class="dev-list" id="dev-list">' + db.orders.slice().reverse().map(function(order) {
+        var store = db.stores.find(function(item) { return item.id === order.storeId; });
+        var isPending = String(order.status || '').indexOf('انتظار') !== -1;
+        return '<article class="dev-record" data-dev-searchable><div class="dev-record-main"><div class="dev-record-title"><b>طلب #' + escapeHtml(String(order.id || '').slice(-6)) + '</b><span class="dev-status-tag ' + (isPending ? 'pending' : 'normal') + '">' + escapeHtml(order.status || 'حالة غير محددة') + '</span></div><p>الزبون: ' + escapeHtml(order.userName || 'غير معروف') + ' · المتجر: ' + escapeHtml(store ? store.name : 'غير مرتبط') + '</p><small>' + escapeHtml(order.date || order.createdAt || '') + '</small></div><div class="dev-record-actions">' + (isPending ? '<button type="button" class="btn btn-sm btn-success" data-dev-action="accept-order" data-id="' + escapeHtml(order.id) + '"><i class="fas fa-check"></i> قبول</button>' : '') + '<button type="button" class="btn btn-sm btn-danger" data-dev-action="delete-order" data-id="' + escapeHtml(order.id) + '" aria-label="حذف الطلب"><i class="fas fa-trash"></i></button></div></article>';
+    }).join('') + '<p id="dev-no-results" class="muted-empty" hidden>لا توجد نتائج تطابق البحث.</p></div>';
+
+    var reportsHtml = '<div class="dev-list" id="dev-list">' + (db.reports || []).slice().reverse().map(function(report) {
+        var status = report.status || 'جديد';
+        var resolved = ['تم الحل', 'محلول', 'مغلق'].indexOf(status) !== -1;
+        return '<article class="dev-record dev-report" data-dev-searchable><div class="dev-record-main"><div class="dev-record-title"><b>' + escapeHtml(report.userName || 'مستخدم') + '</b><span class="dev-status-tag ' + (resolved ? 'normal' : 'pending') + '">' + escapeHtml(status) + '</span></div><p><span class="dev-report-type">' + escapeHtml(report.type || 'عام') + '</span> · ' + escapeHtml(report.text || '') + '</p>' + (report.img ? '<a class="dev-report-image" href="' + escapeHtml(report.img) + '" target="_blank" rel="noopener">عرض الصورة المرفقة</a>' : '') + '<small>' + escapeHtml(report.date || '') + ' · #' + escapeHtml(String(report.id || '').slice(-6)) + '</small></div><div class="dev-record-actions"><button type="button" class="btn btn-sm btn-outline" data-dev-action="report-status" data-id="' + escapeHtml(report.id) + '">' + (resolved ? 'إعادة فتح' : 'تم الحل') + '</button><button type="button" class="btn btn-sm btn-danger" data-dev-action="delete-report" data-id="' + escapeHtml(report.id) + '" aria-label="حذف البلاغ"><i class="fas fa-trash"></i></button></div></article>';
+    }).join('') + '<p id="dev-no-results" class="muted-empty" hidden>لا توجد نتائج تطابق البحث.</p></div>';
+
+    var usersHtml = '<div class="dev-user-tools" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0 12px"><span>عرض ' + uniqueUsers.length + ' حسابات فريدة</span><button type="button" class="btn btn-sm btn-success" onclick="repairUserIds()"><i class="fas fa-fingerprint"></i> ترقيم IDs الثابتة</button></div><div class="dev-list" id="dev-list">' + uniqueUsers.map(function(user) {
+        var roleName = ({customer:'زبون', store_owner:'تاجر', driver:'سائق', developer:'مطور'})[user.type] || user.role || 'مستخدم';
+        return '<article class="dev-record" data-dev-searchable><span class="avatar-circle">' + escapeHtml((user.name || 'م').charAt(0)) + '</span><div class="dev-record-main"><div class="dev-record-title"><b>' + escapeHtml(user.name || 'مستخدم') + '</b><span class="dev-status-tag normal">' + escapeHtml(roleName) + '</span></div><p>' + escapeHtml(user.email || user.phone || 'لا يوجد بريد أو هاتف') + '</p><small>المعرّف: ' + escapeHtml(user.id || '') + '</small></div></article>';
+    }).join('') + '<p id="dev-no-results" class="muted-empty" hidden>لا توجد نتائج تطابق البحث.</p></div>';
+
+    var storesHtml = db.stores.map(function(store) {
+        var open = store.isOpen !== false;
+        return '<article class="dev-record" data-dev-searchable><div class="dev-record-main"><div class="dev-record-title"><b>' + escapeHtml(store.name || 'متجر') + '</b><span class="dev-status-tag ' + (open ? 'normal' : 'pending') + '">' + (open ? 'مفتوح' : 'مغلق') + '</span></div><p>' + (store.products || []).length + ' منتج · المعرّف ' + escapeHtml(store.id || '') + '</p></div><div class="dev-record-actions"><button type="button" class="btn btn-sm btn-outline" data-dev-action="toggle-store" data-id="' + escapeHtml(store.id) + '">' + (open ? 'إيقاف' : 'فتح') + '</button><button type="button" class="btn btn-sm btn-danger" data-dev-action="delete-store" data-id="' + escapeHtml(store.id) + '" aria-label="حذف المتجر"><i class="fas fa-trash"></i></button></div></article>';
     }).join('');
 
-    v.innerHTML = '<div class="animate-fade"><div class="card" style="border:2px solid var(--warning)">' +
-        '<h3 style="color:var(--warning);margin-bottom:16px;">🛡️ لوحة الإدارة</h3>' +
-        '<div class="grid-3" style="margin-bottom:16px;">' +
-        '<div class="stat-card"><div class="stat-value">' + uniqueUsers.length + '</div><div class="stat-label">👥 مستخدمون فريدون</div></div>' +
-        '<div class="stat-card"><div class="stat-value">' + db.stores.length + '</div><div class="stat-label">🏪 متاجر</div></div>' +
-        '<div class="stat-card"><div class="stat-value">' + db.orders.length + '</div><div class="stat-label">📦 طلبات</div></div></div>' +
-        '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><h4 style="margin:0;">👥 المستخدمون (' + uniqueUsers.length + ')</h4><div style="display:flex;gap:6px"><button class="btn btn-success btn-sm" onclick="repairUserIds()"><i class="fas fa-fingerprint"></i> ترقيم IDs</button><button class="btn btn-ghost btn-sm" onclick="renderSuperAdminPanel()"><i class="fas fa-sync-alt"></i> تحديث</button></div></div><div style="margin-top:12px;max-height:360px;overflow:auto;">' + (usersList || '<p style="color:var(--text-muted);">لا توجد سجلات مستخدمين بعد</p>') + '</div></div>' +
-        '<h4>📢 إعلان عام</h4><input id="new-ad" value="' + db.ad + '">' +
-        '<button class="btn btn-sm btn-primary" style="margin-top:8px;" onclick="db.ad=document.getElementById(\'new-ad\').value;sync();showToast(\'تم التحديث\')">تحديث</button>' +
-        '<h4 style="margin-top:16px;">📜 سياسة الاستخدام</h4><textarea id="new-policy">' + db.policy + '</textarea>' +
-        '<button class="btn btn-sm btn-primary" style="margin-top:8px;" onclick="db.policy=document.getElementById(\'new-policy\').value;sync();showToast(\'تم الحفظ\')">حفظ</button>' +
-        '<h4 style="margin-top:16px;">📨 إرسال إشعار</h4><select id="notify-user">' + usersOptions + '</select><input id="notify-text" placeholder="نص الإشعار">' +
-        '<button class="btn btn-sm btn-success" style="margin-top:8px;" onclick="sendDevNotification()"><i class="fas fa-paper-plane"></i> إرسال</button>' +
-        '<h4 style="margin-top:16px;">🎟️ إضافة كوبون</h4><input id="dev-coupon-name" placeholder="اسم الكوبون"><input id="dev-coupon-code" placeholder="الكود"><input id="dev-coupon-disc" type="number" placeholder="نسبة الخصم %">' +
-        '<button class="btn btn-sm btn-success" style="margin-top:8px;" onclick="devAddCoupon()"><i class="fas fa-plus"></i> إضافة كوبون</button>' +
-        '<h4 style="margin-top:16px;">🏪 إدارة المتاجر</h4>' + db.stores.map(function(s) { return '<div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:10px;"><b>' + s.name + '</b><button class="btn btn-sm btn-danger" onclick="devDeleteStore(\'' + s.id + '\')">حذف</button></div>'; }).join('') +
-        '<h4 style="margin-top:16px;">🏪 إضافة متجر</h4><input id="dev-s-name" placeholder="اسم المتجر"><input id="dev-s-owner" placeholder="ID المالك">' +
-        '<button class="btn btn-sm btn-success" style="margin-top:8px;" onclick="devAddStore()"><i class="fas fa-plus"></i> إضافة</button>' +
-        '<h4 style="margin-top:16px;">📦 إدارة منتجات المتاجر</h4><select id="dev-store-select">' + storesOptions + '</select><div id="dev-products-list"></div>' +
-        '<button class="btn btn-sm btn-primary" style="margin-top:8px;" onclick="devShowAddProduct()">➕ إضافة منتج</button>' +
-        '<h4 style="margin-top:16px;">🚨 بلاغات المستخدمين (' + (db.reports ? db.reports.length : 0) + ')</h4>' + (reportsList || '<p>لا توجد بلاغات</p>') +
-        '<h4 style="margin-top:16px;">🗂️ جميع الطلبات (' + db.orders.length + ')</h4>' + (ordersList || '<p>لا توجد طلبات</p>') +
-        '</div></div>';
-    devRefreshProductsList();
+    var catalogHtml = '<div class="dev-content-grid"><section class="dev-form-card"><h4><i class="fas fa-bullhorn"></i> الإعلان العام</h4><textarea id="new-ad" rows="3">' + escapeHtml(db.ad || '') + '</textarea><button type="button" class="btn btn-primary btn-sm" data-dev-action="save-ad">حفظ الإعلان</button><h4><i class="fas fa-file-shield"></i> سياسة الاستخدام</h4><textarea id="new-policy" rows="5">' + escapeHtml(db.policy || '') + '</textarea><button type="button" class="btn btn-primary btn-sm" data-dev-action="save-policy">حفظ السياسة</button></section>' +
+        '<section class="dev-form-card"><h4><i class="fas fa-paper-plane"></i> إشعار لمستخدم</h4><select id="notify-user">' + uniqueUsers.map(function(user) { return '<option value="' + escapeHtml(user.id) + '">' + escapeHtml(user.name || 'مستخدم') + ' (' + escapeHtml(user.type || 'مستخدم') + ')</option>'; }).join('') + '</select><textarea id="notify-text" rows="2" maxlength="240" placeholder="اكتب إشعاراً واضحاً ومختصراً"></textarea><button type="button" class="btn btn-success btn-sm" data-dev-action="send-notification">إرسال الإشعار</button><h4><i class="fas fa-ticket"></i> كوبون جديد</h4><input id="dev-coupon-name" maxlength="60" placeholder="اسم الكوبون"><input id="dev-coupon-code" maxlength="24" placeholder="الكود"><input id="dev-coupon-disc" type="number" min="1" max="100" placeholder="نسبة الخصم %"><button type="button" class="btn btn-success btn-sm" data-dev-action="add-coupon">إضافة كوبون</button></section></div>' +
+        '<section class="dev-form-card"><h4><i class="fas fa-store"></i> إضافة متجر</h4><div class="dev-inline-form"><input id="dev-s-name" maxlength="80" placeholder="اسم المتجر"><input id="dev-s-owner" placeholder="معرّف المالك (اختياري)"><button type="button" class="btn btn-success btn-sm" data-dev-action="add-store">إضافة متجر</button></div></section>' +
+        '<section class="dev-form-card"><h4><i class="fas fa-shop"></i> المتاجر الحالية</h4><div class="dev-list" id="dev-list">' + (storesHtml || '<p class="muted-empty">لا توجد متاجر.</p>') + '<p id="dev-no-results" class="muted-empty" hidden>لا توجد نتائج تطابق البحث.</p></div></section>' +
+        '<section class="dev-form-card"><h4><i class="fas fa-box"></i> منتجات المتجر</h4><select id="dev-store-select">' + (storesOptions || '<option value="">لا توجد متاجر</option>') + '</select><div id="dev-products-list" class="dev-list"></div><button type="button" class="btn btn-primary btn-sm" data-dev-action="add-product" ' + (db.stores.length ? '' : 'disabled') + '>إضافة منتج</button></section>';
+
+    var sectionHtml = devPanelTab === 'orders' ? ordersHtml : devPanelTab === 'reports' ? reportsHtml : devPanelTab === 'users' ? usersHtml : devPanelTab === 'catalog' ? catalogHtml : overviewHtml;
+    v.innerHTML = '<div class="animate-fade dev-panel"><div class="dev-panel-heading"><div><span class="eyebrow">مساحة المطور</span><h3>مركز إدارة زلطن تريبول</h3><p>ملخص مبني على البيانات المحمّلة مع تنبيه واضح عند توقف الاتصال.</p></div><div class="dev-heading-actions"><span id="dev-source-pill" class="dev-source-pill ' + sourceClass + '"><i class="fas fa-circle"></i>' + sourceLabel + '</span><button type="button" class="btn btn-sm btn-outline" data-dev-action="refresh"><i class="fas fa-rotate"></i> تحديث</button></div></div>' +
+        '<div class="dev-stats-grid"><div class="dev-stat"><span>المستخدمون</span><b>' + uniqueUsers.length + '</b><i class="fas fa-users"></i></div><div class="dev-stat"><span>المتاجر</span><b>' + db.stores.length + '</b><i class="fas fa-store"></i></div><div class="dev-stat"><span>الطلبات</span><b>' + db.orders.length + '</b><i class="fas fa-box"></i></div><div class="dev-stat"><span>بلاغات مفتوحة</span><b>' + openReports.length + '</b><i class="fas fa-flag"></i></div></div>' +
+        '<div class="dev-tabs" role="tablist">' + tabsHtml + '</div>' + searchHtml + '<div class="dev-section-content">' + sectionHtml + '</div></div>';
+    if (devPanelTab === 'catalog') devRefreshProductsList();
+    bindDevPanelActions(v);
+}
+
+function devUpdateReportStatus(reportId) {
+    if (!requireDeveloperWrite()) return;
+    var report = (db.reports || []).find(function(item) { return item.id === reportId; });
+    if (!report) return showToast('البلاغ غير موجود', 'error');
+    var previous = report.status || 'جديد';
+    report.status = ['تم الحل', 'محلول', 'مغلق'].indexOf(previous) !== -1 ? 'قيد المعالجة' : 'تم الحل';
+    sync().then(function(saved) {
+        if (!saved) report.status = previous;
+        else showToast(report.status === 'تم الحل' ? 'تم إغلاق البلاغ مع الاحتفاظ بسجله' : 'تمت إعادة فتح البلاغ');
+        renderSuperAdminPanel();
+    });
+}
+
+function saveDevAnnouncement() {
+    if (!requireDeveloperWrite()) return;
+    var input = document.getElementById('new-ad');
+    if (!input) return;
+    var previous = db.ad;
+    db.ad = input.value.trim();
+    persistDevChange('تم حفظ الإعلان', function() { db.ad = previous; });
+}
+
+function saveDevPolicy() {
+    if (!requireDeveloperWrite()) return;
+    var input = document.getElementById('new-policy');
+    if (!input || !input.value.trim()) return showToast('لا يمكن حفظ سياسة فارغة', 'error');
+    var previous = db.policy;
+    db.policy = input.value.trim();
+    persistDevChange('تم حفظ سياسة الاستخدام', function() { db.policy = previous; });
 }
 
 function sendDevNotification() {
+    if (!requireDeveloperWrite()) return;
     let userId = document.getElementById('notify-user').value;
-    let text = document.getElementById('notify-text').value;
+    let text = document.getElementById('notify-text').value.trim();
     if (!text) return showToast('أدخل نص الإشعار', 'error');
-    addNotification(userId, text); showToast('تم إرسال الإشعار');
+    let target = db.users.find(function(user) { return user.id === userId; });
+    if (!target) return showToast('لم يتم العثور على المستخدم', 'error');
+    let previous = (target.notifications || []).slice();
+    addNotification(userId, text, '', true);
+    persistDevChange('تم إرسال الإشعار', function() { target.notifications = previous; });
 }
 
 function devAddCoupon() {
-    let name = document.getElementById('dev-coupon-name').value;
-    let code = document.getElementById('dev-coupon-code').value.toUpperCase();
+    if (!requireDeveloperWrite()) return;
+    let name = document.getElementById('dev-coupon-name').value.trim();
+    let code = document.getElementById('dev-coupon-code').value.trim().toUpperCase();
     let disc = parseInt(document.getElementById('dev-coupon-disc').value);
-    if (!name || !code || !disc) return showToast('أدخل جميع البيانات', 'error');
+    if (!name || !code || !disc || disc < 1 || disc > 100) return showToast('أدخل اسماً وكوداً ونسبة خصم بين 1 و100', 'error');
     if (!db.coupons) db.coupons = [];
+    if (db.coupons.some(function(coupon) { return String(coupon.code || '').toUpperCase() === code; })) return showToast('هذا الكود مستخدم بالفعل', 'error');
+    let previous = db.coupons.slice();
     db.coupons.push({ id: 'C' + Date.now(), name: name, code: code, discount: disc, active: true });
-    sync(); showToast('تم إضافة الكوبون'); renderSuperAdminPanel();
+    persistDevChange('تم إضافة الكوبون', function() { db.coupons = previous; });
 }
 
 function devDeleteOrder(orderId) {
-    if (!isDeveloperUser()) return showToast('غير مصرح', 'error');
-    showModal("حذف طلب", "هل أنت متأكد من حذف هذا الطلب نهائياً؟", "confirm", function() {
+    if (!requireDeveloperWrite()) return;
+    let order = db.orders.find(function(item) { return item.id === orderId; });
+    if (!order) return showToast('الطلب غير موجود', 'error');
+    showModal("حذف طلب نهائياً", "سيتم حذف سجل الطلب #'" + String(order.id).slice(-6) + "' من القائمة. استخدم ذلك فقط إذا كان السجل غير مطلوب للمراجعة.", "confirm", function() {
+        let previous = db.orders.slice();
         db.orders = db.orders.filter(function(o) { return o.id !== orderId; });
-        sync(); renderSuperAdminPanel(); showToast('تم حذف الطلب');
+        persistDevChange('تم حذف الطلب', function() { db.orders = previous; });
     });
 }
 
 function devDeleteReport(reportId) {
-    if (!isDeveloperUser()) return showToast('غير مصرح', 'error');
+    if (!requireDeveloperWrite()) return;
     var report = (db.reports || []).find(function(r) { return r.id === reportId; });
     if (!report) return showToast('البلاغ غير موجود أو تمت إزالته مسبقاً', 'error');
-    showModal("إزالة البلاغ", "هل أنت متأكد من إزالة هذا البلاغ نهائياً؟", "confirm", function() {
+    showModal("حذف البلاغ نهائياً", "سيُزال سجل البلاغ من القائمة؛ يمكنك بدلاً من ذلك إغلاقه والاحتفاظ به.", "confirm", function() {
+        var previous = (db.reports || []).slice();
         db.reports = (db.reports || []).filter(function(r) { return r.id !== reportId; });
-        sync(); renderSuperAdminPanel(); showToast('تمت إزالة البلاغ بنجاح');
+        persistDevChange('تم حذف البلاغ', function() { db.reports = previous; });
     });
 }
 
 function devAcceptOrder(orderId) {
-    if (!isDeveloperUser()) return showToast('غير مصرح', 'error');
+    if (!requireDeveloperWrite()) return;
     acceptOrder(orderId);
 }
 
@@ -2224,64 +2796,97 @@ function devRefreshProductsList() {
     let storeId = select.value;
     let store = db.stores.find(function(s) { return s.id === storeId; });
     let listDiv = document.getElementById('dev-products-list');
-    if (store && store.products) {
-        listDiv.innerHTML = store.products.map(function(p) {
-            return '<div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:8px;">' +
-                '<span>' + p.name + ' - ' + p.price + ' د.ل</span>' +
-                '<div style="display:flex;gap:8px">' +
-                '<i class="fas fa-edit" style="color:var(--warning);cursor:pointer;" onclick="devEditProduct(\'' + storeId + '\', \'' + p.id + '\')"></i>' +
-                '<i class="fas fa-trash" style="color:var(--danger);cursor:pointer;" onclick="devDeleteProduct(\'' + storeId + '\', \'' + p.id + '\')"></i></div></div>';
-        }).join('');
-    } else listDiv.innerHTML = '<p>لا توجد منتجات</p>';
+    if (!listDiv) return;
+    var products = store ? (Array.isArray(store.products) ? store.products : dataArray(store.products)) : [];
+    listDiv.innerHTML = products.length ? products.map(function(product) {
+        return '<article class="dev-record dev-product-row" data-dev-searchable><div class="dev-record-main"><b>' + escapeHtml(product.name || 'منتج') + '</b><small>' + escapeHtml(product.price || 0) + ' د.ل · #' + escapeHtml(product.id || '') + '</small></div><div class="dev-record-actions"><button type="button" class="btn btn-sm btn-outline" data-dev-action="edit-product" data-store-id="' + escapeHtml(storeId) + '" data-product-id="' + escapeHtml(product.id) + '" aria-label="تعديل المنتج"><i class="fas fa-edit"></i></button><button type="button" class="btn btn-sm btn-danger" data-dev-action="delete-product" data-store-id="' + escapeHtml(storeId) + '" data-product-id="' + escapeHtml(product.id) + '" aria-label="حذف المنتج"><i class="fas fa-trash"></i></button></div></article>';
+    }).join('') : '<p class="muted-empty">لا توجد منتجات لهذا المتجر.</p>';
     select.onchange = devRefreshProductsList;
+    var panel = document.getElementById('app-content');
+    if (panel) bindDevPanelActions(panel);
 }
 
 function devEditProduct(storeId, productId) {
+    if (!requireDeveloperWrite()) return;
     let store = db.stores.find(function(s) { return s.id === storeId; });
-    let product = store.products.find(function(p) { return p.id === productId; });
-    if (!product) return;
+    let product = store && Array.isArray(store.products) ? store.products.find(function(p) { return p.id === productId; }) : null;
+    if (!product) return showToast('المنتج غير موجود', 'error');
     tempImageBase64 = product.img || '';
-    showModal("✏️ تعديل منتج", '<input id="dev-edit-name" value="' + product.name + '" placeholder="اسم المنتج"><input id="dev-edit-price" type="number" value="' + product.price + '" placeholder="السعر"><label>صورة جديدة (اختياري)</label><input type="file" accept="image/*" onchange="encodeImage(this)">', 'confirm', function() {
+    showModal("تعديل المنتج", '<input id="dev-edit-name" maxlength="80" value="' + escapeHtml(product.name) + '" placeholder="اسم المنتج"><input id="dev-edit-price" type="number" min="0.01" value="' + escapeHtml(product.price) + '" placeholder="السعر"><label>صورة جديدة (اختياري)</label><input type="file" accept="image/*" onchange="encodeImage(this)">', 'confirm', function() {
         let newName = document.getElementById('dev-edit-name') ? document.getElementById('dev-edit-name').value : '';
         let newPrice = document.getElementById('dev-edit-price') ? document.getElementById('dev-edit-price').value : '';
-        if (!newName || !newPrice) return showToast('الرجاء إدخال الاسم والسعر', 'error');
-        product.name = newName; product.price = parseInt(newPrice);
+        if (!newName.trim() || !newPrice || Number(newPrice) <= 0) return showToast('أدخل اسماً وسعراً صحيحاً أكبر من صفر', 'error');
+        let previous = { name:product.name, price:product.price, img:product.img };
+        product.name = newName.trim(); product.price = Number(newPrice);
         if (tempImageBase64) product.img = tempImageBase64;
-        sync(); devRefreshProductsList(); showToast('تم تعديل المنتج');
+        persistDevChange('تم تعديل المنتج', function() { product.name = previous.name; product.price = previous.price; product.img = previous.img; });
     });
 }
 
 function devDeleteProduct(storeId, productId) {
+    if (!requireDeveloperWrite()) return;
     let store = db.stores.find(function(s) { return s.id === storeId; });
-    store.products = store.products.filter(function(p) { return p.id !== productId; });
-    sync(); devRefreshProductsList(); showToast('تم حذف المنتج');
+    if (!store || !Array.isArray(store.products)) return showToast('المنتج غير موجود', 'error');
+    let product = store.products.find(function(item) { return item.id === productId; });
+    if (!product) return showToast('المنتج غير موجود', 'error');
+    showModal('حذف المنتج نهائياً', 'سيتم حذف «' + escapeHtml(product.name) + '» من قائمة المتجر. قد يبقى اسمه ضمن الطلبات السابقة.', 'confirm', function() {
+        let previous = store.products.slice();
+        store.products = store.products.filter(function(item) { return item.id !== productId; });
+        persistDevChange('تم حذف المنتج', function() { store.products = previous; });
+    });
 }
 
 function devShowAddProduct() {
+    if (!requireDeveloperWrite()) return;
     let storeId = document.getElementById('dev-store-select').value;
+    if (!storeId) return showToast('اختر متجراً أولاً', 'warning');
     tempImageBase64 = '';
-    showModal("➕ إضافة منتج", '<input id="dev-prod-name" placeholder="اسم المنتج"><input id="dev-prod-price" type="number" placeholder="السعر"><label>صورة المنتج (اختياري)</label><input type="file" accept="image/*" onchange="encodeImage(this)">', 'confirm', function() {
+    showModal("إضافة منتج", '<input id="dev-prod-name" maxlength="80" placeholder="اسم المنتج"><input id="dev-prod-price" type="number" min="0.01" placeholder="السعر"><label>صورة المنتج (اختياري)</label><input type="file" accept="image/*" onchange="encodeImage(this)">', 'confirm', function() {
         let name = document.getElementById('dev-prod-name') ? document.getElementById('dev-prod-name').value : '';
         let price = document.getElementById('dev-prod-price') ? document.getElementById('dev-prod-price').value : '';
-        if (!name || !price) return showToast('الرجاء إدخال الاسم والسعر', 'error');
+        if (!name.trim() || !price || Number(price) <= 0) return showToast('أدخل اسماً وسعراً صحيحاً أكبر من صفر', 'error');
         let store = db.stores.find(function(s) { return s.id === storeId; });
-        if (!store.products) store.products = [];
-        store.products.push({ id: 'P'+Date.now(), name: name, price: parseInt(price), img: tempImageBase64 });
-        sync(); devRefreshProductsList(); showToast('تم إضافة المنتج');
+        if (!store) return showToast('المتجر غير موجود', 'error');
+        let previous = Array.isArray(store.products) ? store.products.slice() : [];
+        store.products = previous.slice();
+        store.products.push({ id:'P' + Date.now(), name:name.trim(), price:Number(price), img:tempImageBase64 });
+        persistDevChange('تم إضافة المنتج', function() { store.products = previous; });
+    });
+}
+
+function devToggleStore(sid) {
+    if (!requireDeveloperWrite()) return;
+    var store = db.stores.find(function(item) { return item.id === sid; });
+    if (!store) return showToast('المتجر غير موجود', 'error');
+    var wasOpen = store.isOpen !== false;
+    var newState = !wasOpen;
+    showModal(newState ? 'فتح المتجر' : 'إيقاف المتجر', 'تغيير حالة «' + escapeHtml(store.name || 'المتجر') + '» دون حذف بياناته أو طلباته؟', 'confirm', function() {
+        store.isOpen = newState;
+        persistDevChange(newState ? 'تم فتح المتجر' : 'تم إيقاف المتجر', function() { store.isOpen = wasOpen; });
     });
 }
 
 function devDeleteStore(sid) {
-    db.stores = db.stores.filter(function(s) { return s.id !== sid; });
-    sync(); renderSuperAdminPanel(); showToast('تم حذف المتجر');
+    if (!requireDeveloperWrite()) return;
+    var store = db.stores.find(function(item) { return item.id === sid; });
+    if (!store) return showToast('المتجر غير موجود', 'error');
+    var activeOrders = db.orders.filter(function(order) { return order.storeId === sid && !/(تم التسليم|مكتمل|ملغي|مرفوض)/.test(String(order.status || '')); }).length;
+    if (activeOrders) return showToast('لا يمكن حذف متجر لديه ' + activeOrders + ' طلبات غير مكتملة. أوقفه مؤقتاً بدلاً من ذلك.', 'warning', 5000);
+    showModal('حذف المتجر نهائياً', 'سيتم حذف «' + escapeHtml(store.name || 'المتجر') + '». ستبقى الطلبات التاريخية، لكن لن يعود المتجر للقائمة.', 'confirm', function() {
+        var previous = db.stores.slice();
+        db.stores = db.stores.filter(function(item) { return item.id !== sid; });
+        persistDevChange('تم حذف المتجر', function() { db.stores = previous; });
+    });
 }
 
 function devAddStore() {
-    let name = document.getElementById('dev-s-name').value;
-    let owner = document.getElementById('dev-s-owner').value;
-    if (!name) return;
+    if (!requireDeveloperWrite()) return;
+    let name = document.getElementById('dev-s-name').value.trim();
+    let owner = document.getElementById('dev-s-owner').value.trim();
+    if (!name) return showToast('أدخل اسم المتجر', 'error');
+    let previous = db.stores.slice();
     db.stores.push({ id: 'S'+Date.now(), name: name, ownerId: owner, category: 'other', products: [], ratingSum: 0, ratingCount: 0, isOpen: true, reviews: [] });
-    sync(); renderSuperAdminPanel(); showToast('تم إضافة المتجر');
+    persistDevChange('تم إضافة المتجر', function() { db.stores = previous; });
 }
 
 firebaseAuth.onAuthStateChanged(function(user) {
