@@ -2322,7 +2322,7 @@ window.addEventListener('appinstalled', function() {
 <script>
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js?v=3', { scope: './' }).then(function(registration) {
+    navigator.serviceWorker.register('sw.js?v=4', { scope: './' }).then(function(registration) {
       registration.addEventListener('updatefound', function() {
         var worker = registration.installing;
         if (worker) worker.addEventListener('statechange', function() {
