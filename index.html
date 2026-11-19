@@ -163,14 +163,30 @@ header { padding:16px 20px; display:flex; justify-content:space-between; align-i
 .auth-input-wrap { position:relative; }
 .auth-input-wrap i { position:absolute;right:16px;top:50%;transform:translateY(-50%);color:var(--primary); }
 .auth-input-wrap input { padding-right:45px; }
-.auth-type-title { color:#a9b8d1;font-size:.8rem;margin-top:12px; }
-.auth-types { display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 15px; }
-.auth-type { width:100%;padding:11px 5px;border:1px solid var(--border);border-radius:13px;text-align:center;color:var(--text-muted);cursor:pointer;font-size:.75rem;transition:.2s;background:rgba(255,255,255,.03);appearance:none;-webkit-appearance:none; }
-.auth-type.active { border-color:var(--primary);background:rgba(0,212,255,.12);color:var(--primary);box-shadow:0 0 0 2px rgba(0,212,255,.08); }
-.auth-type i { display:block;font-size:1.25rem;margin-bottom:4px; }
-.auth-type:active { transform:scale(.97); }
-	.auth-hint { text-align:center;color:var(--text-muted);font-size:.74rem;margin-top:12px;line-height:1.7; }
-	.brand-mark { width:34px;height:34px;border-radius:10px;object-fit:cover;vertical-align:middle;box-shadow:0 0 16px rgba(0,212,255,.28); }
+	.auth-type-title { color:#a9b8d1;font-size:.8rem;margin-top:12px; }
+	.auth-types { display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 15px; }
+	.auth-type { width:100%;padding:11px 5px;border:1px solid var(--border);border-radius:13px;text-align:center;color:var(--text-muted);cursor:pointer;font-size:.75rem;transition:.2s;background:rgba(255,255,255,.03);appearance:none;-webkit-appearance:none; }
+	.auth-type.active { border-color:var(--primary);background:rgba(0,212,255,.12);color:var(--primary);box-shadow:0 0 0 2px rgba(0,212,255,.08); }
+	.auth-type i { display:block;font-size:1.25rem;margin-bottom:4px; }
+	.auth-type:active { transform:scale(.97); }
+		.auth-hint { text-align:center;color:var(--text-muted);font-size:.74rem;margin-top:12px;line-height:1.7; }
+	.auth-mode-tabs { display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:5px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:15px;margin-bottom:15px; }
+	.auth-mode-tab { border:0;border-radius:11px;background:transparent;color:var(--text-muted);padding:11px 8px;font:inherit;font-size:.8rem;cursor:pointer;transition:.2s; }
+	.auth-mode-tab.active { background:var(--gradient-1);color:#fff;box-shadow:0 5px 16px rgba(0,212,255,.2); }
+	.auth-mode-note { display:flex;gap:9px;align-items:flex-start;padding:11px 12px;border-radius:13px;background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.2);color:#bfe8cf;font-size:.76rem;line-height:1.65;margin-bottom:13px; }
+	.auth-mode-note i { color:var(--success);margin-top:3px; }
+	.auth-google { display:flex;align-items:center;justify-content:center;gap:9px;color:var(--text);border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.04); }
+	.auth-google i { color:#ea4335; }
+	.auth-divider { display:flex;align-items:center;gap:10px;color:var(--text-muted);font-size:.72rem;margin:14px 0; }
+	.auth-divider::before,.auth-divider::after { content:'';height:1px;flex:1;background:var(--border); }
+	.auth-reset { display:block;width:100%;border:0;background:transparent;color:var(--primary);font:inherit;font-size:.76rem;cursor:pointer;margin-top:12px; }
+	.auth-reset:hover { text-decoration:underline; }
+	.auth-submit.is-loading { opacity:.7;pointer-events:none; }
+	.auth-submit .auth-spinner { display:none; }
+	.auth-submit.is-loading .auth-spinner { display:inline-block; }
+	.auth-submit.is-loading .auth-submit-icon { display:none; }
+	.auth-success-note { display:flex;gap:9px;align-items:center;padding:11px 12px;border-radius:13px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);color:#c9f5ff;font-size:.78rem;line-height:1.6;margin-bottom:13px; }
+		.brand-mark { width:34px;height:34px;border-radius:10px;object-fit:cover;vertical-align:middle;box-shadow:0 0 16px rgba(0,212,255,.28); }
 	.section-toolbar { display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px; }
 	.section-toolbar h3 { margin:0; }
 	.app-promo { background:linear-gradient(135deg,rgba(0,212,255,.16),rgba(0,119,182,.12));border-color:rgba(0,212,255,.35); }
@@ -237,6 +253,7 @@ const firebaseConfig = { apiKey: "AIzaSyBws34UGupiHQJDe_AL2HjS0DGPcUfG3H0", auth
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 const firebaseAuth = firebase.auth();
+const googleProvider = new firebase.auth.GoogleAuthProvider();
 const DEVELOPER_EMAIL = 'muhammadmoad5@gmail.com';
 
 // ==================== البيانات العامة ====================
@@ -272,6 +289,9 @@ let activeLocationWatchId = null, activeLocationOrderId = null, liveLocationRef 
 let liveMap = null, liveMarker = null, liveMapOrderId = null;
 let deferredInstallPrompt = null;
 let appInstalledThisSession = false;
+let authMode = 'email';
+let pendingAuthProfile = null;
+let authBusy = false;
 
 // ==================== Theme ====================
 function applyTheme() {
@@ -455,32 +475,107 @@ function renderDatabaseError(error) {
         '<small style="display:block;color:var(--text-muted);margin-top:14px">رمز الخطأ: ' + code + '</small></div></div>';
 }
 
+function authErrorMessage(error, action) {
+    var code = error && error.code ? error.code : '';
+    if (code === 'auth/wrong-password' || code === 'auth/invalid-credential' || code === 'auth/invalid-login-credentials') return 'بيانات الدخول غير صحيحة. راجع البريد/الرمز وكلمة المرور.';
+    if (code === 'auth/user-not-found') return 'الحساب غير موجود. أنشئ حساباً جديداً أو جرّب الدخول بحساب Google.';
+    if (code === 'auth/email-already-in-use') return 'هذا البريد مسجل مسبقاً. سنحاول إرجاعك إلى حسابك بدلاً من إنشاء حساب مكرر.';
+    if (code === 'auth/account-exists-with-different-credential') return 'هذا البريد مرتبط بطريقة دخول أخرى. استخدم البريد وكلمة المرور أو افتح Gmail بنفس الحساب.';
+    if (code === 'auth/too-many-requests') return 'تم إيقاف المحاولات مؤقتاً لحماية الحساب. حاول لاحقاً.';
+    if (code === 'auth/popup-closed-by-user') return 'أُغلقت نافذة Google قبل إكمال الدخول.';
+    if (code === 'auth/popup-blocked') return 'المتصفح منع نافذة Google. سنستخدم صفحة دخول بديلة.';
+    if (code === 'auth/invalid-email') return 'صيغة البريد الإلكتروني غير صحيحة.';
+    if (code === 'auth/weak-password') return 'كلمة المرور ضعيفة. استخدم 6 أحرف أو أكثر.';
+    if (code === 'auth/user-disabled') return 'تم إيقاف هذا الحساب. تواصل مع الإدارة.';
+    return (action === 'signup' ? 'تعذر إنشاء الحساب.' : 'تعذر تسجيل الدخول.') + (error && error.message ? ' ' + error.message : '');
+}
+
+function hideAppShell() {
+    document.getElementById('main-header').style.display = 'none';
+    document.getElementById('main-nav').style.display = 'none';
+    document.getElementById('report-btn').style.display = 'none';
+}
+
+function renderAuthLoading(message) {
+    hideAppShell();
+    document.getElementById('app-content').innerHTML = '<div class="card auth-modern auth-loading-card"><div class="auth-hero"><img src="icons/icon-192.png" class="auth-logo-modern" alt="هوية زلطن تريبول"><h2>جاري الدخول</h2><p>' + (message || 'نجهز حسابك ونفتح التطبيق…') + '</p></div><div class="auth-form" style="text-align:center"><i class="fas fa-circle-notch fa-spin" style="color:var(--primary);font-size:2rem"></i><p style="color:var(--text-muted);margin-top:12px">لن تحتاج للانتقال إلى قسم آخر؛ ستظهر الصفحة تلقائياً بعد اكتمال الدخول.</p></div></div>';
+}
+
+function authProfileTemplate(authUser, overrides) {
+    overrides = overrides || {};
+    var authEmail = (authUser.email || '').toLowerCase();
+    var isDeveloper = authEmail === DEVELOPER_EMAIL;
+    var name = overrides.name || authUser.displayName || (overrides.loginName || '') || (authEmail ? authEmail.split('@')[0] : 'مستخدم جديد');
+    var type = isDeveloper ? 'developer' : (overrides.type || 'customer');
+    return {
+        id: 'AUTH_' + authUser.uid, authUid: authUser.uid, name: name, email: isDeveloper ? authUser.email : (overrides.email || (overrides.loginMode === 'quick' ? '' : authUser.email)),
+        authEmail: authUser.email || '', loginName: overrides.loginName || '', loginMode: overrides.loginMode || 'email', pass: '', type: type, role: type, isDeveloper: isDeveloper,
+        phone: overrides.phone || '', cashCollected: 0, notifications: [], wallet: 0, addresses: [], createdAt: new Date().toLocaleString('ar-LY'), avatar: '', bio: '', rating: 0, ratingCount: 0
+    };
+}
+
+function persistAuthProfile(profile) {
+    if (!profile || !profile.id) return;
+    database.ref('appData/users/' + profile.id).set(profile).catch(function() {
+        // بعض نسخ قواعد Firebase تمنع الكتابة للمستخدم العادي، لكن الجلسة نفسها تبقى صالحة.
+    });
+}
+
+function finishAuthenticatedUser(authUser, overrides) {
+    if (!authUser) return;
+    overrides = overrides || {};
+    pendingAuthProfile = { authUid: authUser.uid, name: overrides.name || '', loginName: overrides.loginName || '', loginMode: overrides.loginMode || 'email', type: overrides.type || 'customer', phone: overrides.phone || '', email: overrides.email || '' };
+    if (overrides.type) localStorage.setItem('z_pending_role', overrides.type);
+    renderAuthLoading('تم التحقق من الحساب، نربط بياناتك الآن…');
+    firebaseDataLoaded = false;
+    loadData();
+}
+
 function checkAuth() {
     var authUser = firebaseAuth.currentUser;
     if (authUser) {
         var authEmail = (authUser.email || '').toLowerCase();
-        var authProfile = db.users.find(function(u) { return u.authUid === authUser.uid || (u.email && u.email.toLowerCase() === authEmail); });
-        if (!authProfile && authEmail === DEVELOPER_EMAIL) {
-            authProfile = { id:'AUTH_' + authUser.uid, authUid:authUser.uid, name:'moad', email:authUser.email, pass:'', type:'developer', role:'developer', isDeveloper:true, phone:'', cashCollected:0, notifications:[], wallet:0, addresses:[], createdAt:new Date().toLocaleString('ar-LY'), avatar:'', bio:'', rating:0, ratingCount:0 };
-            db.users.push(authProfile);
+        var pending = pendingAuthProfile && pendingAuthProfile.authUid === authUser.uid ? pendingAuthProfile : null;
+        if (!pending) {
+            pending = { type: localStorage.getItem('z_pending_role') || 'customer', loginMode: authEmail.indexOf('@quick.zliten.tripol') !== -1 ? 'quick' : 'email' };
         }
-        if (authProfile) { currentUser = authProfile; localStorage.setItem('z_user_id', authProfile.id); updateUI(); return; }
+        var authProfile = db.users.find(function(u) {
+            return u.authUid === authUser.uid || (authEmail && u.email && u.email.toLowerCase() === authEmail) || (pending.loginName && u.loginName && u.loginName.toLowerCase() === pending.loginName.toLowerCase());
+        });
+        if (!authProfile) {
+            authProfile = authProfileTemplate(authUser, pending);
+            db.users.push(authProfile);
+            persistAuthProfile(authProfile);
+        } else {
+            var profileChanged = false;
+            if (!authProfile.authUid) { authProfile.authUid = authUser.uid; profileChanged = true; }
+            if (!authProfile.authEmail) { authProfile.authEmail = authUser.email || ''; profileChanged = true; }
+            if (pending.loginName && !authProfile.loginName) { authProfile.loginName = pending.loginName; profileChanged = true; }
+            if (pending.loginMode && !authProfile.loginMode) { authProfile.loginMode = pending.loginMode; profileChanged = true; }
+            if (pending.phone && !authProfile.phone) { authProfile.phone = pending.phone; profileChanged = true; }
+            if (profileChanged) persistAuthProfile(authProfile);
+        }
+        currentUser = authProfile;
+        pendingAuthProfile = null;
+        localStorage.removeItem('z_pending_role');
+        localStorage.setItem('z_user_id', authProfile.id);
+        updateUI();
+        return;
     }
     let savedId = localStorage.getItem('z_user_id');
     if (savedId && db.users.length) {
         let user = db.users.find(function(u) { return u.id === savedId; });
         if (user) { currentUser = user; updateUI(); return; }
     }
+    currentUser = null;
     renderAuth();
 }
 
 function logout() {
     stopLiveLocationTracking(true);
     firebaseAuth.signOut().catch(function(){});
-    localStorage.removeItem('z_user_id'); localStorage.removeItem('z_developer_session'); currentUser = null; cart = []; appliedCoupon = null; currentLocation = null;
-    document.getElementById('main-header').style.display = 'none';
-    document.getElementById('main-nav').style.display = 'none';
-    document.getElementById('report-btn').style.display = 'none';
+    localStorage.removeItem('z_user_id'); localStorage.removeItem('z_developer_session'); localStorage.removeItem('z_pending_role'); currentUser = null; pendingAuthProfile = null; authMode = 'email'; setAuthBusy(false); cart = []; appliedCoupon = null; currentLocation = null;
+    hideAppShell();
     document.getElementById('quick-menu').style.display = 'none';
     document.getElementById('cart-count').style.display = 'none';
     document.getElementById('notify-badge').style.display = 'none';
@@ -557,28 +652,65 @@ function navigate(page, param) {
 }
 
 // ==================== المصادقة ====================
+function selectAuthMode(mode) {
+    if (authBusy) return;
+    authMode = mode === 'quick' ? 'quick' : 'email';
+    renderAuth();
+}
+
+function setAuthBusy(value) {
+    authBusy = !!value;
+    document.querySelectorAll('.auth-submit').forEach(function(button) {
+        button.classList.toggle('is-loading', authBusy);
+        button.disabled = authBusy;
+    });
+}
+
+function normalizeQuickName(value) {
+    return String(value || '').trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+function quickEmailForName(name) {
+    var normalized = normalizeQuickName(name);
+    var encoded = btoa(unescape(encodeURIComponent(normalized))).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    return 'u_' + encoded + '@quick.zliten.tripol';
+}
+
+function quickPasswordForCode(code) {
+    return 'Zliten#' + String(code || '').trim() + '!';
+}
+
 function renderAuth() {
+    hideAppShell();
+    var isQuick = authMode === 'quick';
+    var selectedType = localStorage.getItem('z_pending_role') || 'customer';
     document.getElementById('app-content').innerHTML =
         '<div class="animate-fade">' +
         '<div class="card auth-modern">' +
         '<div class="auth-hero"><img src="icons/icon-192.png" class="auth-logo-modern" alt="هوية زلطن تريبول">' +
-        '<h2>زلطن تريبول</h2><p>سوقك المحلي في مكان واحد</p></div>' +
+        '<h2>زلطن تريبول</h2><p>ادخل بسرعة وخلّ طلبك علينا</p></div>' +
         '<div class="auth-form">' +
-        '<div class="auth-label">البريد الإلكتروني</div>' +
-        '<div class="auth-input-wrap"><i class="fas fa-envelope"></i><input id="auth-email" type="email" placeholder="example@email.com" autocomplete="email"></div>' +
-        '<div class="auth-label">كلمة المرور</div>' +
-        '<div class="auth-input-wrap"><i class="fas fa-lock"></i><input id="auth-pass" type="password" placeholder="6 أحرف على الأقل" autocomplete="current-password"></div>' +
+        '<div class="auth-mode-tabs" role="tablist">' +
+        '<button type="button" class="auth-mode-tab ' + (!isQuick ? 'active' : '') + '" onclick="selectAuthMode(\'email\')"><i class="fas fa-envelope"></i> بالبريد الإلكتروني</button>' +
+        '<button type="button" class="auth-mode-tab ' + (isQuick ? 'active' : '') + '" onclick="selectAuthMode(\'quick\')"><i class="fas fa-bolt"></i> باسم ورمز فقط</button>' +
+        '</div>' +
+        (isQuick ? '<div class="auth-mode-note"><i class="fas fa-bolt"></i><span>أنشئ حساباً سريعاً باسمك ورمز من 4 أحرف أو أرقام. لا تحتاج إلى بريد، ويمكنك استعمال نفس البيانات للعودة لحسابك.</span></div>' : '<div class="auth-success-note"><i class="fas fa-shield-halved"></i><span>لرجوع أسرع لحسابك، استخدم Gmail من الزر بالأسفل أو سجّل بالبريد وكلمة المرور.</span></div>') +
+        (isQuick ? '<div class="auth-label">اسم الدخول</div><div class="auth-input-wrap"><i class="fas fa-user"></i><input id="auth-name" type="text" maxlength="32" placeholder="مثال: محمد الزليطني" autocomplete="username"></div>' : '<div class="auth-label">البريد الإلكتروني</div><div class="auth-input-wrap"><i class="fas fa-envelope"></i><input id="auth-email" type="email" placeholder="example@email.com" autocomplete="email"></div>') +
+        '<div class="auth-label">' + (isQuick ? 'رمز الدخول' : 'كلمة المرور') + '</div>' +
+        '<div class="auth-input-wrap"><i class="fas fa-' + (isQuick ? 'key' : 'lock') + '"></i><input id="auth-pass" type="password" ' + (isQuick ? 'inputmode="numeric" maxlength="32"' : '') + ' placeholder="' + (isQuick ? '4 أحرف أو أرقام على الأقل' : '6 أحرف على الأقل') + '" autocomplete="' + (isQuick ? 'current-password' : 'current-password') + '"></div>' +
         '<div class="auth-label">رقم الهاتف <small>(اختياري)</small></div>' +
-        '<div class="auth-input-wrap"><i class="fas fa-phone"></i><input id="auth-phone" inputmode="tel" placeholder="09xxxxxxxx"></div>' +
+        '<div class="auth-input-wrap"><i class="fas fa-phone"></i><input id="auth-phone" inputmode="tel" placeholder="09xxxxxxxx" autocomplete="tel"></div>' +
         '<div class="auth-type-title">كيف ستستخدم التطبيق؟</div>' +
         '<div class="auth-types">' +
-        '<button type="button" class="auth-type active" data-auth-type="customer"><i class="fas fa-user"></i>زبون</button>' +
-        '<button type="button" class="auth-type" data-auth-type="store_owner"><i class="fas fa-store"></i>تاجر</button>' +
-        '<button type="button" class="auth-type" data-auth-type="driver"><i class="fas fa-motorcycle"></i>سائق</button>' +
-        '</div><input type="hidden" id="auth-type" value="customer">' +
-        '<button class="btn btn-primary btn-lg" onclick="handleAuth()"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول الآمن</button>' +
-        '<button class="btn btn-outline btn-lg" style="margin-top:10px" onclick="createFirebaseAccount()"><i class="fas fa-user-plus"></i> إنشاء حساب جديد</button>' +
-        '<button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="navigate(\'guide\')"><i class="fas fa-book-open"></i> كيف أستخدم التطبيق؟</button>' +
+        '<button type="button" class="auth-type ' + (selectedType === 'customer' ? 'active' : '') + '" data-auth-type="customer"><i class="fas fa-user"></i>زبون</button>' +
+        '<button type="button" class="auth-type ' + (selectedType === 'store_owner' ? 'active' : '') + '" data-auth-type="store_owner"><i class="fas fa-store"></i>تاجر</button>' +
+        '<button type="button" class="auth-type ' + (selectedType === 'driver' ? 'active' : '') + '" data-auth-type="driver"><i class="fas fa-motorcycle"></i>سائق</button>' +
+        '</div><input type="hidden" id="auth-type" value="' + selectedType + '">' +
+        (isQuick ? '<button class="btn btn-primary btn-lg auth-submit" onclick="quickAuth()"><i class="fas fa-bolt auth-submit-icon"></i><i class="fas fa-circle-notch fa-spin auth-spinner"></i> دخول سريع / إنشاء حساب</button>' : '<button class="btn btn-primary btn-lg auth-submit" onclick="handleAuth()"><i class="fas fa-sign-in-alt auth-submit-icon"></i><i class="fas fa-circle-notch fa-spin auth-spinner"></i> تسجيل الدخول</button>' +
+        '<div class="auth-divider"><span>أو</span></div><button class="btn btn-outline btn-lg auth-google auth-submit" onclick="signInWithGoogle()"><i class="fab fa-google"></i> الرجوع السريع بحساب Gmail</button>' +
+        '<button class="btn btn-outline btn-lg" style="margin-top:10px" onclick="createFirebaseAccount()"><i class="fas fa-user-plus"></i> إنشاء حساب بالبريد</button>' +
+        '<button class="auth-reset" onclick="resetPassword()"><i class="fas fa-key"></i> نسيت كلمة المرور؟ أرسل رابط استرجاع</button>') +
+        '<button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="navigate(\'guide\')"><i class="fas fa-book-open"></i> كيف أستخدم التطبيق؟</button>' +
         '<button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="showPolicy()"><i class="fas fa-shield-alt"></i> سياسة الاستخدام والخصوصية</button>' +
         '<div class="auth-hint">بتسجيل الدخول أنت توافق على شروط استخدام زلطن تريبول<br>📍 زلطن - ليبيا</div>' +
         '</div></div></div>';
@@ -591,6 +723,7 @@ function selectAuthType(el, type) {
     document.querySelectorAll('.auth-type').forEach(function(x){ x.classList.remove('active'); });
     el.classList.add('active');
     var input = document.getElementById('auth-type'); if (input) input.value = type;
+    localStorage.setItem('z_pending_role', type);
 }
 
 function handleAuth() {
@@ -600,18 +733,13 @@ function handleAuth() {
     let phone = document.getElementById('auth-phone') ? document.getElementById('auth-phone').value : '';
     if (!email || !pass) { showToast('أدخل البريد الإلكتروني وكلمة المرور', 'error'); return; }
     if (pass.length < 6) { showToast('كلمة المرور يجب أن تكون 6 أحرف على الأقل', 'error'); return; }
+    setAuthBusy(true);
     firebaseAuth.signInWithEmailAndPassword(email, pass).then(function(result) {
-        var authUser = result.user;
-        var profile = db.users.find(function(u) { return u.authUid === authUser.uid || (u.email && u.email.toLowerCase() === email); });
-        if (!profile && email === DEVELOPER_EMAIL) {
-            profile = { id:'AUTH_' + authUser.uid, authUid:authUser.uid, name:'moad', email:email, pass:'', type:'developer', role:'developer', isDeveloper:true, phone:phone, cashCollected:0, notifications:[], wallet:0, addresses:[], createdAt:new Date().toLocaleString('ar-LY'), avatar:'', bio:'', rating:0, ratingCount:0 };
-            db.users.push(profile);
-            database.ref('appData/users/' + profile.id).set(profile).catch(function(){ });
-        }
-        if (!profile) { showToast('تم تسجيل الدخول، لكن حسابك غير مربوط بملف مستخدم داخل التطبيق', 'warning', 5000); return; }
-        currentUser = profile; localStorage.setItem('z_user_id', profile.id); updateUI(); database.ref('appData').off(); loadData();
+        finishAuthenticatedUser(result.user, { type: type, phone: phone, email: email, loginMode: 'email' });
+        showToast('تم التحقق من حسابك، لحظات ونفتح التطبيق…', 'success', 2500);
     }).catch(function(error) {
-        var message = error && (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-login-credentials') ? 'البريد أو كلمة المرور غير صحيحة. تأكد من إنشاء الحساب في Firebase Authentication.' : error && error.code === 'auth/user-not-found' ? 'الحساب غير موجود. اضغط «إنشاء حساب جديد» أولاً.' : error && error.code === 'auth/too-many-requests' ? 'تم إيقاف المحاولات مؤقتاً. حاول لاحقاً أو أعد تعيين كلمة المرور.' : (error.message || 'تعذر تسجيل الدخول');
+        setAuthBusy(false);
+        var message = authErrorMessage(error, 'login');
         showToast(message, 'error', 5000);
     });
 }
@@ -623,17 +751,86 @@ function createFirebaseAccount() {
     var phone = document.getElementById('auth-phone') ? document.getElementById('auth-phone').value : '';
     if (!email || !pass) { showToast('أدخل البريد وكلمة المرور لإنشاء الحساب', 'error'); return; }
     if (pass.length < 6) { showToast('كلمة المرور يجب أن تكون 6 أحرف على الأقل', 'error'); return; }
+    setAuthBusy(true);
     firebaseAuth.createUserWithEmailAndPassword(email, pass).then(function(result) {
         var u = result.user;
-        var developer = email === DEVELOPER_EMAIL;
-        var profile = { id:'AUTH_' + u.uid, authUid:u.uid, name:developer ? 'moad' : email.split('@')[0], email:email, pass:'', type:developer ? 'developer' : type, role:developer ? 'developer' : type, isDeveloper:developer, phone:phone, cashCollected:0, notifications:[], wallet:0, addresses:[], createdAt:new Date().toLocaleString('ar-LY'), avatar:'', bio:'', rating:0, ratingCount:0 };
-        db.users.push(profile); currentUser = profile; localStorage.setItem('z_user_id', profile.id); updateUI();
-        database.ref('appData/users/' + profile.id).set(profile).then(function(){ loadData(); }).catch(function(){ loadData(); });
-        showToast('تم إنشاء الحساب وتسجيل الدخول بنجاح');
+        finishAuthenticatedUser(u, { type: type, phone: phone, email: email, loginMode: 'email', name: email.split('@')[0] });
+        showToast('تم إنشاء الحساب بنجاح، لحظات ونفتح التطبيق…', 'success', 2500);
     }).catch(function(error) {
-        var message = error && error.code === 'auth/email-already-in-use' ? 'هذا البريد مسجل مسبقاً. استخدم تسجيل الدخول.' : error && error.code === 'auth/invalid-email' ? 'صيغة البريد الإلكتروني غير صحيحة.' : error && error.code === 'auth/weak-password' ? 'كلمة المرور ضعيفة. استخدم 6 أحرف أو أكثر.' : (error.message || 'تعذر إنشاء الحساب');
-        showToast(message, 'error', 5000);
+        if (error && error.code === 'auth/email-already-in-use') {
+            firebaseAuth.signInWithEmailAndPassword(email, pass).then(function(result) {
+                finishAuthenticatedUser(result.user, { type: type, phone: phone, email: email, loginMode: 'email' });
+                showToast('هذا البريد كان مسجلاً، تم إرجاعك إلى حسابك مباشرة.', 'success', 3500);
+            }).catch(function(loginError) {
+                setAuthBusy(false);
+                showToast('هذا البريد مسجل مسبقاً. استخدم كلمة المرور الأصلية أو اضغط «نسيت كلمة المرور؟».', 'warning', 6000);
+            });
+            return;
+        }
+        setAuthBusy(false);
+        showToast(authErrorMessage(error, 'signup'), 'error', 5000);
     });
+}
+
+function quickAuth() {
+    var name = normalizeQuickName(document.getElementById('auth-name') ? document.getElementById('auth-name').value : '');
+    var code = document.getElementById('auth-pass') ? document.getElementById('auth-pass').value.trim() : '';
+    var type = document.getElementById('auth-type').value;
+    var phone = document.getElementById('auth-phone') ? document.getElementById('auth-phone').value : '';
+    if (name.length < 2 || name.length > 32) { showToast('اكتب اسماً بين حرفين و32 حرفاً', 'error'); return; }
+    if (code.length < 4) { showToast('رمز الدخول يجب أن يكون 4 أحرف أو أرقام على الأقل', 'error'); return; }
+    var quickEmail = quickEmailForName(name);
+    var quickPassword = quickPasswordForCode(code);
+    setAuthBusy(true);
+    firebaseAuth.signInWithEmailAndPassword(quickEmail, quickPassword).then(function(result) {
+        finishAuthenticatedUser(result.user, { type: type, phone: phone, loginMode: 'quick', loginName: name, name: name });
+        showToast('تم إرجاع حسابك بسرعة.', 'success', 2500);
+    }).catch(function(error) {
+        if (error && error.code === 'auth/user-not-found') {
+            firebaseAuth.createUserWithEmailAndPassword(quickEmail, quickPassword).then(function(result) {
+                var update = result.user.updateProfile ? result.user.updateProfile({ displayName: name }) : Promise.resolve();
+                update.catch(function(){}).then(function() {
+                    finishAuthenticatedUser(result.user, { type: type, phone: phone, loginMode: 'quick', loginName: name, name: name });
+                    showToast('تم إنشاء حسابك السريع بنجاح.', 'success', 3000);
+                });
+            }).catch(function(createError) {
+                setAuthBusy(false);
+                showToast(authErrorMessage(createError, 'signup'), 'error', 5000);
+            });
+            return;
+        }
+        setAuthBusy(false);
+        showToast(error && (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') ? 'رمز الدخول غير صحيح لهذا الاسم.' : authErrorMessage(error, 'login'), 'error', 5000);
+    });
+}
+
+function signInWithGoogle() {
+    var type = document.getElementById('auth-type') ? document.getElementById('auth-type').value : 'customer';
+    localStorage.setItem('z_pending_role', type);
+    googleProvider.setCustomParameters({ prompt: 'select_account' });
+    setAuthBusy(true);
+    renderAuthLoading('نفتح Google لتسجيل الدخول الآمن…');
+    var flow = isNativeApp() ? firebaseAuth.signInWithRedirect(googleProvider) : firebaseAuth.signInWithPopup(googleProvider);
+    flow.then(function(result) {
+        if (result && result.user) finishAuthenticatedUser(result.user, { type: type, loginMode: 'google', email: result.user.email || '', name: result.user.displayName || '' });
+    }).catch(function(error) {
+        if (error && (error.code === 'auth/popup-blocked' || error.code === 'auth/operation-not-supported-in-this-environment')) {
+            firebaseAuth.signInWithRedirect(googleProvider).catch(function(redirectError) {
+                setAuthBusy(false); renderAuth(); showToast(authErrorMessage(redirectError, 'login'), 'error', 5000);
+            });
+            return;
+        }
+        setAuthBusy(false); renderAuth(); showToast(authErrorMessage(error, 'login'), 'error', 5000);
+    });
+}
+
+function resetPassword() {
+    var emailInput = document.getElementById('auth-email');
+    var email = emailInput ? emailInput.value.trim().toLowerCase() : '';
+    if (!email) { showToast('اكتب بريدك الإلكتروني أولاً ثم اضغط استرجاع.', 'warning'); return; }
+    firebaseAuth.sendPasswordResetEmail(email).then(function() {
+        showToast('تم إرسال رابط استرجاع كلمة المرور إلى بريدك.', 'success', 5000);
+    }).catch(function(error) { showToast(authErrorMessage(error, 'login'), 'error', 5000); });
 }
 
 function showPolicy() { showModal("📜 سياسة الاستخدام", db.policy || "التطبيق غير مسؤول قانونياً عن أي أضرار."); }
@@ -1899,7 +2096,13 @@ function devAddStore() {
 }
 
 firebaseAuth.onAuthStateChanged(function(user) {
-    if (user) loadData();
+    if (user) {
+        if (authBusy && !pendingAuthProfile) {
+            renderAuthLoading('تم التحقق، نكمل إعداد حسابك…');
+            return;
+        }
+        loadData();
+    }
     else renderAuth();
 });
 
