@@ -530,7 +530,7 @@ function renderDatabaseError(error) {
 
 function authErrorMessage(error, action) {
     var code = error && error.code ? error.code : '';
-    if (code === 'auth/wrong-password' || code === 'auth/invalid-credential' || code === 'auth/invalid-login-credentials') return 'بيانات الدخول غير صحيحة. راجع البريد/الرمز وكلمة المرور.';
+    if (code === 'auth/wrong-password' || code === 'auth/invalid-credential' || code === 'auth/invalid-login-credentials') return action === 'quick' ? 'الاسم أو رمز الدخول غير صحيح. إذا كان الاسم جديداً سيُنشأ حسابك تلقائياً.' : 'بيانات الدخول غير صحيحة. راجع البريد/الرمز وكلمة المرور.';
     if (code === 'auth/user-not-found') return 'الحساب غير موجود. أنشئ حساباً جديداً أو جرّب الدخول بحساب Google.';
     if (code === 'auth/email-already-in-use') return 'هذا البريد مسجل مسبقاً. سنحاول إرجاعك إلى حسابك بدلاً من إنشاء حساب مكرر.';
     if (code === 'auth/account-exists-with-different-credential') return 'هذا البريد مرتبط بطريقة دخول أخرى. استخدم البريد وكلمة المرور أو افتح Gmail بنفس الحساب.';
@@ -843,7 +843,10 @@ function quickAuth() {
         finishAuthenticatedUser(result.user, { type: type, phone: phone, loginMode: 'quick', loginName: name, name: name });
         showToast('تم إرجاع حسابك بسرعة.', 'success', 2500);
     }).catch(function(error) {
-        if (error && error.code === 'auth/user-not-found') {
+        // تفعيل Email Enumeration Protection يجعل Firebase يعيد invalid-credential
+        // بدلاً من user-not-found للحساب السريع الجديد؛ نجرّب الإنشاء بأمان.
+        var canTryCreate = error && (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-login-credentials');
+        if (canTryCreate) {
             firebaseAuth.createUserWithEmailAndPassword(quickEmail, quickPassword).then(function(result) {
                 var update = result.user.updateProfile ? result.user.updateProfile({ displayName: name }) : Promise.resolve();
                 update.catch(function(){}).then(function() {
@@ -852,12 +855,16 @@ function quickAuth() {
                 });
             }).catch(function(createError) {
                 setAuthBusy(false);
+                if (createError && createError.code === 'auth/email-already-in-use') {
+                    showToast('هذا الاسم مستخدم من قبل، ورمز الدخول غير مطابق. اكتب الرمز الذي أنشأت به الحساب.', 'error', 6000);
+                    return;
+                }
                 showToast(authErrorMessage(createError, 'signup'), 'error', 5000);
             });
             return;
         }
         setAuthBusy(false);
-        showToast(error && (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') ? 'رمز الدخول غير صحيح لهذا الاسم.' : authErrorMessage(error, 'login'), 'error', 5000);
+        showToast(error && (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-login-credentials') ? 'الاسم أو رمز الدخول غير صحيح. إذا كان الاسم جديداً سيُنشأ حسابك تلقائياً.' : authErrorMessage(error, 'quick'), 'error', 5000);
     });
 }
 
@@ -1603,14 +1610,33 @@ function activateDriver() {
 
 function pickOrderDriver(oid) {
     let order = db.orders.find(function(o) { return o.id === oid; });
-    order.driverId = currentUser.id;
-    order.status = 'جاري التوصيل 🛵';
-    if (!order.orderChat) order.orderChat = [];
-    order.orderChat.push({ sender: 'system', text: 'تم تعيين السائق ' + currentUser.name + ' للطلب' });
-    addNotification(order.userId, 'السائق ' + currentUser.name + ' في طريقه إليك');
-    let store = db.stores.find(function(s) { return s.id === order.storeId; });
-    if (store) addNotification(store.ownerId, 'السائق ' + currentUser.name + ' استلم الطلب #' + order.id.slice(-6));
-    sync(); navigate('driver'); showToast('تم استلام الطلب 🛵');
+    if (currentUser.type !== 'driver') return showToast('فعّل وضع السائق أولاً', 'error');
+    if (!order) return showToast('الطلب غير موجود أو تم تحديثه', 'warning');
+    if (order.driverId || order.status !== 'تم القبول ✅ (بانتظار سائق)') return showToast('هذا الطلب تم استلامه من سائق آخر أو لم يعد متاحاً', 'warning', 5000);
+    var driverId = currentUser.id, driverName = currentUser.name;
+    database.ref('appData/orders').transaction(function(raw) {
+        var orders = dataArray(raw);
+        var remoteOrder = orders.find(function(o) { return o && o.id === oid; });
+        if (!remoteOrder || remoteOrder.driverId || remoteOrder.status !== 'تم القبول ✅ (بانتظار سائق)') return;
+        remoteOrder.driverId = driverId;
+        remoteOrder.status = 'جاري التوصيل 🛵';
+        if (!remoteOrder.orderChat) remoteOrder.orderChat = [];
+        remoteOrder.orderChat.push({ sender:'system', text:'تم تعيين السائق ' + driverName + ' للطلب' });
+        return orders;
+    }, function(error, committed, snapshot) {
+        if (error) return showToast('تعذر استلام الطلب الآن. تحقق من الاتصال وحاول مرة أخرى.', 'error', 5500);
+        if (!committed) return showToast('سبق أن استلم سائق آخر هذا الطلب.', 'warning', 5000);
+        var savedOrders = dataArray(snapshot.val());
+        var saved = savedOrders.find(function(o) { return o && o.id === oid; });
+        var localIndex = db.orders.findIndex(function(o) { return o.id === oid; });
+        if (saved && localIndex !== -1) db.orders[localIndex] = saved;
+        if (saved) {
+            addNotification(saved.userId, 'السائق ' + driverName + ' في طريقه إليك');
+            var store = db.stores.find(function(s) { return s.id === saved.storeId; });
+            if (store) addNotification(store.ownerId, 'السائق ' + driverName + ' استلم الطلب #' + saved.id.slice(-6));
+        }
+        sync(); navigate('driver'); showToast('تم استلام الطلب بنجاح 🛵');
+    });
 }
 
 function resetDriverCash() {
@@ -2419,7 +2445,7 @@ window.addEventListener('appinstalled', function() {
 <script>
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js?v=7', { scope: './' }).then(function(registration) {
+    navigator.serviceWorker.register('sw.js?v=8', { scope: './' }).then(function(registration) {
       registration.addEventListener('updatefound', function() {
         var worker = registration.installing;
         if (worker) worker.addEventListener('statechange', function() {
