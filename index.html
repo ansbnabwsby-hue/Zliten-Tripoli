@@ -300,6 +300,11 @@ let authMode = 'email';
 let pendingAuthProfile = null;
 let authBusy = false;
 let loadedAuthUid = '';
+let seenNotificationIds = {};
+let locationPermissionState = 'unknown';
+
+const ZLITEN_MAP_BOUNDS = [[32.38, 14.38], [32.60, 14.78]];
+const ZLITEN_AREAS = ['وسط زلطن', 'سوق الثلاثاء', 'الدافنية', 'ماجر', 'كعام', 'رأس جدير', 'المنارة', 'العلوص'];
 
 // ==================== Theme ====================
 function applyTheme() {
@@ -401,6 +406,20 @@ function dataArray(value) {
     return [];
 }
 
+function announceIncomingNotifications(previousUsers) {
+    if (!currentUser || currentUser.type !== 'driver') return;
+    var previous = (dataArray(previousUsers).find(function(u) { return u && u.id === currentUser.id; }) || {}).notifications || [];
+    var current = currentUser.notifications || [];
+    var oldIds = {};
+    previous.forEach(function(n) { if (n && n.id) oldIds[String(n.id)] = true; });
+    current.slice(0, 8).forEach(function(n) {
+        if (!n || !n.id || oldIds[String(n.id)] || seenNotificationIds[String(n.id)]) return;
+        seenNotificationIds[String(n.id)] = true;
+        showToast('🔔 ' + (n.text || 'لديك إشعار جديد'), 'info', 6500);
+        sendLocalNotification('طلب جديد في زلطن تريبول', n.text || 'لديك إشعار جديد');
+    });
+}
+
 function uniqueUserRecords(users) {
     var result = [], aliases = {};
     dataArray(users).forEach(function(user) {
@@ -421,12 +440,17 @@ function uniqueUserRecords(users) {
 
 function applyAppData(data) {
     if (!data || typeof data !== 'object') return false;
+    var previousUsers = db.users;
     db.users = uniqueUserRecords(data.users); db.stores = dataArray(data.stores);
     db.orders = dataArray(data.orders); db.chats = dataArray(data.chats);
     db.reports = dataArray(data.reports); db.ad = data.ad || db.ad;
     db.policy = data.policy || db.policy; db.coupons = dataArray(data.coupons);
     db.faq = dataArray(data.faq); db.categories = dataArray(data.categories);
     db.orders.forEach(function(o) { if (!o.orderChat) o.orderChat = []; });
+    if (currentUser && currentUser.type === 'driver') {
+        var refreshed = db.users.find(function(u) { return u.id === currentUser.id; });
+        if (refreshed) { currentUser = refreshed; announceIncomingNotifications(previousUsers); }
+    }
     return true;
 }
 
@@ -909,6 +933,17 @@ function requestAppPermissions() {
     else showToast('الموقع غير مدعوم على هذا الجهاز', 'warning');
 }
 
+function requestDriverLocationAccess() {
+    if (!navigator.geolocation) return showToast('الموقع غير مدعوم على هذا الجهاز', 'error');
+    navigator.geolocation.getCurrentPosition(function(pos) {
+        locationPermissionState = 'granted';
+        showToast('تم تفعيل موقع السائق. سيظهر للزبون أثناء التوصيل', 'success', 4500);
+    }, function() {
+        locationPermissionState = 'denied';
+        showModal('موقع السائق مطلوب', '<div style="line-height:1.9">فعّل إذن الموقع حتى يتمكن الزبون من متابعة وصولك.<br><br>من إعدادات الهاتف: أذونات التطبيق ← الموقع ← السماح أثناء الاستخدام، ثم اضغط إعادة المحاولة.</div>', 'confirm', requestDriverLocationAccess);
+    }, { enableHighAccuracy:true, timeout:12000, maximumAge:0 });
+}
+
 function updateInstallButtons() {
     var hideInstallButton = isPwaInstalled();
     document.querySelectorAll('[data-install-app]').forEach(function(btn){ btn.style.display = hideInstallButton ? 'none' : 'flex'; });
@@ -1153,12 +1188,16 @@ function deleteAddress(idx) {
 // ==================== السلة ====================
 function getCurrentLocation(callback) {
     if (!navigator.geolocation) return showToast('متصفحك لا يدعم تحديد الموقع', 'error');
-    showToast('جاري طلب إذن الموقع وتحديد مكانك...');
+    showToast('سيطلب الهاتف إذن الموقع الآن؛ وافق لإكمال الطلب', 'info', 4500);
     navigator.geolocation.getCurrentPosition(
-        function(pos) { currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy }; updateCustomerMap(currentLocation); let el = document.getElementById('location-status'); if (el) el.innerHTML = '✅ تم تحديد موقعك بدقة ' + Math.round(pos.coords.accuracy) + 'م'; if (callback) callback(); },
-        function(err) { let el = document.getElementById('location-status'); if (el) el.innerHTML = '⚠️ فعّل إذن الموقع من إعدادات الهاتف'; showToast('اسمح للتطبيق باستخدام موقعك من نافذة الأذونات', 'error', 5000); },
+        function(pos) { locationPermissionState = 'granted'; currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy }; updateCustomerMap(currentLocation); let el = document.getElementById('location-status'); if (el) el.innerHTML = '✅ تم تفعيل الموقع بدقة ' + Math.round(pos.coords.accuracy) + 'م'; if (callback) callback(); },
+        function(err) { locationPermissionState = err && err.code === 1 ? 'denied' : 'error'; let el = document.getElementById('location-status'); if (el) el.innerHTML = '⚠️ يجب السماح بالموقع من أذونات الهاتف'; showModal('تفعيل الموقع مطلوب', '<div style="line-height:1.9">لا يمكن إرسال طلب توصيل بدون تحديد الموقع.<br><br><b>اضغط السماح أثناء ظهور نافذة الهاتف.</b><br>إذا اخترت الرفض سابقاً: افتح إعدادات الهاتف ← أذونات التطبيق ← الموقع، واختر السماح أثناء الاستخدام، ثم اضغط إعادة المحاولة.</div>', 'confirm', function(){ getCurrentLocation(callback); }); },
         { enableHighAccuracy:true, timeout:12000, maximumAge:30000 }
     );
+}
+
+function isInsideZliten(location) {
+    return !!location && Number(location.lat) >= ZLITEN_MAP_BOUNDS[0][0] && Number(location.lat) <= ZLITEN_MAP_BOUNDS[1][0] && Number(location.lng) >= ZLITEN_MAP_BOUNDS[0][1] && Number(location.lng) <= ZLITEN_MAP_BOUNDS[1][1];
 }
 
 let customerMap = null, customerMarker = null, customerAccuracyCircle = null;
@@ -1168,7 +1207,7 @@ function initCustomerMap() {
     if (customerMap) { customerMap.remove(); customerMap = null; customerMarker = null; customerAccuracyCircle = null; }
     var fallback = [32.467, 14.568];
     var start = currentLocation ? [currentLocation.lat, currentLocation.lng] : fallback;
-    customerMap = L.map(holder, { zoomControl:true, attributionControl:true }).setView(start, currentLocation ? 16 : 13);
+    customerMap = L.map(holder, { zoomControl:true, attributionControl:true, maxBounds:ZLITEN_MAP_BOUNDS, maxBoundsViscosity:0.9, minZoom:11, maxZoom:18 }).setView(start, currentLocation ? 16 : 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap' }).addTo(customerMap);
     if (currentLocation) updateCustomerMap(currentLocation);
     setTimeout(function(){ if (customerMap) customerMap.invalidateSize(); }, 200);
@@ -1223,7 +1262,7 @@ function renderCart(container) {
         '<div style="display:flex;gap:10px;align-items:center;margin:10px 0">' +
         '<button class="btn btn-outline btn-sm" style="width:auto;" onclick="getCurrentLocation()"><i class="fas fa-map-marker-alt"></i> تحديد موقعي</button>' +
         '<span id="location-status" style="color:var(--gray);"></span></div>' +
-        '<div class="card" style="padding:10px;margin-top:8px;"><div style="font-size:.82rem;color:var(--text-muted);margin-bottom:6px;"><i class="fas fa-map-marked-alt"></i> موقعك على الخريطة</div><div id="customer-map" class="customer-map"></div></div>' +
+        '<div class="card" style="padding:10px;margin-top:8px;"><div style="font-size:.82rem;color:var(--text-muted);margin-bottom:6px;"><i class="fas fa-map-marked-alt"></i> نطاق التوصيل: زلطن والمناطق القريبة</div><div class="categories-scroll" style="margin:0 0 8px;gap:6px;">' + ZLITEN_AREAS.map(function(area){ return '<span class="category-pill" style="font-size:.72rem;padding:6px 10px;">📍 ' + area + '</span>'; }).join('') + '</div><div id="customer-map" class="customer-map"></div></div>' +
         '<button class="btn btn-primary btn-lg" onclick="confirmOrder()"><i class="fas fa-paper-plane"></i> تأكيد الطلب</button></div>';
     setTimeout(initCustomerMap, 0);
 }
@@ -1249,6 +1288,8 @@ function confirmOrder() {
     let notes = document.getElementById('order-notes') ? document.getElementById('order-notes').value.trim() : '';
     let time = document.getElementById('delivery-time') ? document.getElementById('delivery-time').value : 'now';
     if (!addr || !phone) return showToast('أدخل العنوان ورقم الهاتف', 'error');
+    if (!currentLocation) return showToast('اضغط «تحديد موقعي» واسمح بإذن الموقع أولاً', 'error', 5000);
+    if (!isInsideZliten(currentLocation)) return showToast('التوصيل متاح داخل نطاق زلطن والمناطق المحددة فقط', 'error', 5000);
     let storeId = cart[0].sid;
     let total = cart.reduce(function(s, i) { return s + i.price; }, 0);
     let discount = appliedCoupon ? Math.round(total * (appliedCoupon.discount / 100)) : 0;
@@ -1482,7 +1523,7 @@ function renderDriver(container) {
 
     container.innerHTML = '<div class="animate-fade">' +
         '<div class="delivery-head"><div><h3>🛵 مركز التوصيل</h3><small style="color:var(--text-muted)">رتّب مهماتك وتابع التسليم من مكان واحد</small></div><span class="driver-online"><i class="fas fa-circle" style="font-size:.55rem"></i> متاح</span></div>' +
-        '<div class="driver-toolbar"><span><i class="fas fa-bolt" style="color:var(--warning)"></i> نسبة إنجاز اليوم: <b>' + completionRate + '%</b></span><button class="btn btn-ghost btn-sm" onclick="navigate(\'driver\')"><i class="fas fa-sync-alt"></i> تحديث</button></div>' +
+        '<div class="driver-toolbar"><span><i class="fas fa-bolt" style="color:var(--warning)"></i> نسبة إنجاز اليوم: <b>' + completionRate + '%</b></span><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="requestDriverLocationAccess()"><i class="fas fa-location-arrow"></i> تفعيل موقعي</button><button class="btn btn-ghost btn-sm" onclick="navigate(\'driver\')"><i class="fas fa-sync-alt"></i> تحديث</button></div></div>' +
         '<div class="wallet-card cash-card"><div class="wallet-label">💰 الكاش المجمع</div><div class="wallet-balance">' + (currentUser.cashCollected || 0) + ' د.ل</div><div style="font-size:.75rem;opacity:.85">اليوم: ' + todayCash + ' د.ل • المبلغ الذي تم تحصيله من الطلبات المسلّمة</div></div>' +
         '<div class="grid-3" style="margin-bottom:16px;">' +
         '<div class="stat-card"><div class="stat-value">' + (myTasks.length) + '</div><div class="stat-label">🚚 مهامي</div></div>' +
@@ -1617,7 +1658,7 @@ function initLiveMap(orderId, isDriver) {
     if (!holder || typeof L === 'undefined') return;
     if (liveMap) { liveMap.remove(); liveMap = null; liveMarker = null; }
     liveMapOrderId = orderId;
-    liveMap = L.map(holder, { zoomControl:true, attributionControl:true }).setView([32.467, 14.568], 13);
+    liveMap = L.map(holder, { zoomControl:true, attributionControl:true, maxBounds:ZLITEN_MAP_BOUNDS, maxBoundsViscosity:0.9, minZoom:11, maxZoom:18 }).setView([32.467, 14.568], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap' }).addTo(liveMap);
     if (isDriver) {
         var status = document.getElementById('live-location-status');
@@ -2378,7 +2419,7 @@ window.addEventListener('appinstalled', function() {
 <script>
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js?v=6', { scope: './' }).then(function(registration) {
+    navigator.serviceWorker.register('sw.js?v=7', { scope: './' }).then(function(registration) {
       registration.addEventListener('updatefound', function() {
         var worker = registration.installing;
         if (worker) worker.addEventListener('statechange', function() {
