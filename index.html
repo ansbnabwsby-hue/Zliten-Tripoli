@@ -538,6 +538,8 @@ function finishAuthenticatedUser(authUser, overrides) {
 function checkAuth() {
     var authUser = firebaseAuth.currentUser;
     if (authUser) {
+        var previousUserId = currentUser && currentUser.id ? currentUser.id : '';
+        var shellWasVisible = document.getElementById('main-header').style.display !== 'none';
         var authEmail = (authUser.email || '').toLowerCase();
         var pending = pendingAuthProfile && pendingAuthProfile.authUid === authUser.uid ? pendingAuthProfile : null;
         if (!pending) {
@@ -564,13 +566,14 @@ function checkAuth() {
         authBusy = false;
         localStorage.removeItem('z_pending_role');
         localStorage.setItem('z_user_id', authProfile.id);
-        updateUI();
+        if (!previousUserId || previousUserId !== authProfile.id || !shellWasVisible) updateUI();
+        else { updateCartBadge(); updateNotifyBadge(); }
         return;
     }
     let savedId = localStorage.getItem('z_user_id');
     if (savedId && db.users.length) {
         let user = db.users.find(function(u) { return u.id === savedId; });
-        if (user) { currentUser = user; updateUI(); return; }
+        if (user) { currentUser = user; authBusy = false; updateUI(); return; }
     }
     currentUser = null;
     renderAuth();
@@ -2322,7 +2325,7 @@ window.addEventListener('appinstalled', function() {
 <script>
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js?v=4', { scope: './' }).then(function(registration) {
+    navigator.serviceWorker.register('sw.js?v=5', { scope: './' }).then(function(registration) {
       registration.addEventListener('updatefound', function() {
         var worker = registration.installing;
         if (worker) worker.addEventListener('statechange', function() {
