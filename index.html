@@ -271,6 +271,7 @@ let isLightTheme = localStorage.getItem('z_theme') === 'light';
 let activeLocationWatchId = null, activeLocationOrderId = null, liveLocationRef = null, liveLocationListener = null;
 let liveMap = null, liveMarker = null, liveMapOrderId = null;
 let deferredInstallPrompt = null;
+let appInstalledThisSession = false;
 
 // ==================== Theme ====================
 function applyTheme() {
@@ -654,13 +655,19 @@ function isNativeApp() {
     return !!(window.Capacitor || location.protocol === 'capacitor:' || location.protocol === 'file:');
 }
 
+function isPwaInstalled() {
+    return appInstalledThisSession || navigator.standalone === true ||
+        !!(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+}
+
 function renderAppPromo() {
+    if (isPwaInstalled()) return '';
     if (isNativeApp()) return '<div class="card app-promo"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;"><div style="display:flex;align-items:center;gap:10px;"><img src="icons/icon-192.png" class="brand-mark" alt="زلطن تريبول"><b>زلطن تريبول</b></div><button class="btn btn-outline btn-sm" onclick="shareApp()"><i class="fas fa-share-alt"></i> مشاركة</button></div></div>';
     return '<div class="card app-promo"><div style="display:flex;gap:14px;align-items:center;"><img src="icons/icon-192.png" class="app-promo-logo" alt="زلطن تريبول"><div><h3 style="margin-bottom:4px;">تطبيق زلطن تريبول</h3><p style="color:var(--text-muted);font-size:.85rem;">ثبّت التطبيق ووصل لطلباتك بسرعة.</p></div></div><div class="permission-row"><button class="btn btn-primary btn-sm" data-install-app onclick="installApp()"><i class="fas fa-download"></i> تثبيت التطبيق</button><button class="btn btn-outline btn-sm" onclick="shareApp()"><i class="fas fa-share-alt"></i> مشاركة</button><button class="btn btn-ghost btn-sm" onclick="requestAppPermissions()"><i class="fas fa-bell"></i> تفعيل الأذونات</button></div><small style="display:block;color:var(--text-muted);margin-top:10px;">فعّل الموقع لتحديد عنوانك على الخريطة، والإشعارات لمعرفة حالة الطلب.</small></div>';
 }
 
 function installApp() {
-    if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return showToast('التطبيق مثبت على جهازك بالفعل');
+    if (isPwaInstalled()) return showToast('التطبيق مثبت على جهازك بالفعل');
     if (deferredInstallPrompt) {
         deferredInstallPrompt.prompt();
         deferredInstallPrompt.userChoice.then(function(choice){ if (choice.outcome === 'accepted') showToast('تم بدء تثبيت التطبيق'); deferredInstallPrompt = null; updateInstallButtons(); });
@@ -674,7 +681,8 @@ function requestAppPermissions() {
 }
 
 function updateInstallButtons() {
-    document.querySelectorAll('[data-install-app]').forEach(function(btn){ btn.style.display = deferredInstallPrompt ? 'flex' : 'flex'; });
+    var hideInstallButton = isPwaInstalled();
+    document.querySelectorAll('[data-install-app]').forEach(function(btn){ btn.style.display = hideInstallButton ? 'none' : 'flex'; });
 }
 
 function getCategoryName(catId) {
@@ -2095,7 +2103,10 @@ window.addEventListener('beforeinstallprompt', function(event) {
     updateInstallButtons();
 });
 window.addEventListener('appinstalled', function() {
+    appInstalledThisSession = true;
     deferredInstallPrompt = null;
+    document.querySelectorAll('.app-promo').forEach(function(promo){ promo.remove(); });
+    updateInstallButtons();
     showToast('تم تثبيت زلطن تريبول بنجاح ✅');
 });
 // ==================== تحديث navigate ليشمل الصفحات الجديدة ====================
@@ -2104,7 +2115,7 @@ window.addEventListener('appinstalled', function() {
 <script>
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js?v=2', { scope: './' }).then(function(registration) {
+    navigator.serviceWorker.register('sw.js?v=3', { scope: './' }).then(function(registration) {
       registration.addEventListener('updatefound', function() {
         var worker = registration.installing;
         if (worker) worker.addEventListener('statechange', function() {
