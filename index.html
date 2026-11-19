@@ -406,6 +406,25 @@ function dataArray(value) {
     return [];
 }
 
+function userRecordArray(value) {
+    if (Array.isArray(value)) {
+        return value.map(function(user, index) {
+            if (!user || typeof user !== 'object') return null;
+            var copy = Object.assign({}, user);
+            if (!copy.id) copy.id = 'USER_' + index;
+            return copy;
+        }).filter(Boolean);
+    }
+    if (!value || typeof value !== 'object') return [];
+    return Object.keys(value).map(function(key) {
+        var user = value[key];
+        if (!user || typeof user !== 'object') return null;
+        var copy = Object.assign({}, user);
+        if (!copy.id) copy.id = key;
+        return copy;
+    }).filter(Boolean);
+}
+
 function announceIncomingNotifications(previousUsers) {
     if (!currentUser || currentUser.type !== 'driver') return;
     var previous = (dataArray(previousUsers).find(function(u) { return u && u.id === currentUser.id; }) || {}).notifications || [];
@@ -422,7 +441,7 @@ function announceIncomingNotifications(previousUsers) {
 
 function uniqueUserRecords(users) {
     var result = [], aliases = {};
-    dataArray(users).forEach(function(user) {
+    userRecordArray(users).forEach(function(user) {
         if (!user || typeof user !== 'object') return;
         var keys = [
             user.authUid ? 'uid:' + String(user.authUid).trim().toLowerCase() : '',
@@ -2076,6 +2095,13 @@ function renderSuperAdminPanel() {
     let storesOptions = db.stores.map(function(s) { return '<option value="' + s.id + '">' + s.name + '</option>'; }).join('');
     let uniqueUsers = uniqueUserRecords(db.users);
     let usersOptions = uniqueUsers.map(function(u) { return '<option value="' + u.id + '">' + u.name + ' (' + u.type + ')</option>'; }).join('');
+    let usersList = uniqueUsers.slice().reverse().map(function(u) {
+        var role = u.type === 'driver' ? '🛵 سائق' : u.type === 'store_owner' ? '🏪 تاجر' : u.type === 'developer' ? '🛡️ مطور' : '👤 زبون';
+        var contact = u.email || u.authEmail || (u.loginName ? 'اسم الدخول: ' + u.loginName : 'بدون بريد');
+        return '<div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;margin-bottom:8px;">' +
+            '<div style="min-width:0;"><b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (u.name || 'مستخدم بدون اسم') + '</b><small style="color:var(--text-muted);display:block;margin-top:4px;">' + contact + (u.phone ? ' • ' + u.phone : '') + '</small></div>' +
+            '<span class="tag ' + (u.type === 'driver' ? 'tag-success' : u.type === 'store_owner' ? 'tag-warning' : 'tag-primary') + '" style="white-space:nowrap;">' + role + '</span></div>';
+    }).join('');
     let ordersList = db.orders.slice().reverse().map(function(o) {
         let acceptButton = o.status === 'قيد الانتظار ⏳' ? '<button class="btn btn-sm btn-success" style="margin-top:8px;margin-left:6px" onclick="devAcceptOrder(\'' + o.id + '\')"><i class="fas fa-check"></i> قبول الطلب</button>' : '';
         return '<div class="card">' +
@@ -2098,6 +2124,7 @@ function renderSuperAdminPanel() {
         '<div class="stat-card"><div class="stat-value">' + uniqueUsers.length + '</div><div class="stat-label">👥 مستخدمون فريدون</div></div>' +
         '<div class="stat-card"><div class="stat-value">' + db.stores.length + '</div><div class="stat-label">🏪 متاجر</div></div>' +
         '<div class="stat-card"><div class="stat-value">' + db.orders.length + '</div><div class="stat-label">📦 طلبات</div></div></div>' +
+        '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><h4 style="margin:0;">👥 المستخدمون (' + uniqueUsers.length + ')</h4><button class="btn btn-ghost btn-sm" onclick="renderSuperAdminPanel()"><i class="fas fa-sync-alt"></i> تحديث</button></div><div style="margin-top:12px;max-height:360px;overflow:auto;">' + (usersList || '<p style="color:var(--text-muted);">لا توجد سجلات مستخدمين بعد</p>') + '</div></div>' +
         '<h4>📢 إعلان عام</h4><input id="new-ad" value="' + db.ad + '">' +
         '<button class="btn btn-sm btn-primary" style="margin-top:8px;" onclick="db.ad=document.getElementById(\'new-ad\').value;sync();showToast(\'تم التحديث\')">تحديث</button>' +
         '<h4 style="margin-top:16px;">📜 سياسة الاستخدام</h4><textarea id="new-policy">' + db.policy + '</textarea>' +
@@ -2445,7 +2472,7 @@ window.addEventListener('appinstalled', function() {
 <script>
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js?v=8', { scope: './' }).then(function(registration) {
+    navigator.serviceWorker.register('sw.js?v=9', { scope: './' }).then(function(registration) {
       registration.addEventListener('updatefound', function() {
         var worker = registration.installing;
         if (worker) worker.addEventListener('statechange', function() {
