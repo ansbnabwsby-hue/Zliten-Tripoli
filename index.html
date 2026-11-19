@@ -425,6 +425,27 @@ function userRecordArray(value) {
     }).filter(Boolean);
 }
 
+function stableUserId(user, index) {
+    var seed = [user.authUid, user.email, user.loginName, user.name, user.phone, index].filter(Boolean).join('|');
+    var hash = 0;
+    for (var i = 0; i < seed.length; i++) hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
+    return 'USR_' + Math.abs(hash).toString(36).toUpperCase();
+}
+
+function ensureUserIds(value) {
+    var used = {}, records = userRecordArray(value);
+    return records.map(function(user, index) {
+        var id = user.id ? String(user.id).trim() : '';
+        if (!id || used[id]) {
+            id = stableUserId(user, index);
+            while (used[id]) id = id + '_' + index;
+        }
+        user.id = id;
+        used[id] = true;
+        return user;
+    });
+}
+
 function announceIncomingNotifications(previousUsers) {
     if (!currentUser || currentUser.type !== 'driver') return;
     var previous = (dataArray(previousUsers).find(function(u) { return u && u.id === currentUser.id; }) || {}).notifications || [];
@@ -441,7 +462,7 @@ function announceIncomingNotifications(previousUsers) {
 
 function uniqueUserRecords(users) {
     var result = [], aliases = {};
-    userRecordArray(users).forEach(function(user) {
+    ensureUserIds(users).forEach(function(user) {
         if (!user || typeof user !== 'object') return;
         var keys = [
             user.authUid ? 'uid:' + String(user.authUid).trim().toLowerCase() : '',
@@ -549,6 +570,9 @@ function renderDatabaseError(error) {
 
 function authErrorMessage(error, action) {
     var code = error && error.code ? error.code : '';
+    var rawError = '';
+    try { rawError = JSON.stringify(error || '').toUpperCase(); } catch (e) { rawError = String(error || '').toUpperCase(); }
+    if (rawError.indexOf('INVALID_LOGIN_CREDENTIALS') !== -1) code = 'auth/invalid-login-credentials';
     if (code === 'auth/wrong-password' || code === 'auth/invalid-credential' || code === 'auth/invalid-login-credentials') return action === 'quick' ? 'الاسم أو رمز الدخول غير صحيح. إذا كان الاسم جديداً سيُنشأ حسابك تلقائياً.' : 'بيانات الدخول غير صحيحة. راجع البريد/الرمز وكلمة المرور.';
     if (code === 'auth/user-not-found') return 'الحساب غير موجود. أنشئ حساباً جديداً أو جرّب الدخول بحساب Google.';
     if (code === 'auth/email-already-in-use') return 'هذا البريد مسجل مسبقاً. سنحاول إرجاعك إلى حسابك بدلاً من إنشاء حساب مكرر.';
@@ -864,7 +888,9 @@ function quickAuth() {
     }).catch(function(error) {
         // تفعيل Email Enumeration Protection يجعل Firebase يعيد invalid-credential
         // بدلاً من user-not-found للحساب السريع الجديد؛ نجرّب الإنشاء بأمان.
-        var canTryCreate = error && (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-login-credentials');
+        var rawError = '';
+        try { rawError = JSON.stringify(error || '').toUpperCase(); } catch (e) { rawError = String(error || '').toUpperCase(); }
+        var canTryCreate = error && (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-login-credentials' || rawError.indexOf('INVALID_LOGIN_CREDENTIALS') !== -1);
         if (canTryCreate) {
             firebaseAuth.createUserWithEmailAndPassword(quickEmail, quickPassword).then(function(result) {
                 var update = result.user.updateProfile ? result.user.updateProfile({ displayName: name }) : Promise.resolve();
@@ -883,7 +909,7 @@ function quickAuth() {
             return;
         }
         setAuthBusy(false);
-        showToast(error && (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-login-credentials') ? 'الاسم أو رمز الدخول غير صحيح. إذا كان الاسم جديداً سيُنشأ حسابك تلقائياً.' : authErrorMessage(error, 'quick'), 'error', 5000);
+        showToast(error && (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-login-credentials' || rawError.indexOf('INVALID_LOGIN_CREDENTIALS') !== -1) ? 'الاسم أو رمز الدخول غير صحيح. إذا كان الاسم جديداً سيُنشأ حسابك تلقائياً.' : authErrorMessage(error, 'quick'), 'error', 5000);
     });
 }
 
@@ -2090,6 +2116,14 @@ function checkDevPass() {
     else showToast('حسابك ليس حساب مطور معتمداً', 'error');
 }
 
+function repairUserIds() {
+    if (!isDeveloperUser()) return showToast('غير مصرح', 'error');
+    db.users = uniqueUserRecords(db.users);
+    sync();
+    renderSuperAdminPanel();
+    showToast('تم إنشاء ID ثابت لكل مستخدم وحفظه بنجاح', 'success', 4500);
+}
+
 function renderSuperAdminPanel() {
     let v = document.getElementById('app-content');
     let storesOptions = db.stores.map(function(s) { return '<option value="' + s.id + '">' + s.name + '</option>'; }).join('');
@@ -2099,7 +2133,7 @@ function renderSuperAdminPanel() {
         var role = u.type === 'driver' ? '🛵 سائق' : u.type === 'store_owner' ? '🏪 تاجر' : u.type === 'developer' ? '🛡️ مطور' : '👤 زبون';
         var contact = u.email || u.authEmail || (u.loginName ? 'اسم الدخول: ' + u.loginName : 'بدون بريد');
         return '<div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;margin-bottom:8px;">' +
-            '<div style="min-width:0;"><b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (u.name || 'مستخدم بدون اسم') + '</b><small style="color:var(--text-muted);display:block;margin-top:4px;">' + contact + (u.phone ? ' • ' + u.phone : '') + '</small></div>' +
+            '<div style="min-width:0;"><b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (u.name || 'مستخدم بدون اسم') + '</b><small style="color:var(--text-muted);display:block;margin-top:4px;">ID: ' + u.id + ' • ' + contact + (u.phone ? ' • ' + u.phone : '') + '</small></div>' +
             '<span class="tag ' + (u.type === 'driver' ? 'tag-success' : u.type === 'store_owner' ? 'tag-warning' : 'tag-primary') + '" style="white-space:nowrap;">' + role + '</span></div>';
     }).join('');
     let ordersList = db.orders.slice().reverse().map(function(o) {
@@ -2124,7 +2158,7 @@ function renderSuperAdminPanel() {
         '<div class="stat-card"><div class="stat-value">' + uniqueUsers.length + '</div><div class="stat-label">👥 مستخدمون فريدون</div></div>' +
         '<div class="stat-card"><div class="stat-value">' + db.stores.length + '</div><div class="stat-label">🏪 متاجر</div></div>' +
         '<div class="stat-card"><div class="stat-value">' + db.orders.length + '</div><div class="stat-label">📦 طلبات</div></div></div>' +
-        '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><h4 style="margin:0;">👥 المستخدمون (' + uniqueUsers.length + ')</h4><button class="btn btn-ghost btn-sm" onclick="renderSuperAdminPanel()"><i class="fas fa-sync-alt"></i> تحديث</button></div><div style="margin-top:12px;max-height:360px;overflow:auto;">' + (usersList || '<p style="color:var(--text-muted);">لا توجد سجلات مستخدمين بعد</p>') + '</div></div>' +
+        '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><h4 style="margin:0;">👥 المستخدمون (' + uniqueUsers.length + ')</h4><div style="display:flex;gap:6px"><button class="btn btn-success btn-sm" onclick="repairUserIds()"><i class="fas fa-fingerprint"></i> ترقيم IDs</button><button class="btn btn-ghost btn-sm" onclick="renderSuperAdminPanel()"><i class="fas fa-sync-alt"></i> تحديث</button></div></div><div style="margin-top:12px;max-height:360px;overflow:auto;">' + (usersList || '<p style="color:var(--text-muted);">لا توجد سجلات مستخدمين بعد</p>') + '</div></div>' +
         '<h4>📢 إعلان عام</h4><input id="new-ad" value="' + db.ad + '">' +
         '<button class="btn btn-sm btn-primary" style="margin-top:8px;" onclick="db.ad=document.getElementById(\'new-ad\').value;sync();showToast(\'تم التحديث\')">تحديث</button>' +
         '<h4 style="margin-top:16px;">📜 سياسة الاستخدام</h4><textarea id="new-policy">' + db.policy + '</textarea>' +
@@ -2472,7 +2506,7 @@ window.addEventListener('appinstalled', function() {
 <script>
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js?v=9', { scope: './' }).then(function(registration) {
+    navigator.serviceWorker.register('sw.js?v=10', { scope: './' }).then(function(registration) {
       registration.addEventListener('updatefound', function() {
         var worker = registration.installing;
         if (worker) worker.addEventListener('statechange', function() {

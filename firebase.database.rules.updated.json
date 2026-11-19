@@ -1,0 +1,44 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "appData": {
+      ".read": "auth != null",
+      ".write": "auth != null && (auth.token.developer === true || auth.token.admin === true || auth.token.email == 'muhammadmoad5@gmail.com')",
+      "users": {
+        ".indexOn": ["id", "authUid", "email", "authEmail", "loginName", "type", "role"],
+        "$userKey": {
+          ".write": "auth != null && (auth.uid == newData.child('authUid').val() || auth.token.developer === true || auth.token.admin === true || auth.token.email == 'muhammadmoad5@gmail.com')"
+        }
+      },
+      "orders": {
+        ".indexOn": ["id", "userId", "storeId", "driverId", "status", "createdAt"]
+      },
+      "stores": {
+        ".indexOn": ["id", "ownerId", "approved"]
+      }
+    },
+    "users": {
+      ".read": "auth != null",
+      ".indexOn": ["id", "authUid", "email", "authEmail", "loginName", "type", "role"]
+    },
+    "stores": {
+      ".read": "auth != null",
+      ".indexOn": ["id", "ownerId", "approved"]
+    },
+    "orders": {
+      ".read": "auth != null",
+      ".indexOn": ["id", "userId", "storeId", "driverId", "status", "createdAt"]
+    },
+    "categories": { ".read": "auth != null" },
+    "reports": { ".read": "auth != null" },
+    "chats": { ".read": "auth != null" },
+    "liveLocations": {
+      "$orderId": {
+        ".read": "auth != null && (auth.token.developer === true || auth.token.email == 'muhammadmoad5@gmail.com' || data.child('driverId').val() === auth.uid || data.child('customerId').val() === auth.uid || data.child('storeOwnerId').val() === auth.uid)",
+        ".write": "auth != null && (auth.token.developer === true || auth.token.email == 'muhammadmoad5@gmail.com' || (newData.child('driverId').val() === auth.uid && newData.child('lat').isNumber() && newData.child('lng').isNumber() && newData.child('updatedAt').isNumber()))",
+        ".validate": "newData.hasChildren(['lat', 'lng', 'updatedAt', 'driverId']) && newData.child('lat').val() >= -90 && newData.child('lat').val() <= 90 && newData.child('lng').val() >= -180 && newData.child('lng').val() <= 180 && newData.child('updatedAt').val() <= now + 120000"
+      }
+    }
+  }
+}
