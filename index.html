@@ -198,10 +198,17 @@ header { padding:16px 20px; display:flex; justify-content:space-between; align-i
 	.live-map { height:260px; width:100%; border-radius:16px; overflow:hidden; background:#0b1730; border:1px solid var(--border); }
 	.customer-map { height:220px; width:100%; border-radius:16px; overflow:hidden; background:#0b1730; border:1px solid var(--border); margin-top:10px; }
 .live-map .leaflet-control-attribution { font-size:9px; }
-.live-location-status { display:flex;align-items:center;gap:8px;margin-bottom:10px;color:var(--text-muted);font-size:.8rem; }
-.live-dot { width:9px;height:9px;border-radius:50%;background:var(--success);box-shadow:0 0 0 4px rgba(46,204,113,.14); }
-.live-dot.waiting { background:var(--warning);box-shadow:0 0 0 4px rgba(243,156,18,.14); }
-.live-privacy { margin-top:9px;color:var(--text-muted);font-size:.72rem;line-height:1.6; }
+	.live-location-status { display:flex;align-items:center;gap:8px;margin-bottom:10px;color:var(--text-muted);font-size:.8rem; }
+	.live-dot { width:9px;height:9px;border-radius:50%;background:var(--success);box-shadow:0 0 0 4px rgba(46,204,113,.14); }
+	.live-dot.waiting { background:var(--warning);box-shadow:0 0 0 4px rgba(243,156,18,.14); }
+	.live-privacy { margin-top:9px;color:var(--text-muted);font-size:.72rem;line-height:1.6; }
+	.delivery-head { display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px; }
+	.driver-online { display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:20px;background:rgba(46,204,113,.12);color:var(--success);font-size:.75rem;white-space:nowrap; }
+	.driver-toolbar { display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;margin-bottom:12px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.03);color:var(--text-muted);font-size:.8rem; }
+	.delivery-meta { display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;color:var(--text-muted);font-size:.78rem; }
+	.delivery-meta span { padding:4px 7px;border-radius:8px;background:rgba(255,255,255,.04); }
+	.delivery-actions { display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;align-items:center; }
+	.delivery-actions .btn { flex:1 1 auto;min-width:92px; }
 
 </style>
 </head>
@@ -394,9 +401,27 @@ function dataArray(value) {
     return [];
 }
 
+function uniqueUserRecords(users) {
+    var result = [], aliases = {};
+    dataArray(users).forEach(function(user) {
+        if (!user || typeof user !== 'object') return;
+        var keys = [
+            user.authUid ? 'uid:' + String(user.authUid).trim().toLowerCase() : '',
+            user.email ? 'email:' + String(user.email).trim().toLowerCase() : '',
+            user.loginName ? 'login:' + String(user.loginName).trim().toLowerCase() : '',
+            user.id ? 'id:' + String(user.id).trim() : ''
+        ].filter(Boolean);
+        if (!keys.length) return;
+        if (keys.some(function(key) { return aliases[key]; })) return;
+        keys.forEach(function(key) { aliases[key] = true; });
+        result.push(user);
+    });
+    return result;
+}
+
 function applyAppData(data) {
     if (!data || typeof data !== 'object') return false;
-    db.users = dataArray(data.users); db.stores = dataArray(data.stores);
+    db.users = uniqueUserRecords(data.users); db.stores = dataArray(data.stores);
     db.orders = dataArray(data.orders); db.chats = dataArray(data.chats);
     db.reports = dataArray(data.reports); db.ad = data.ad || db.ad;
     db.policy = data.policy || db.policy; db.coupons = dataArray(data.coupons);
@@ -423,7 +448,7 @@ function loadLegacyRootData(done) {
         });
         if (found) {
             if (values.stores) db.stores = dataArray(values.stores);
-            if (values.users) db.users = dataArray(values.users);
+            if (values.users) db.users = uniqueUserRecords(values.users);
             if (values.orders) db.orders = dataArray(values.orders);
             if (values.categories) db.categories = dataArray(values.categories);
             if (values.reports) db.reports = dataArray(values.reports);
@@ -1425,24 +1450,45 @@ function deleteProduct(pid) {
     sync(); navigate('my-store'); showToast('تم حذف المنتج');
 }
 
+function setDriverOrderStatus(orderId, status) {
+    let order = db.orders.find(function(o) { return o.id === orderId; });
+    if (!order || order.driverId !== currentUser.id) return showToast('هذه المهمة ليست مسجلة باسمك', 'error');
+    order.status = status;
+    if (!order.orderChat) order.orderChat = [];
+    order.orderChat.push({ sender:'system', text:'تحديث السائق: ' + status });
+    addNotification(order.userId, status === 'وصلت للموقع 📍' ? 'السائق وصل إلى موقع التسليم' : 'السائق حدّث حالة طلبك إلى ' + status);
+    sync(); navigate('driver'); showToast('تم تحديث حالة الطلب');
+}
+
+function copyDeliveryAddress(address) {
+    if (navigator.clipboard) navigator.clipboard.writeText(address).then(function(){ showToast('تم نسخ العنوان'); }).catch(function(){ showToast('العنوان: ' + address); });
+    else showToast('العنوان: ' + address);
+}
+
 function renderDriver(container) {
     if (currentUser.type !== 'driver') {
         container.innerHTML = '<div class="animate-fade"><div class="card" style="text-align:center"><div style="font-size:3rem;margin-bottom:16px;">🛵</div><h3>فعّل وضع السائق</h3><p style="color:var(--text-muted);margin:12px 0;">استلم الطلبات وحقق دخلاً إضافياً</p><button class="btn btn-success" onclick="activateDriver()"><i class="fas fa-check"></i> تفعيل</button></div></div>';
         return;
     }
-    let available = db.orders.filter(function(o) { return o.status === 'تم القبول ✅ (بانتظار سائق)' && !o.driverId; });
-    let myTasks = db.orders.filter(function(o) { return o.driverId === currentUser.id && o.status.indexOf('تسليم') === -1; });
-    let completedToday = db.orders.filter(function(o) { return o.driverId === currentUser.id && o.status.indexOf('تسليم') !== -1 && o.createdAt && o.createdAt.indexOf(new Date().toLocaleDateString('ar-LY')) !== -1; }).length;
-    let avgRating = currentUser.ratingCount ? (currentUser.rating / currentUser.ratingCount).toFixed(1) : 'جديد';
+    let priority = { now:0, '30':1, '60':2, '120':3 };
+    let available = db.orders.filter(function(o) { return o.status === 'تم القبول ✅ (بانتظار سائق)' && !o.driverId; }).slice().sort(function(a,b) { return (priority[a.deliveryTime] !== undefined ? priority[a.deliveryTime] : 9) - (priority[b.deliveryTime] !== undefined ? priority[b.deliveryTime] : 9); });
+    let myTasks = db.orders.filter(function(o) { return o.driverId === currentUser.id && o.status.indexOf('تسليم') === -1; }).slice().sort(function(a,b) { return (priority[a.deliveryTime] !== undefined ? priority[a.deliveryTime] : 9) - (priority[b.deliveryTime] !== undefined ? priority[b.deliveryTime] : 9); });
+    let today = new Date().toISOString().slice(0,10);
+    let completedToday = db.orders.filter(function(o) { return o.driverId === currentUser.id && o.status.indexOf('تسليم') !== -1 && ((o.deliveredAt && o.deliveredAt.slice(0,10) === today) || (!o.deliveredAt && o.createdAt && o.createdAt.indexOf(new Date().toLocaleDateString('ar-LY')) !== -1)); }).length;
+    let todayCash = db.orders.filter(function(o) { return o.driverId === currentUser.id && o.deliveredAt && o.deliveredAt.slice(0,10) === today; }).reduce(function(sum,o) { return sum + Number(o.collectedAmount || o.total || 0); }, 0);
+    let completionRate = (completedToday + myTasks.length) ? Math.round((completedToday / (completedToday + myTasks.length)) * 100) : 0;
+    let avgRatingValue = currentUser.ratingCount ? Number((currentUser.rating / currentUser.ratingCount).toFixed(1)) : 0;
+    let avgRating = avgRatingValue ? avgRatingValue.toFixed(1) : 'جديد';
 
     container.innerHTML = '<div class="animate-fade">' +
-        '<div class="delivery-head"><h3>🛵 مركز التوصيل</h3><span class="driver-online"><i class="fas fa-circle" style="font-size:.55rem"></i> متاح لاستلام الطلبات</span></div>' +
-        '<div class="wallet-card cash-card"><div class="wallet-label">💰 الكاش المجمع</div><div class="wallet-balance">' + (currentUser.cashCollected || 0) + ' د.ل</div><div style="font-size:.75rem;opacity:.85">المبلغ الذي تم تحصيله من الطلبات المسلّمة</div></div>' +
+        '<div class="delivery-head"><div><h3>🛵 مركز التوصيل</h3><small style="color:var(--text-muted)">رتّب مهماتك وتابع التسليم من مكان واحد</small></div><span class="driver-online"><i class="fas fa-circle" style="font-size:.55rem"></i> متاح</span></div>' +
+        '<div class="driver-toolbar"><span><i class="fas fa-bolt" style="color:var(--warning)"></i> نسبة إنجاز اليوم: <b>' + completionRate + '%</b></span><button class="btn btn-ghost btn-sm" onclick="navigate(\'driver\')"><i class="fas fa-sync-alt"></i> تحديث</button></div>' +
+        '<div class="wallet-card cash-card"><div class="wallet-label">💰 الكاش المجمع</div><div class="wallet-balance">' + (currentUser.cashCollected || 0) + ' د.ل</div><div style="font-size:.75rem;opacity:.85">اليوم: ' + todayCash + ' د.ل • المبلغ الذي تم تحصيله من الطلبات المسلّمة</div></div>' +
         '<div class="grid-3" style="margin-bottom:16px;">' +
         '<div class="stat-card"><div class="stat-value">' + (myTasks.length) + '</div><div class="stat-label">🚚 مهامي</div></div>' +
         '<div class="stat-card"><div class="stat-value">' + available.length + '</div><div class="stat-label">📋 متاحة</div></div>' +
         '<div class="stat-card"><div class="stat-value">' + completedToday + '</div><div class="stat-label">✅ اليوم</div></div></div>' +
-        '<div class="card" style="text-align:center;"><div style="font-size:0.9rem;color:var(--text-muted);">⭐ تقييمك</div><div class="rating-stars" style="font-size:1.5rem;">' + '★'.repeat(Math.round(avgRating)) + '☆'.repeat(5-Math.round(avgRating)) + '</div><div style="color:var(--primary);font-weight:700;">' + avgRating + '</div></div>' +
+        '<div class="card" style="text-align:center;"><div style="font-size:0.9rem;color:var(--text-muted);">⭐ تقييمك</div><div class="rating-stars" style="font-size:1.5rem;">' + '★'.repeat(Math.round(avgRatingValue)) + '☆'.repeat(5-Math.round(avgRatingValue)) + '</div><div style="color:var(--primary);font-weight:700;">' + avgRating + '</div></div>' +
         '<div style="display:flex;gap:10px;margin-bottom:15px;">' +
         '<button class="btn btn-outline btn-sm" onclick="suggestHotZone()"><i class="fas fa-fire"></i> منطقة ساخنة 🔥</button>' +
         '<button class="btn btn-ghost btn-sm" onclick="resetDriverCash()"><i class="fas fa-redo"></i> تصفير الكاش</button></div>' +
@@ -1453,13 +1499,16 @@ function renderDriver(container) {
                 '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
                 '<b>' + o.userName + '</b><span class="status-badge status-delivery">' + o.status + '</span></div>' +
                 '<div style="color:var(--text-muted);font-size:0.85rem;">📍 ' + o.location + '</div>' +
-                '<div class="delivery-meta"><span>📞 ' + o.phone + '</span><span>💰 ' + (o.total || 0) + ' د.ل</span><span>📦 ' + o.items.length + ' منتجات</span></div>' +
+                '<div class="delivery-meta"><span>📞 ' + o.phone + '</span><span>💰 ' + (o.total || 0) + ' د.ل</span><span>📦 ' + (o.items || []).length + ' منتجات</span></div>' +
                 (o.notes ? '<div class="card" style="padding:9px;margin:8px 0;background:rgba(243,156,18,.1);border-color:var(--warning);"><b>📝 ملاحظات الزبون:</b> ' + o.notes + '</div>' : '') +
                 (o.deliveryTime && o.deliveryTime !== 'now' ? '<div style="color:var(--warning);font-size:0.85rem;">⏰ التوصيل: ' + (o.deliveryTime === '30' ? '30 دقيقة' : o.deliveryTime === '60' ? 'ساعة' : 'ساعتين') + '</div>' : '') +
                 (o.coordinates ? '<a href="' + mapLink + '" target="_blank" style="color:var(--primary);display:block;margin:8px 0;font-size:0.9rem;"><i class="fas fa-map-marked-alt"></i> فتح الموقع في الخرائط</a>' : '') +
                 '<div class="delivery-actions">' +
+                (o.status.indexOf('وصلت') === -1 ? '<button class="btn btn-sm btn-warning" onclick="setDriverOrderStatus(\'' + o.id + '\',\'وصلت للموقع 📍\')"><i class="fas fa-map-pin"></i> وصلت</button>' : '<span class="status-badge status-accepted">📍 وصلت للموقع</span>') +
                 '<button class="btn btn-sm btn-success" onclick="openDeliverModal(\'' + o.id + '\')"><i class="fas fa-check-circle"></i> تم التسليم</button>' +
-                '<button class="btn btn-sm btn-outline" onclick="navigate(\'track\',\'' + o.id + '\')"><i class="fas fa-comments"></i> دردشة</button></div></div>';
+                '<a class="btn btn-sm btn-ghost" href="tel:' + o.phone + '"><i class="fas fa-phone"></i> اتصال</a>' +
+                '<button class="btn btn-sm btn-outline" onclick="copyDeliveryAddress(\'' + String(o.location).replace(/'/g, "\\'") + '\')"><i class="fas fa-copy"></i> نسخ</button>' +
+                '<button class="btn btn-sm btn-outline" onclick="navigate(\'track\',\'' + o.id + '\')"><i class="fas fa-comments"></i> تتبع</button></div></div>';
         }).join('') || '<p style="color:var(--text-muted)">لا مهام حالياً</p>') +
         '<h4 style="margin-top:20px;">📋 طلبات متاحة (' + available.length + ')</h4>' +
         (available.map(function(o) {
@@ -1468,7 +1517,8 @@ function renderDriver(container) {
                 '<div style="display:flex;justify-content:space-between;align-items:center;">' +
                 '<div><b>' + (store ? store.name : 'متجر') + '</b><div style="color:var(--text-muted);font-size:0.85rem;">' + o.userName + '</div></div>' +
                 '<button class="btn btn-sm btn-primary" onclick="pickOrderDriver(\'' + o.id + '\')"><i class="fas fa-hand-paper"></i> استلام</button></div>' +
-                '<div style="color:var(--text-muted);font-size:0.85rem;margin-top:6px;">📍 ' + o.location + '</div></div>';
+                '<div style="color:var(--text-muted);font-size:0.85rem;margin-top:6px;">📍 ' + o.location + '</div>' +
+                '<div class="delivery-meta"><span>💰 ' + (o.total || 0) + ' د.ل</span><span>📦 ' + (o.items || []).length + ' منتجات</span>' + (o.deliveryTime && o.deliveryTime !== 'now' ? '<span>⏰ ' + (o.deliveryTime === '30' ? '30 د' : o.deliveryTime === '60' ? 'ساعة' : 'ساعتان') + '</span>' : '<span>⚡ الآن</span>') + '</div></div>';
         }).join('') || '<p style="color:var(--text-muted)">لا توجد طلبات متاحة</p>') + '</div>';
 }
 
@@ -1479,6 +1529,8 @@ function openDeliverModal(oid) {
         if (!amount) return showToast('أدخل المبلغ المستلم', 'error');
         let order = db.orders.find(function(o) { return o.id === oid; });
         order.status = 'تم التسليم ✅';
+        order.deliveredAt = new Date().toISOString();
+        order.collectedAmount = amount;
         stopLiveLocationTracking(true);
         database.ref('liveLocations/' + oid).remove().catch(function(){});
         order.deliveryProof = tempImageBase64 || null;
@@ -1955,7 +2007,8 @@ function checkDevPass() {
 function renderSuperAdminPanel() {
     let v = document.getElementById('app-content');
     let storesOptions = db.stores.map(function(s) { return '<option value="' + s.id + '">' + s.name + '</option>'; }).join('');
-    let usersOptions = db.users.map(function(u) { return '<option value="' + u.id + '">' + u.name + ' (' + u.type + ')</option>'; }).join('');
+    let uniqueUsers = uniqueUserRecords(db.users);
+    let usersOptions = uniqueUsers.map(function(u) { return '<option value="' + u.id + '">' + u.name + ' (' + u.type + ')</option>'; }).join('');
     let ordersList = db.orders.slice().reverse().map(function(o) {
         let acceptButton = o.status === 'قيد الانتظار ⏳' ? '<button class="btn btn-sm btn-success" style="margin-top:8px;margin-left:6px" onclick="devAcceptOrder(\'' + o.id + '\')"><i class="fas fa-check"></i> قبول الطلب</button>' : '';
         return '<div class="card">' +
@@ -1975,7 +2028,7 @@ function renderSuperAdminPanel() {
     v.innerHTML = '<div class="animate-fade"><div class="card" style="border:2px solid var(--warning)">' +
         '<h3 style="color:var(--warning);margin-bottom:16px;">🛡️ لوحة الإدارة</h3>' +
         '<div class="grid-3" style="margin-bottom:16px;">' +
-        '<div class="stat-card"><div class="stat-value">' + db.users.length + '</div><div class="stat-label">👥 مستخدمين</div></div>' +
+        '<div class="stat-card"><div class="stat-value">' + uniqueUsers.length + '</div><div class="stat-label">👥 مستخدمون فريدون</div></div>' +
         '<div class="stat-card"><div class="stat-value">' + db.stores.length + '</div><div class="stat-label">🏪 متاجر</div></div>' +
         '<div class="stat-card"><div class="stat-value">' + db.orders.length + '</div><div class="stat-label">📦 طلبات</div></div></div>' +
         '<h4>📢 إعلان عام</h4><input id="new-ad" value="' + db.ad + '">' +
@@ -2325,7 +2378,7 @@ window.addEventListener('appinstalled', function() {
 <script>
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js?v=5', { scope: './' }).then(function(registration) {
+    navigator.serviceWorker.register('sw.js?v=6', { scope: './' }).then(function(registration) {
       registration.addEventListener('updatefound', function() {
         var worker = registration.installing;
         if (worker) worker.addEventListener('statechange', function() {
