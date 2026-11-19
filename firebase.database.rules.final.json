@@ -4,18 +4,29 @@
     ".write": false,
     "appData": {
       ".read": "auth != null",
-      ".write": "auth != null && (auth.token.developer === true || auth.token.admin === true || auth.token.email == 'muhammadmoad5@gmail.com')",
+      ".write": "auth != null && (auth.token.email == 'muhammadmoad5@gmail.com' || auth.token.developer === true || auth.token.admin === true)",
       "stores": {
         ".indexOn": ["id", "ownerId", "approved"]
       },
-      "orders": {
-        ".indexOn": ["id", "userId", "storeId", "driverId", "status"]
-      },
       "users": {
-        ".indexOn": ["id", "type", "role"]
-        ,"$userKey": {
-          ".write": "auth != null && (auth.uid == newData.child('authUid').val() || auth.token.developer === true || auth.token.admin === true || auth.token.email == 'muhammadmoad5@gmail.com')"
+        ".indexOn": ["id", "type", "role", "authUid", "authEmail", "email", "loginName"],
+        "$userKey": {
+          ".write": "auth != null && (auth.uid == newData.child('authUid').val() || auth.token.email == 'muhammadmoad5@gmail.com' || auth.token.developer === true || auth.token.admin === true)",
+          ".validate": "newData.hasChildren(['id', 'authUid']) && newData.child('id').isString() && newData.child('authUid').isString()"
         }
+      },
+      "orders": {
+        ".indexOn": ["id", "userId", "storeId", "driverId", "status", "createdAt"]
+      },
+      "chats": {
+        ".indexOn": ["u1", "u2"]
+      }
+    },
+    "liveLocations": {
+      "$orderId": {
+        ".read": "auth != null",
+        ".write": "auth != null && (auth.token.email == 'muhammadmoad5@gmail.com' || auth.token.developer === true || auth.token.admin === true || newData.child('driverId').val() == auth.uid)",
+        ".validate": "newData.hasChildren(['lat', 'lng', 'updatedAt', 'driverId']) && newData.child('lat').isNumber() && newData.child('lng').isNumber() && newData.child('lat').val() >= -90 && newData.child('lat').val() <= 90 && newData.child('lng').val() >= -180 && newData.child('lng').val() <= 180 && newData.child('updatedAt').isNumber() && newData.child('updatedAt').val() <= now + 120000"
       }
     },
     "stores": {
@@ -24,11 +35,11 @@
     },
     "users": {
       ".read": "auth != null",
-      ".indexOn": ["id", "type", "role", "email", "authUid"]
+      ".indexOn": ["id", "type", "role", "authUid", "authEmail", "email", "loginName"]
     },
     "orders": {
       ".read": "auth != null",
-      ".indexOn": ["id", "userId", "storeId", "driverId", "status"]
+      ".indexOn": ["id", "userId", "storeId", "driverId", "status", "createdAt"]
     },
     "categories": {
       ".read": "auth != null"
@@ -37,14 +48,8 @@
       ".read": "auth != null"
     },
     "chats": {
-      ".read": "auth != null"
-    },
-    "liveLocations": {
-      "$orderId": {
-        ".read": "auth != null && (auth.token.developer === true || auth.token.email == 'muhammadmoad5@gmail.com' || data.child('driverId').val() === auth.uid || data.child('customerId').val() === auth.uid || data.child('storeOwnerId').val() === auth.uid)",
-        ".write": "auth != null && (auth.token.developer === true || auth.token.email == 'muhammadmoad5@gmail.com' || (newData.child('driverId').val() === auth.uid && newData.child('lat').isNumber() && newData.child('lng').isNumber() && newData.child('updatedAt').isNumber()))",
-        ".validate": "newData.hasChildren(['lat', 'lng', 'updatedAt', 'driverId']) && newData.child('lat').val() >= -90 && newData.child('lat').val() <= 90 && newData.child('lng').val() >= -180 && newData.child('lng').val() <= 180 && newData.child('updatedAt').val() <= now + 120000"
-      }
+      ".read": "auth != null",
+      ".indexOn": ["u1", "u2"]
     }
   }
 }
