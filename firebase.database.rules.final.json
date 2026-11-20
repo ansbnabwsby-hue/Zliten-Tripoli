@@ -6,20 +6,112 @@
       ".read": "auth != null",
       ".write": "auth != null && (auth.token.email == 'muhammadmoad5@gmail.com' || auth.token.developer === true || auth.token.admin === true)",
       "stores": {
-        ".indexOn": ["id", "ownerId", "approved"]
+        ".indexOn": [
+          "id",
+          "ownerId",
+          "approved"
+        ]
       },
       "users": {
-        ".indexOn": ["id", "type", "role", "authUid", "authEmail", "email", "loginName"],
+        ".indexOn": [
+          "id",
+          "type",
+          "role",
+          "authUid",
+          "authEmail",
+          "email",
+          "loginName"
+        ],
         "$userKey": {
           ".write": "auth != null && (auth.uid == newData.child('authUid').val() || auth.token.email == 'muhammadmoad5@gmail.com' || auth.token.developer === true || auth.token.admin === true)",
           ".validate": "newData.hasChildren(['id', 'authUid']) && newData.child('id').isString() && newData.child('authUid').isString()"
         }
       },
       "orders": {
-        ".indexOn": ["id", "userId", "storeId", "driverId", "status", "createdAt"]
+        ".indexOn": [
+          "id",
+          "userId",
+          "storeId",
+          "driverId",
+          "status",
+          "createdAt"
+        ],
+        "$orderIndex": {
+          "storeReview": {
+            ".write": "auth != null && !data.exists() && root.child('appData/orders').child($orderIndex).exists() && root.child('appData/orders').child($orderIndex).child('customerAuthUid').val() == auth.uid && (root.child('appData/orders').child($orderIndex).child('status').val() == 'تم التسليم ✅' || root.child('appData/orders').child($orderIndex).child('status').val() == 'تم التسليم') && newData.child('orderId').val() == root.child('appData/orders').child($orderIndex).child('id').val() && newData.child('targetType').val() == 'store' && newData.child('targetId').val() == root.child('appData/orders').child($orderIndex).child('storeId').val() && newData.child('reviewerId').val() == root.child('appData/orders').child($orderIndex).child('userId').val() && newData.child('reviewerName').val() == root.child('appData/orders').child($orderIndex).child('userName').val()",
+            ".validate": "newData.hasChildren(['orderId', 'targetType', 'targetId', 'reviewerUid', 'reviewerId', 'reviewerName', 'rating', 'comment', 'createdAt']) && newData.child('orderId').isString() && newData.child('targetType').val() == 'store' && newData.child('targetId').isString() && newData.child('reviewerUid').val() == auth.uid && newData.child('reviewerId').isString() && newData.child('reviewerName').isString() && newData.child('reviewerName').val().length <= 80 && newData.child('rating').isNumber() && newData.child('rating').val() >= 1 && newData.child('rating').val() <= 5 && newData.child('rating').val() % 1 == 0 && newData.child('comment').isString() && newData.child('comment').val().length <= 500 && newData.child('createdAt').isNumber() && newData.child('createdAt').val() >= now - 120000 && newData.child('createdAt').val() <= now + 120000",
+            "orderId": {
+              ".validate": "true"
+            },
+            "targetType": {
+              ".validate": "true"
+            },
+            "targetId": {
+              ".validate": "true"
+            },
+            "reviewerUid": {
+              ".validate": "true"
+            },
+            "reviewerId": {
+              ".validate": "true"
+            },
+            "reviewerName": {
+              ".validate": "true"
+            },
+            "rating": {
+              ".validate": "true"
+            },
+            "comment": {
+              ".validate": "true"
+            },
+            "createdAt": {
+              ".validate": "true"
+            },
+            "$other": {
+              ".validate": "false"
+            }
+          },
+          "driverReview": {
+            ".write": "auth != null && !data.exists() && root.child('appData/orders').child($orderIndex).exists() && root.child('appData/orders').child($orderIndex).child('customerAuthUid').val() == auth.uid && (root.child('appData/orders').child($orderIndex).child('status').val() == 'تم التسليم ✅' || root.child('appData/orders').child($orderIndex).child('status').val() == 'تم التسليم') && root.child('appData/orders').child($orderIndex).child('driverId').isString() && root.child('appData/orders').child($orderIndex).child('driverId').val() != '' && newData.child('orderId').val() == root.child('appData/orders').child($orderIndex).child('id').val() && newData.child('targetType').val() == 'driver' && newData.child('targetId').val() == root.child('appData/orders').child($orderIndex).child('driverId').val() && newData.child('reviewerId').val() == root.child('appData/orders').child($orderIndex).child('userId').val() && newData.child('reviewerName').val() == root.child('appData/orders').child($orderIndex).child('userName').val()",
+            ".validate": "newData.hasChildren(['orderId', 'targetType', 'targetId', 'reviewerUid', 'reviewerId', 'reviewerName', 'rating', 'comment', 'createdAt']) && newData.child('orderId').isString() && newData.child('targetType').val() == 'driver' && newData.child('targetId').isString() && newData.child('reviewerUid').val() == auth.uid && newData.child('reviewerId').isString() && newData.child('reviewerName').isString() && newData.child('reviewerName').val().length <= 80 && newData.child('rating').isNumber() && newData.child('rating').val() >= 1 && newData.child('rating').val() <= 5 && newData.child('rating').val() % 1 == 0 && newData.child('comment').isString() && newData.child('comment').val().length <= 500 && newData.child('createdAt').isNumber() && newData.child('createdAt').val() >= now - 120000 && newData.child('createdAt').val() <= now + 120000",
+            "orderId": {
+              ".validate": "true"
+            },
+            "targetType": {
+              ".validate": "true"
+            },
+            "targetId": {
+              ".validate": "true"
+            },
+            "reviewerUid": {
+              ".validate": "true"
+            },
+            "reviewerId": {
+              ".validate": "true"
+            },
+            "reviewerName": {
+              ".validate": "true"
+            },
+            "rating": {
+              ".validate": "true"
+            },
+            "comment": {
+              ".validate": "true"
+            },
+            "createdAt": {
+              ".validate": "true"
+            },
+            "$other": {
+              ".validate": "false"
+            }
+          }
+        }
       },
       "chats": {
-        ".indexOn": ["u1", "u2"]
+        ".indexOn": [
+          "u1",
+          "u2"
+        ]
       }
     },
     "liveLocations": {
@@ -31,15 +123,34 @@
     },
     "stores": {
       ".read": "auth != null",
-      ".indexOn": ["id", "ownerId", "approved"]
+      ".indexOn": [
+        "id",
+        "ownerId",
+        "approved"
+      ]
     },
     "users": {
       ".read": "auth != null",
-      ".indexOn": ["id", "type", "role", "authUid", "authEmail", "email", "loginName"]
+      ".indexOn": [
+        "id",
+        "type",
+        "role",
+        "authUid",
+        "authEmail",
+        "email",
+        "loginName"
+      ]
     },
     "orders": {
       ".read": "auth != null",
-      ".indexOn": ["id", "userId", "storeId", "driverId", "status", "createdAt"]
+      ".indexOn": [
+        "id",
+        "userId",
+        "storeId",
+        "driverId",
+        "status",
+        "createdAt"
+      ]
     },
     "categories": {
       ".read": "auth != null"
@@ -49,7 +160,10 @@
     },
     "chats": {
       ".read": "auth != null",
-      ".indexOn": ["u1", "u2"]
+      ".indexOn": [
+        "u1",
+        "u2"
+      ]
     }
   }
 }

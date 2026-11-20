@@ -1396,6 +1396,98 @@ function getCategoryName(catId) {
     return cat ? cat.name : catId;
 }
 
+// ==================== مراجعات الطلبات الموثقة ====================
+function getStoreRatingSummary(store) {
+    let verified = db.orders.reduce(function(total, order) {
+        let review = order && order.storeReview;
+        if (order && String(order.storeId) === String(store.id) && review && review.reviewerUid === order.customerAuthUid && String(review.reviewerId) === String(order.userId) && review.targetType === 'store' && String(review.targetId) === String(store.id) && isReviewDeliveryStatus(order.status)) {
+            let rating = Number(review.rating);
+            if (rating >= 1 && rating <= 5) { total.sum += rating; total.count += 1; }
+        }
+        return total;
+    }, { sum: 0, count: 0 });
+    return { sum: verified.sum, count: verified.count, average: verified.count ? verified.sum / verified.count : 0 };
+}
+
+function getDriverRatingSummary(driver) {
+    let verified = db.orders.reduce(function(total, order) {
+        let review = order && order.driverReview;
+        if (order && String(order.driverId) === String(driver.id) && review && review.reviewerUid === order.customerAuthUid && String(review.reviewerId) === String(order.userId) && review.targetType === 'driver' && String(review.targetId) === String(driver.id) && isReviewDeliveryStatus(order.status)) {
+            let rating = Number(review.rating);
+            if (rating >= 1 && rating <= 5) { total.sum += rating; total.count += 1; }
+        }
+        return total;
+    }, { sum: 0, count: 0 });
+    return { sum: verified.sum, count: verified.count, average: verified.count ? verified.sum / verified.count : 0 };
+}
+
+function isReviewDeliveryStatus(status) {
+    return status === 'تم التسليم ✅' || status === 'تم التسليم';
+}
+
+function canReviewOrder(order, targetType, targetId) {
+    let authUid = firebaseAuth && firebaseAuth.currentUser ? firebaseAuth.currentUser.uid : '';
+    if (!order || !currentUser || !authUid || String(order.userId) !== String(currentUser.id) || order.customerAuthUid !== authUid || !isReviewDeliveryStatus(order.status)) return false;
+    if (targetType === 'store') return String(order.storeId) === String(targetId) && !order.storeReview;
+    if (targetType === 'driver') return !!order.driverId && String(order.driverId) === String(targetId || order.driverId) && !order.driverReview && !order.driverRated;
+    return false;
+}
+
+function findEligibleReviewOrder(targetType, targetId) {
+    for (let i = db.orders.length - 1; i >= 0; i--) {
+        if (canReviewOrder(db.orders[i], targetType, targetId)) return db.orders[i];
+    }
+    return null;
+}
+
+function saveVerifiedOrderReview(orderId, targetType, targetId, rating, comment) {
+    let authUser = firebaseAuth && firebaseAuth.currentUser;
+    if (!authUser || !firebaseConnected || !firebaseDataLoaded) {
+        showToast('تعذر التقييم الآن؛ تحقق من تسجيل الدخول والاتصال ثم أعد المحاولة.', 'error', 5000);
+        return Promise.resolve(false);
+    }
+    let orderIndex = db.orders.findIndex(function(order) { return order && String(order.id) === String(orderId); });
+    if (orderIndex < 0) { showToast('لم يتم العثور على الطلب.', 'error'); return Promise.resolve(false); }
+    let reviewField = targetType === 'store' ? 'storeReview' : 'driverReview';
+    let orderRef = database.ref('appData/orders/' + orderIndex);
+    return orderRef.once('value').then(function(snapshot) {
+        let freshOrder = snapshot.val();
+        if (!freshOrder || String(freshOrder.id) !== String(orderId) || !canReviewOrder(freshOrder, targetType, targetId)) return { eligible: false };
+        let review = {
+            orderId: String(freshOrder.id), targetType: targetType, targetId: String(targetId),
+            reviewerUid: authUser.uid, reviewerId: String(freshOrder.userId), reviewerName: String(freshOrder.userName || 'زبون').slice(0, 80),
+            rating: Number(rating), comment: String(comment || '').trim().slice(0, 500), createdAt: Date.now()
+        };
+        return new Promise(function(resolve) {
+            database.ref('appData/orders/' + orderIndex + '/' + reviewField).transaction(function(existing) {
+                return existing === null ? review : undefined;
+            }, function(error, committed, resultSnapshot) {
+                resolve({ error: error, committed: committed, review: resultSnapshot && resultSnapshot.val(), order: freshOrder });
+            }, false);
+        });
+    }).then(function(result) {
+        if (!result || result.eligible === false) {
+            showToast('لا يمكن تقييم هذا الطلب إلا بعد تسليمه ومن الحساب الذي طلبه، ولمرة واحدة.', 'warning', 5000);
+            return false;
+        }
+        if (result.error) {
+            showToast(result.error.code === 'PERMISSION_DENIED' ? 'رفضت قواعد Firebase التقييم لهذا الطلب؛ لم يُحفظ.' : 'تعذر حفظ التقييم في Firebase.', 'error', 5000);
+            return false;
+        }
+        if (!result.committed) {
+            showToast('سبق تقييم هذا الطلب؛ لا يمكن تكرار التقييم.', 'warning', 4000);
+            return false;
+        }
+        if (db.orders[orderIndex] && String(db.orders[orderIndex].id) === String(orderId)) db.orders[orderIndex][reviewField] = result.review;
+        cacheAppData();
+        showToast(targetType === 'store' ? 'تم حفظ تقييم المتجر بنجاح، شكراً لك! ⭐' : 'تم حفظ تقييم السائق بنجاح، شكراً لك! ⭐');
+        return true;
+    }).catch(function(error) {
+        showToast(error && error.code === 'PERMISSION_DENIED' ? 'رفضت قواعد Firebase التقييم لهذا الطلب؛ لم يُحفظ.' : 'تعذر حفظ التقييم في Firebase.', 'error', 5000);
+        return false;
+    });
+}
+
 // ==================== الرئيسية ====================
 function renderHome(container) {
     let filteredStores = db.stores;
@@ -1407,7 +1499,9 @@ function renderHome(container) {
         });
     }
     let storesHtml = filteredStores.map(function(s) {
-        let avg = s.ratingCount ? (s.ratingSum / s.ratingCount).toFixed(1) : 'جديد';
+        let ratingSummary = getStoreRatingSummary(s);
+        let avg = ratingSummary.count ? ratingSummary.average.toFixed(1) : 'جديد';
+        let roundedRating = ratingSummary.count ? Math.round(ratingSummary.average) : 0;
         let isFav = favorites.indexOf(s.id) !== -1;
         let productCount = s.products ? s.products.length : 0;
         return '<div class="card animate-fade" onclick="navigate(\'store\', \'' + s.id + '\')" style="display:flex;gap:15px;align-items:center;cursor:pointer;">' +
@@ -1417,7 +1511,7 @@ function renderHome(container) {
             '<b style="font-size:1.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + s.name + '</b>' +
             '<button class="fav-btn ' + (isFav ? 'active' : '') + '" onclick="event.stopPropagation();toggleFavorite(\'' + s.id + '\')"><i class="fas fa-heart"></i></button>' +
             '</div>' +
-            '<div class="rating-stars">' + '★'.repeat(Math.round(avg)) + '☆'.repeat(5-Math.round(avg)) + ' <span style="color:var(--text-muted);font-size:0.85rem;">' + avg + '</span></div>' +
+            '<div class="rating-stars">' + '★'.repeat(roundedRating) + '☆'.repeat(5-roundedRating) + ' <span style="color:var(--text-muted);font-size:0.85rem;">' + avg + '</span></div>' +
             '<div style="display:flex;gap:8px;margin-top:6px;align-items:center;">' +
             '<span class="tag tag-primary"><i class="fas fa-box"></i> ' + productCount + ' منتج</span>' +
             (s.category ? '<span class="tag tag-success">' + getCategoryName(s.category) + '</span>' : '') +
@@ -1466,7 +1560,9 @@ function handleSearch(query) {
         });
     }
     let storesHtml = filteredStores.map(function(s) {
-        let avg = s.ratingCount ? (s.ratingSum / s.ratingCount).toFixed(1) : 'جديد';
+        let ratingSummary = getStoreRatingSummary(s);
+        let avg = ratingSummary.count ? ratingSummary.average.toFixed(1) : 'جديد';
+        let roundedRating = ratingSummary.count ? Math.round(ratingSummary.average) : 0;
         let isFav = favorites.indexOf(s.id) !== -1;
         return '<div class="card animate-fade" onclick="navigate(\'store\', \'' + s.id + '\')" style="display:flex;gap:15px;align-items:center;cursor:pointer;">' +
             (s.img ? '<img src="' + s.img + '" class="store-avatar">' : '<div class="store-avatar" style="display:flex;align-items:center;justify-content:center;font-size:2rem;">🏪</div>') +
@@ -1475,7 +1571,7 @@ function handleSearch(query) {
             '<b style="font-size:1.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + s.name + '</b>' +
             '<button class="fav-btn ' + (isFav ? 'active' : '') + '" onclick="event.stopPropagation();toggleFavorite(\'' + s.id + '\')"><i class="fas fa-heart"></i></button>' +
             '</div>' +
-            '<div class="rating-stars">' + '★'.repeat(Math.round(avg)) + '☆'.repeat(5-Math.round(avg)) + ' <span style="color:var(--text-muted);font-size:0.85rem;">' + avg + '</span></div>' +
+            '<div class="rating-stars">' + '★'.repeat(roundedRating) + '☆'.repeat(5-roundedRating) + ' <span style="color:var(--text-muted);font-size:0.85rem;">' + avg + '</span></div>' +
             '<div style="display:flex;gap:8px;margin-top:6px;">' +
             '<span class="tag tag-primary"><i class="fas fa-box"></i> ' + (s.products ? s.products.length : 0) + ' منتج</span>' +
             (s.isOpen === false ? '<span class="tag" style="background:rgba(231,76,60,0.2);color:var(--danger);">مغلق</span>' : '<span class="tag tag-success">مفتوح</span>') +
@@ -1507,9 +1603,13 @@ function renderStoreView(container, storeId) {
     let store = db.stores.find(function(s) { return s.id === storeId; });
     if (!store) return navigate('home');
     if (!store.ownerId) store.ownerId = currentUser.id;
-    let avg = store.ratingCount ? (store.ratingSum / store.ratingCount).toFixed(1) : '0.0';
+    let ratingSummary = getStoreRatingSummary(store);
+    let avg = ratingSummary.count ? ratingSummary.average.toFixed(1) : 'جديد';
+    let roundedRating = ratingSummary.count ? Math.round(ratingSummary.average) : 0;
     let isFav = favorites.indexOf(storeId) !== -1;
     let isOwner = currentUser.id === store.ownerId;
+    let reviewOrder = !isOwner ? findEligibleReviewOrder('store', storeId) : null;
+    let reviewOrderIndex = reviewOrder ? db.orders.indexOf(reviewOrder) : -1;
     let productsHtml = (store.products || []).map(function(p, idx) {
         return '<div class="card animate-fade" style="display:flex;gap:12px;align-items:center;animation-delay:' + (idx * 0.05) + 's;">' +
             (p.img ? '<img src="' + p.img + '" class="product-img">' : '<div class="product-img" style="background:var(--gradient-1);display:flex;align-items:center;justify-content:center;font-size:1.8rem;">🍕</div>') +
@@ -1521,15 +1621,25 @@ function renderStoreView(container, storeId) {
             '<button class="btn btn-sm btn-primary" onclick="addToCart(\'' + store.id + '\',\'' + p.name.replace(/\'/g, "\\'") + '\',' + p.price + ',\'' + (p.img || '') + '\')"><i class="fas fa-cart-plus"></i></button>' +
             '</div>';
     }).join('') || '<div class="empty-state"><i class="fas fa-box-open"></i><p>لا توجد منتجات حالياً</p></div>';
+    let verifiedStoreReviews = db.orders.filter(function(order) {
+        let review = order && order.storeReview;
+        let rating = review ? Number(review.rating) : 0;
+        return order && String(order.storeId) === String(store.id) && isReviewDeliveryStatus(order.status) && review && review.reviewerUid === order.customerAuthUid && String(review.reviewerId) === String(order.userId) && review.targetType === 'store' && String(review.targetId) === String(store.id) && rating >= 1 && rating <= 5;
+    }).map(function(order) {
+        return Object.assign({}, order.storeReview, { reviewerName: order.userName || 'زبون', date: new Date(order.storeReview.createdAt).toLocaleString('ar-LY') });
+    }).reverse();
+    let archivedStoreReviews = Array.isArray(store.reviews) ? store.reviews.filter(function(review) { return review && typeof review === 'object'; }) : [];
     let reviewsHtml = '';
-    if (store.reviews && store.reviews.length) {
-        reviewsHtml = '<div style="margin-top:16px;"><h4 style="margin-bottom:12px;">💬 التقييمات (' + store.reviews.length + ')</h4>' +
-            store.reviews.slice(0, 3).map(function(r) {
-                return '<div class="card" style="padding:12px;"><div style="display:flex;justify-content:space-between;align-items:center;"><b>' + r.user + '</b><span class="rating-stars">' + '★'.repeat(r.rating) + '☆'.repeat(5-r.rating) + '</span></div>' +
-                    (r.comment ? '<p style="margin-top:6px;color:var(--text-muted);font-size:0.9rem;">' + r.comment + '</p>' : '') +
-                    '<small style="color:var(--text-muted);">' + r.date + '</small></div>';
-            }).join('') + '</div>';
+    function renderReviewCards(rows) {
+        return rows.slice(0, 3).map(function(r) {
+            let rating = Math.max(0, Math.min(5, Number(r.rating) || 0));
+            return '<div class="card" style="padding:12px;"><div style="display:flex;justify-content:space-between;align-items:center;"><b>' + escapeHtml(r.reviewerName || r.user || 'زبون') + '</b><span class="rating-stars">' + '★'.repeat(rating) + '☆'.repeat(5-rating) + '</span></div>' +
+                (r.comment ? '<p style="margin-top:6px;color:var(--text-muted);font-size:0.9rem;">' + escapeHtml(r.comment) + '</p>' : '') +
+                '<small style="color:var(--text-muted);">' + escapeHtml(r.date || (r.createdAt ? new Date(r.createdAt).toLocaleString('ar-LY') : '')) + '</small></div>';
+        }).join('');
     }
+    if (verifiedStoreReviews.length) reviewsHtml += '<section style="margin-top:16px;"><h4 style="margin-bottom:12px;">💬 تقييمات موثقة (' + ratingSummary.count + ')</h4>' + renderReviewCards(verifiedStoreReviews) + '</section>';
+    if (archivedStoreReviews.length) reviewsHtml += '<details style="margin-top:16px;"><summary class="card" style="cursor:pointer;">تقييمات سابقة غير موثقة (' + archivedStoreReviews.length + ')</summary>' + renderReviewCards(archivedStoreReviews) + '</details>';
     container.innerHTML = '<div class="animate-fade">' +
         '<button class="btn btn-sm btn-outline" style="margin-bottom:12px" onclick="navigate(\'home\')"><i class="fas fa-arrow-right"></i> عودة</button>' +
         '<div class="card" style="text-align:center;position:relative;overflow:visible;">' +
@@ -1538,17 +1648,22 @@ function renderStoreView(container, storeId) {
         '<button class="fav-btn ' + (isFav ? 'active' : '') + '" style="background:var(--card);border-radius:50%;width:40px;height:40px;" onclick="toggleFavorite(\'' + store.id + '\')"><i class="fas fa-heart"></i></button>' +
         '</div>' +
         '<h2 style="color:var(--primary);margin-bottom:8px;">' + store.name + '</h2>' +
-        '<div class="rating-stars" style="font-size:1.3rem;margin-bottom:8px;">' + '★'.repeat(Math.round(avg)) + '☆'.repeat(5-Math.round(avg)) + ' <span style="color:var(--text-muted);">(' + avg + ') • ' + (store.ratingCount || 0) + ' تقييم</span></div>' +
+        '<div class="rating-stars" style="font-size:1.3rem;margin-bottom:8px;">' + '★'.repeat(roundedRating) + '☆'.repeat(5-roundedRating) + ' <span style="color:var(--text-muted);">(' + avg + ') • ' + ratingSummary.count + ' تقييم</span></div>' +
         '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px;">' +
         (store.category ? '<span class="tag tag-primary">' + getCategoryName(store.category) + '</span>' : '') +
         (store.isOpen === false ? '<span class="tag" style="background:rgba(231,76,60,0.2);color:var(--danger);">🔴 مغلق الآن</span>' : '<span class="tag tag-success">🟢 مفتوح</span>') +
         '</div>' +
         '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px;">' +
         (!isOwner ? '<button class="btn btn-sm btn-outline" onclick="messageStoreOwner(\'' + store.ownerId + '\')"><i class="fas fa-comment"></i> مراسلة</button>' : '') +
-        (!isOwner ? '<button class="btn btn-sm btn-warning" onclick="rateStore(\'' + store.id + '\')"><i class="fas fa-star"></i> تقييم</button>' : '') +
+        (!isOwner && reviewOrderIndex >= 0 ? '<button class="btn btn-sm btn-warning" data-rate-store-order="' + reviewOrderIndex + '"><i class="fas fa-star"></i> قيّم طلبك المستلم</button>' : (!isOwner ? '<span class="tag" style="color:var(--text-muted);">يظهر التقييم بعد تسليم طلبك</span>' : '')) +
         '</div></div>' +
         '<h4 style="margin:20px 0 12px;display:flex;align-items:center;gap:8px;"><i class="fas fa-box-open"></i> المنتجات<span style="font-size:0.8rem;color:var(--text-muted);margin-right:auto;">' + (store.products ? store.products.length : 0) + ' منتج</span></h4>' +
         productsHtml + reviewsHtml + '</div>';
+    let storeRatingButton = container.querySelector('[data-rate-store-order]');
+    if (storeRatingButton) storeRatingButton.addEventListener('click', function() {
+        let order = db.orders[Number(storeRatingButton.getAttribute('data-rate-store-order'))];
+        if (order) rateStore(storeId, order.id);
+    });
 }
 
 function messageStoreOwner(ownerId) {
@@ -1562,21 +1677,18 @@ function selectStar(n) {
     stars.forEach(function(s, i) { s.style.color = i < n ? 'var(--warning)' : 'rgba(255,255,255,0.2)'; });
 }
 
-function rateStore(storeId) {
+function rateStore(storeId, orderId) {
+    let order = orderId ? db.orders.find(function(item) { return String(item.id) === String(orderId); }) : findEligibleReviewOrder('store', storeId);
+    if (!canReviewOrder(order, 'store', storeId)) return showToast('يمكنك تقييم المتجر بعد استلام طلب مكتمل من هذا الحساب فقط.', 'warning', 4500);
     selectedRating = 0;
-    showModal("⭐ تقييم المتجر", '<div style="text-align:center;padding:10px;"><p style="margin-bottom:15px;">كيف كانت تجربتك مع هذا المتجر؟</p><div style="font-size:2rem;letter-spacing:8px;cursor:pointer;" id="star-rating">' +
+    showModal("⭐ تقييم المتجر", '<div style="text-align:center;padding:10px;"><p style="margin-bottom:15px;">قيّم المتجر للطلب #' + escapeHtml(String(order.id).slice(-6)) + '</p><div style="font-size:2rem;letter-spacing:8px;cursor:pointer;" id="star-rating">' +
         '<span onclick="selectStar(1)">★</span><span onclick="selectStar(2)">★</span><span onclick="selectStar(3)">★</span><span onclick="selectStar(4)">★</span><span onclick="selectStar(5)">★</span></div>' +
-        '<input id="rating-comment" placeholder="تعليقك (اختياري)" style="margin-top:15px;"></div>', 'confirm', function() {
+        '<textarea id="rating-comment" maxlength="500" placeholder="تعليقك (اختياري، حتى 500 حرف)" style="margin-top:15px;"></textarea></div>', 'confirm', function() {
         let val = selectedRating;
         let comment = document.getElementById('rating-comment') ? document.getElementById('rating-comment').value : '';
-        if (val >= 1 && val <= 5) {
-            let store = db.stores.find(function(s) { return s.id === storeId; });
-            store.ratingSum = (store.ratingSum || 0) + val;
-            store.ratingCount = (store.ratingCount || 0) + 1;
-            if (!store.reviews) store.reviews = [];
-            store.reviews.unshift({ user: currentUser.name, rating: val, comment: comment, date: new Date().toLocaleString('ar-LY') });
-            sync(); showToast('شكراً لتقييمك! ⭐'); navigate('store', storeId);
-        } else { showToast('الرجاء اختيار تقييم', 'error'); }
+        if (val < 1 || val > 5) return showToast('الرجاء اختيار تقييم من 1 إلى 5', 'error');
+        showToast('جارٍ حفظ التقييم…', 'info');
+        saveVerifiedOrderReview(order.id, 'store', storeId, val, comment).then(function(saved) { if (saved) navigate('store', storeId); });
     });
 }
 
@@ -1740,11 +1852,13 @@ function confirmOrder() {
     if (!addr || !phone) return showToast('أدخل العنوان ورقم الهاتف', 'error');
     if (!currentLocation) return showToast('اضغط «تحديد موقعي» واسمح بإذن الموقع أولاً', 'error', 5000);
     if (!isInsideZaltan(currentLocation)) return showToast('التوصيل متاح داخل مدينة زلطن فقط', 'error', 5000);
+    let customerAuthUid = firebaseAuth && firebaseAuth.currentUser ? firebaseAuth.currentUser.uid : '';
+    if (!customerAuthUid) return showToast('سجّل الدخول بحساب موثّق قبل إرسال الطلب.', 'error');
     let storeId = cart[0].sid;
     let total = cart.reduce(function(s, i) { return s + i.price; }, 0);
     let discount = appliedCoupon ? Math.round(total * (appliedCoupon.discount / 100)) : 0;
     let order = {
-        id: 'ORD' + Date.now(), userId: currentUser.id, userName: currentUser.name,
+        id: 'ORD' + Date.now(), userId: currentUser.id, userName: currentUser.name, customerAuthUid: customerAuthUid,
         storeId: storeId, items: JSON.parse(JSON.stringify(cart)), location: addr, phone: phone, notes: notes,
         status: 'قيد الانتظار ⏳', createdAt: new Date().toLocaleString('ar-LY'),
         driverId: null, coordinates: currentLocation, orderChat: [],
@@ -1809,6 +1923,9 @@ function renderOrders(container) {
         let items = o.items || [], itemCount = items.reduce(function(sum, item) { return sum + (Number(item.quantity) || 1); }, 0);
         let timeLabel = o.deliveryTime === 'now' ? 'الآن' : o.deliveryTime === '30' ? 'خلال 30 دقيقة' : o.deliveryTime === '60' ? 'خلال ساعة' : 'خلال ساعتين';
         let shortId = String(o.id || '').slice(-6);
+        let orderIndex = db.orders.indexOf(o);
+        let storeReviewAction = meta.key !== 'done' ? '' : (o.storeReview ? '<span class="tag tag-success">تم تقييم المتجر</span>' : (canReviewOrder(o, 'store', o.storeId) ? '<button class="btn btn-sm btn-warning" data-rate-store-index="' + orderIndex + '"><i class="fas fa-star"></i> تقييم المتجر</button>' : ''));
+        let driverReviewAction = meta.key !== 'done' || !o.driverId ? '' : (o.driverReview || o.driverRated ? '<span class="tag tag-success">تم تقييم السائق</span>' : (canReviewOrder(o, 'driver', o.driverId) ? '<button class="btn btn-sm btn-warning" data-rate-driver-index="' + orderIndex + '"><i class="fas fa-star"></i> تقييم السائق</button>' : ''));
         container.innerHTML += '<div class="card order-card-pro animate-fade">' +
             '<div class="order-card-head"><div class="order-store-line"><div class="order-store-icon"><i class="fas fa-shopping-bag"></i></div><div><b>' + (store ? store.name : 'طلب توصيل') + '</b><div class="order-number">طلب #' + shortId + ' • ' + (o.createdAt || '') + '</div></div></div><span class="status-badge ' + meta.cls + '"><i class="fas ' + meta.icon + '"></i> ' + meta.label + '</span></div>' +
             '<div class="order-card-body">' + renderOrderProgress(meta) +
@@ -1816,10 +1933,16 @@ function renderOrders(container) {
             '<div class="order-info-row"><i class="fas fa-location-dot"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (o.location || 'عنوان التوصيل محفوظ') + '</span></div>' +
             '<div class="order-total-box"><small>إجمالي الطلب</small><strong>' + (o.total || 0) + ' د.ل</strong></div>' +
             '<div class="order-card-actions"><button class="btn btn-sm btn-outline" onclick="navigate(\'track\',\'' + o.id + '\')"><i class="fas fa-map-marked-alt"></i> تتبع الطلب</button>' +
-            (meta.key === 'done' && !o.driverRated ? '<button class="btn btn-sm btn-warning" onclick="rateDriver(\'' + o.id + '\')"><i class="fas fa-star"></i> تقييم</button>' : '') +
+            storeReviewAction + driverReviewAction +
             (meta.key === 'done' ? '<button class="btn btn-sm btn-outline" onclick="reorderItems(\'' + o.id + '\')"><i class="fas fa-rotate-right"></i> إعادة الطلب</button>' : '') + '</div></div></div>';
     });
     container.innerHTML += '</div>';
+    container.querySelectorAll('[data-rate-store-index]').forEach(function(button) {
+        button.addEventListener('click', function() { let order = db.orders[Number(button.getAttribute('data-rate-store-index'))]; if (order) rateStore(order.storeId, order.id); });
+    });
+    container.querySelectorAll('[data-rate-driver-index]').forEach(function(button) {
+        button.addEventListener('click', function() { let order = db.orders[Number(button.getAttribute('data-rate-driver-index'))]; if (order) rateDriver(order.id); });
+    });
 }
 
 function reorderItems(orderId) {
@@ -1829,23 +1952,17 @@ function reorderItems(orderId) {
 }
 
 function rateDriver(orderId) {
-    let order = db.orders.find(function(o) { return o.id === orderId; });
-    if (!order || !order.driverId) return;
+    let order = db.orders.find(function(item) { return String(item.id) === String(orderId); });
+    if (!canReviewOrder(order, 'driver', order && order.driverId)) return showToast('يمكنك تقييم السائق بعد استلام طلب مكتمل من هذا الحساب فقط.', 'warning', 4500);
     selectedRating = 0;
-    showModal("⭐ تقييم السائق", '<div style="text-align:center;padding:10px;"><p>قيم أداء السائق</p><div style="font-size:2rem;letter-spacing:8px;cursor:pointer;" id="star-rating">' +
+    showModal("⭐ تقييم السائق", '<div style="text-align:center;padding:10px;"><p>قيّم السائق للطلب #' + escapeHtml(String(order.id).slice(-6)) + '</p><div style="font-size:2rem;letter-spacing:8px;cursor:pointer;" id="star-rating">' +
         '<span onclick="selectStar(1)">★</span><span onclick="selectStar(2)">★</span><span onclick="selectStar(3)">★</span><span onclick="selectStar(4)">★</span><span onclick="selectStar(5)">★</span></div>' +
-        '<input id="driver-rating-comment" placeholder="تعليقك (اختياري)" style="margin-top:15px;"></div>', 'confirm', function() {
-        if (selectedRating > 0) {
-            let driver = db.users.find(function(u) { return u.id === order.driverId; });
-            if (driver) {
-                driver.rating = (driver.rating || 0) + selectedRating;
-                driver.ratingCount = (driver.ratingCount || 0) + 1;
-            }
-            order.driverRated = true;
-            let comment = document.getElementById('driver-rating-comment') ? document.getElementById('driver-rating-comment').value : '';
-            order.driverReview = { rating: selectedRating, comment: comment, date: new Date().toLocaleString('ar-LY') };
-            sync(); showToast('شكراً لتقييم السائق! ⭐'); navigate('orders');
-        } else { showToast('الرجاء اختيار تقييم', 'error'); }
+        '<textarea id="driver-rating-comment" maxlength="500" placeholder="تعليقك (اختياري، حتى 500 حرف)" style="margin-top:15px;"></textarea></div>', 'confirm', function() {
+        let val = selectedRating;
+        let comment = document.getElementById('driver-rating-comment') ? document.getElementById('driver-rating-comment').value : '';
+        if (val < 1 || val > 5) return showToast('الرجاء اختيار تقييم من 1 إلى 5', 'error');
+        showToast('جارٍ حفظ التقييم…', 'info');
+        saveVerifiedOrderReview(order.id, 'driver', order.driverId, val, comment).then(function(saved) { if (saved) navigate('orders'); });
     });
 }
 
@@ -2042,7 +2159,8 @@ function renderDriver(container) {
     let completedToday = db.orders.filter(function(o) { return o.driverId === currentUser.id && String(o.status || '').indexOf('تسليم') !== -1 && ((o.deliveredAt && o.deliveredAt.slice(0,10) === today) || (!o.deliveredAt && o.createdAt && o.createdAt.indexOf(new Date().toLocaleDateString('ar-LY')) !== -1)); }).length;
     let todayCash = db.orders.filter(function(o) { return o.driverId === currentUser.id && o.deliveredAt && o.deliveredAt.slice(0,10) === today; }).reduce(function(sum, o) { return sum + Number(o.collectedAmount || o.total || 0); }, 0);
     let completionRate = (completedToday + myTasks.length) ? Math.round((completedToday / (completedToday + myTasks.length)) * 100) : 0;
-    let avgRatingValue = currentUser.ratingCount ? Number((currentUser.rating / currentUser.ratingCount).toFixed(1)) : 0;
+    let driverRatingSummary = getDriverRatingSummary(currentUser);
+    let avgRatingValue = driverRatingSummary.count ? Number(driverRatingSummary.average.toFixed(1)) : 0;
     let avgRating = avgRatingValue ? avgRatingValue.toFixed(1) : 'جديد';
     let isOnline = !!firebaseConnected && !!firebaseDataLoaded && (typeof navigator === 'undefined' || navigator.onLine !== false);
     let safe = function(value) { return escapeHtml(value === undefined || value === null ? '' : String(value)); };
@@ -2099,7 +2217,7 @@ function renderDriver(container) {
     container.innerHTML = '<div class="animate-fade driver-page">' +
         '<section class="driver-hero"><div class="driver-hero-top"><div class="driver-brand-icon"><i class="fas fa-motorcycle"></i></div><span class="driver-connection ' + (isOnline ? 'is-connected' : 'is-disconnected') + '"><i class="fas fa-circle"></i> ' + (isOnline ? 'متصل ومتزامن' : 'المزامنة غير متاحة') + '</span></div><div class="driver-hero-copy"><span class="driver-hero-eyebrow">مركز السائق</span><h3>أهلاً ' + safe(currentUser.name || 'بك') + '</h3><p>كل مهامك وتفاصيل التوصيل في مكان واحد.</p></div><div class="driver-completion"><div class="driver-completion-copy"><span><i class="fas fa-bolt"></i> إنجاز اليوم</span><b>' + completionRate + '%</b></div><div class="driver-progress-track"><span style="width:' + completionRate + '%"></span></div></div></section>' +
         '<div class="driver-quick-actions"><button type="button" class="btn btn-sm btn-ghost" onclick="requestDriverLocationAccess()"><i class="fas fa-location-arrow"></i> تفعيل موقعي</button><button type="button" class="btn btn-sm btn-ghost" onclick="navigate(\'driver\')"><i class="fas fa-sync-alt"></i> تحديث اللوحة</button><button type="button" class="btn btn-sm btn-ghost" onclick="suggestHotZone()"><i class="fas fa-fire"></i> منطقة نشطة</button></div>' +
-        '<section class="driver-stats-grid" aria-label="ملخص الأداء"><article class="driver-stat-card"><span class="driver-stat-icon is-cyan"><i class="fas fa-motorcycle"></i></span><strong>' + myTasks.length + '</strong><small>مهام جارية</small></article><article class="driver-stat-card"><span class="driver-stat-icon is-blue"><i class="fas fa-clipboard-list"></i></span><strong>' + available.length + '</strong><small>طلبات متاحة</small></article><article class="driver-stat-card"><span class="driver-stat-icon is-green"><i class="fas fa-circle-check"></i></span><strong>' + completedToday + '</strong><small>توصيلات اليوم</small></article><article class="driver-stat-card"><span class="driver-stat-icon is-gold"><i class="fas fa-star"></i></span><strong>' + safe(avgRating) + '</strong><small>تقييمك · ' + Number(currentUser.ratingCount || 0) + ' تقييمات</small></article></section>' +
+        '<section class="driver-stats-grid" aria-label="ملخص الأداء"><article class="driver-stat-card"><span class="driver-stat-icon is-cyan"><i class="fas fa-motorcycle"></i></span><strong>' + myTasks.length + '</strong><small>مهام جارية</small></article><article class="driver-stat-card"><span class="driver-stat-icon is-blue"><i class="fas fa-clipboard-list"></i></span><strong>' + available.length + '</strong><small>طلبات متاحة</small></article><article class="driver-stat-card"><span class="driver-stat-icon is-green"><i class="fas fa-circle-check"></i></span><strong>' + completedToday + '</strong><small>توصيلات اليوم</small></article><article class="driver-stat-card"><span class="driver-stat-icon is-gold"><i class="fas fa-star"></i></span><strong>' + safe(avgRating) + '</strong><small>تقييمك · ' + driverRatingSummary.count + ' تقييمات</small></article></section>' +
         '<section class="driver-cash-card"><div class="driver-cash-heading"><span class="driver-cash-icon"><i class="fas fa-wallet"></i></span><div><small>إجمالي الكاش المجمع</small><strong>' + money(currentUser.cashCollected) + ' <em>د.ل</em></strong></div></div><div class="driver-cash-footer"><span><i class="fas fa-calendar-day"></i> اليوم <b>' + money(todayCash) + ' د.ل</b></span><button type="button" onclick="resetDriverCash()">تصفير الرصيد</button></div></section>' +
         '<nav class="driver-section-nav" aria-label="أقسام لوحة السائق"><button type="button" data-driver-scroll="driver-section-tasks"><i class="fas fa-motorcycle"></i> مهامي <b>' + myTasks.length + '</b></button><button type="button" data-driver-scroll="driver-section-available"><i class="fas fa-clipboard-list"></i> المتاحة <b>' + available.length + '</b></button></nav>' +
         '<section class="driver-section" id="driver-section-tasks"><div class="driver-section-heading"><div><span class="driver-section-eyebrow">تابع كل خطوة</span><h3>مهامي الجارية</h3></div><span class="driver-section-count">' + myTasks.length + '</span></div>' +
@@ -2328,7 +2446,7 @@ function renderOrderTracking(container, orderId) {
         (order.notes ? '<div class="card" style="padding:10px;margin:8px 0;background:rgba(243,156,18,.1);border-color:var(--warning);"><b>📝 ملاحظات الطلب:</b><br>' + order.notes + '</div>' : '') +
         (order.deliveryTime && order.deliveryTime !== 'now' ? '<p><b>وقت التوصيل المطلوب:</b> ' + (order.deliveryTime === '30' ? '30 دقيقة' : order.deliveryTime === '60' ? 'ساعة' : 'ساعتين') + '</p>' : '') +
         (order.coordinates ? '<a href="' + mapLink + '" target="_blank" class="btn btn-outline btn-sm" style="margin:8px 0;width:auto;display:inline-flex;"><i class="fas fa-map-marker-alt"></i> عرض الموقع على الخريطة</a>' : '') +
-        (driver ? '<p><b>السائق:</b> ' + driver.name + (driver.ratingCount ? ' ⭐ ' + (driver.rating / driver.ratingCount).toFixed(1) : '') + '</p>' : '') +
+        (driver ? '<p><b>السائق:</b> ' + escapeHtml(driver.name) + (getDriverRatingSummary(driver).count ? ' ⭐ ' + getDriverRatingSummary(driver).average.toFixed(1) : '') + '</p>' : '') +
         (order.total ? '<p><b>المبلغ:</b> <span style="color:var(--success);font-weight:700;">' + order.total + ' د.ل</span></p>' : '') +
         (order.deliveryProof ? '<div style="margin-top:10px;"><b>📸 إثبات التسليم:</b><br><img src="' + order.deliveryProof + '" style="max-width:100%;border-radius:12px;margin-top:8px;"></div>' : '') +
         '</div>' +
@@ -2619,14 +2737,15 @@ function deleteChat(cid) {
 // ==================== الملف الشخصي ====================
 function renderProfile(container) {
     let joinDate = currentUser.createdAt || 'غير معروف';
-    let avgRating = currentUser.ratingCount ? (currentUser.rating / currentUser.ratingCount).toFixed(1) : 'جديد';
+    let profileRatingSummary = getDriverRatingSummary(currentUser);
+    let avgRating = profileRatingSummary.count ? profileRatingSummary.average.toFixed(1) : 'جديد';
     container.innerHTML = '<div class="animate-fade">' +
         '<h3 style="margin-bottom:16px;">👤 الملف الشخصي</h3>' +
         '<div class="card" style="text-align:center;">' +
         '<div style="width:100px;height:100px;border-radius:50%;background:var(--gradient-1);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:900;">' + currentUser.name.charAt(0) + '</div>' +
         '<h2 style="color:var(--primary);">' + currentUser.name + '</h2>' +
         '<p style="color:var(--text-muted);">' + (currentUser.type === 'store_owner' ? '🏪 تاجر' : currentUser.type === 'driver' ? '🛵 سائق' : '👤 زبون') + '</p>' +
-        (currentUser.type === 'driver' ? '<div class="rating-stars" style="font-size:1.3rem;">⭐ ' + avgRating + ' (' + (currentUser.ratingCount || 0) + ' تقييم)</div>' : '') +
+        (currentUser.type === 'driver' ? '<div class="rating-stars" style="font-size:1.3rem;">⭐ ' + avgRating + ' (' + profileRatingSummary.count + ' تقييم)</div>' : '') +
         '<div class="grid-3" style="margin-top:16px;">' +
         '<div class="stat-card"><div class="stat-value">' + (db.orders.filter(function(o){return o.userId===currentUser.id;}).length) + '</div><div class="stat-label">📦 طلبات</div></div>' +
         '<div class="stat-card"><div class="stat-value">' + favorites.length + '</div><div class="stat-label">❤️ مفضلة</div></div>' +
@@ -2658,11 +2777,13 @@ function renderFavorites(container) {
         return;
     }
     favStores.forEach(function(s) {
-        let avg = s.ratingCount ? (s.ratingSum / s.ratingCount).toFixed(1) : 'جديد';
+        let ratingSummary = getStoreRatingSummary(s);
+        let avg = ratingSummary.count ? ratingSummary.average.toFixed(1) : 'جديد';
+        let roundedRating = ratingSummary.count ? Math.round(ratingSummary.average) : 0;
         container.innerHTML += '<div class="card animate-fade" onclick="navigate(\'store\',\'' + s.id + '\')" style="display:flex;gap:15px;align-items:center;cursor:pointer;">' +
             (s.img ? '<img src="' + s.img + '" class="store-avatar">' : '<div class="store-avatar" style="display:flex;align-items:center;justify-content:center;font-size:2rem;">🏪</div>') +
             '<div style="flex:1;"><b style="font-size:1.1rem;">' + s.name + '</b>' +
-            '<div class="rating-stars">' + '★'.repeat(Math.round(avg)) + '☆'.repeat(5-Math.round(avg)) + ' ' + avg + '</div>' +
+            '<div class="rating-stars">' + '★'.repeat(roundedRating) + '☆'.repeat(5-roundedRating) + ' ' + avg + '</div>' +
             '<small style="color:var(--text-muted)">' + (s.products ? s.products.length : 0) + ' منتج</small></div>' +
             '<i class="fas fa-chevron-left" style="color:var(--primary);"></i></div>';
     });
@@ -3276,6 +3397,7 @@ function showStoreQR(storeId) {
 // ==================== إحصائيات السائق الشهرية ====================
 function renderDriverStats(container) {
     if (currentUser.type !== 'driver') return navigate('driver');
+    let driverRatingSummary = getDriverRatingSummary(currentUser);
     let myDeliveries = db.orders.filter(function(o) { return o.driverId === currentUser.id && o.status.indexOf('تسليم') !== -1; });
     let monthlyRevenue = {};
     myDeliveries.forEach(function(o) {
@@ -3291,7 +3413,7 @@ function renderDriverStats(container) {
         '<div class="stat-card"><div class="stat-value">' + totalDeliveries + '</div><div class="stat-label">📦 إجمالي التوصيلات</div></div>' +
         '<div class="stat-card"><div class="stat-value">' + totalEarnings + '</div><div class="stat-label">💰 إجمالي الأرباح</div></div>' +
         '<div class="stat-card"><div class="stat-value">' + avgPerDelivery + '</div><div class="stat-label">📊 متوسط الطلب</div></div>' +
-        '<div class="stat-card"><div class="stat-value">' + (currentUser.ratingCount || 0) + '</div><div class="stat-label">⭐ عدد التقييمات</div></div></div>' +
+        '<div class="stat-card"><div class="stat-value">' + driverRatingSummary.count + '</div><div class="stat-label">⭐ عدد التقييمات</div></div></div>' +
         '<div class="card"><h4 style="margin-bottom:12px;">📈 الأرباح الشهرية</h4>' +
         Object.keys(monthlyRevenue).map(function(m) {
             return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">' +
