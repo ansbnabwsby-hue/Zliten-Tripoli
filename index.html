@@ -572,10 +572,10 @@ let loadedAuthUid = '';
 let seenNotificationIds = {};
 let locationPermissionState = 'unknown';
 
-const ZLITEN_CENTER = [32.467, 14.568];
-const ZLITEN_SERVICE_RADIUS_KM = 20;
-const ZLITEN_MAP_BOUNDS = [[32.405, 14.46], [32.535, 14.68]];
-const ZLITEN_AREAS = ['مدينة زلطن فقط'];
+const ZALTAN_CENTER = [32.95, 11.86583];
+const ZALTAN_SERVICE_RADIUS_KM = 20;
+const ZALTAN_MAP_BOUNDS = [[32.75, 11.61583], [33.15, 12.11583]];
+const ZALTAN_AREAS = ['مدينة زلطن فقط'];
 
 database.ref('.info/connected').on('value', function(snapshot) {
     firebaseConnected = !!snapshot.val();
@@ -1632,20 +1632,20 @@ function getCurrentLocation(callback) {
     if (!navigator.geolocation) return showToast('متصفحك لا يدعم تحديد الموقع', 'error');
     showToast('سيطلب الهاتف إذن الموقع الآن؛ وافق لإكمال الطلب', 'info', 4500);
     navigator.geolocation.getCurrentPosition(
-        function(pos) { locationPermissionState = 'granted'; currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy }; updateCustomerMap(currentLocation); let el = document.getElementById('location-status'); if (el) el.innerHTML = isInsideZliten(currentLocation) ? '✅ داخل نطاق زلطن • دقة ' + Math.round(pos.coords.accuracy) + 'م' : '⚠️ الموقع خارج نطاق زلطن'; if (callback) callback(); },
+        function(pos) { locationPermissionState = 'granted'; currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy }; updateCustomerMap(currentLocation); let el = document.getElementById('location-status'); if (el) el.innerHTML = isInsideZaltan(currentLocation) ? '✅ داخل نطاق زلطن • دقة ' + Math.round(pos.coords.accuracy) + 'م' : '⚠️ الموقع خارج نطاق زلطن'; if (callback) callback(); },
         function(err) { locationPermissionState = err && err.code === 1 ? 'denied' : 'error'; let el = document.getElementById('location-status'); if (el) el.innerHTML = '⚠️ يجب السماح بالموقع من أذونات الهاتف'; showModal('تفعيل الموقع مطلوب', '<div style="line-height:1.9">لا يمكن إرسال طلب توصيل بدون تحديد الموقع.<br><br><b>اضغط السماح أثناء ظهور نافذة الهاتف.</b><br>إذا اخترت الرفض سابقاً: افتح إعدادات الهاتف ← أذونات التطبيق ← الموقع، واختر السماح أثناء الاستخدام، ثم اضغط إعادة المحاولة.</div>', 'confirm', function(){ getCurrentLocation(callback); }); },
         { enableHighAccuracy:true, timeout:12000, maximumAge:30000 }
     );
 }
 
-function isInsideZliten(location) {
+function isInsideZaltan(location) {
     if (!location || !Number.isFinite(Number(location.lat)) || !Number.isFinite(Number(location.lng))) return false;
     var lat1 = Number(location.lat) * Math.PI / 180, lng1 = Number(location.lng) * Math.PI / 180;
-    var lat2 = ZLITEN_CENTER[0] * Math.PI / 180, lng2 = ZLITEN_CENTER[1] * Math.PI / 180;
+    var lat2 = ZALTAN_CENTER[0] * Math.PI / 180, lng2 = ZALTAN_CENTER[1] * Math.PI / 180;
     var dLat = lat1 - lat2, dLng = lng1 - lng2;
     var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
     var distanceKm = 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return distanceKm <= ZLITEN_SERVICE_RADIUS_KM;
+    return distanceKm <= ZALTAN_SERVICE_RADIUS_KM;
 }
 
 let customerMap = null, customerMarker = null, customerAccuracyCircle = null;
@@ -1653,11 +1653,11 @@ function initCustomerMap() {
     var holder = document.getElementById('customer-map');
     if (!holder || typeof L === 'undefined') return;
     if (customerMap) { customerMap.remove(); customerMap = null; customerMarker = null; customerAccuracyCircle = null; }
-    var fallback = ZLITEN_CENTER;
+    var fallback = ZALTAN_CENTER;
     var start = currentLocation ? [currentLocation.lat, currentLocation.lng] : fallback;
-    customerMap = L.map(holder, { zoomControl:true, attributionControl:true, maxBounds:ZLITEN_MAP_BOUNDS, maxBoundsViscosity:0.9, minZoom:11, maxZoom:18 }).setView(start, currentLocation ? 16 : 13);
+    customerMap = L.map(holder, { zoomControl:true, attributionControl:true, maxBounds:ZALTAN_MAP_BOUNDS, maxBoundsViscosity:0.9, minZoom:11, maxZoom:18 }).setView(start, currentLocation ? 16 : 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap' }).addTo(customerMap);
-    L.circle(ZLITEN_CENTER, { radius:ZLITEN_SERVICE_RADIUS_KM * 1000, color:'#00d4ff', weight:1, dashArray:'6 7', fillColor:'#00d4ff', fillOpacity:.045 }).addTo(customerMap).bindTooltip('نطاق التوصيل داخل مدينة زلطن', { sticky:true });
+    L.circle(ZALTAN_CENTER, { radius:ZALTAN_SERVICE_RADIUS_KM * 1000, color:'#00d4ff', weight:1, dashArray:'6 7', fillColor:'#00d4ff', fillOpacity:.045 }).addTo(customerMap).bindTooltip('نطاق التوصيل داخل مدينة زلطن', { sticky:true });
     if (currentLocation) updateCustomerMap(currentLocation);
     setTimeout(function(){ if (customerMap) customerMap.invalidateSize(); }, 200);
 }
@@ -1739,7 +1739,7 @@ function confirmOrder() {
     let time = document.getElementById('delivery-time') ? document.getElementById('delivery-time').value : 'now';
     if (!addr || !phone) return showToast('أدخل العنوان ورقم الهاتف', 'error');
     if (!currentLocation) return showToast('اضغط «تحديد موقعي» واسمح بإذن الموقع أولاً', 'error', 5000);
-    if (!isInsideZliten(currentLocation)) return showToast('التوصيل متاح داخل مدينة زلطن فقط', 'error', 5000);
+    if (!isInsideZaltan(currentLocation)) return showToast('التوصيل متاح داخل مدينة زلطن فقط', 'error', 5000);
     let storeId = cart[0].sid;
     let total = cart.reduce(function(s, i) { return s + i.price; }, 0);
     let discount = appliedCoupon ? Math.round(total * (appliedCoupon.discount / 100)) : 0;
@@ -2243,7 +2243,7 @@ function initLiveMap(orderId, isDriver) {
     if (!holder || typeof L === 'undefined') return;
     if (liveMap) { liveMap.remove(); liveMap = null; liveMarker = null; }
     liveMapOrderId = orderId;
-    liveMap = L.map(holder, { zoomControl:true, attributionControl:true, maxBounds:ZLITEN_MAP_BOUNDS, maxBoundsViscosity:0.9, minZoom:11, maxZoom:18 }).setView([32.467, 14.568], 13);
+    liveMap = L.map(holder, { zoomControl:true, attributionControl:true, maxBounds:ZALTAN_MAP_BOUNDS, maxBoundsViscosity:0.9, minZoom:11, maxZoom:18 }).setView(ZALTAN_CENTER, 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap' }).addTo(liveMap);
     if (isDriver) {
         var status = document.getElementById('live-location-status');
@@ -3363,7 +3363,7 @@ window.addEventListener('appinstalled', function() {
 <script>
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js?v=12', { scope: './' }).then(function(registration) {
+    navigator.serviceWorker.register('sw.js?v=13', { scope: './' }).then(function(registration) {
       registration.addEventListener('updatefound', function() {
         var worker = registration.installing;
         if (worker) worker.addEventListener('statechange', function() {
