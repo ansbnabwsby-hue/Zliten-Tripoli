@@ -1769,6 +1769,7 @@ function renderOrders(container) {
         '<div class="orders-summary"><div class="orders-summary-item"><b>' + allOrders.length + '</b><span>كل الطلبات</span></div><div class="orders-summary-item"><b>' + activeCount + '</b><span>قيد المتابعة</span></div><div class="orders-summary-item"><b>' + doneCount + '</b><span>مكتملة</span></div></div></div>' +
         '<div class="orders-filter"><button class="category-pill ' + (ordersFilter === 'all' ? 'active' : '') + '" onclick="setOrdersFilter(\'all\')">الكل <small>(' + allOrders.length + ')</small></button>' +
         '<button class="category-pill ' + (ordersFilter === 'pending' ? 'active' : '') + '" onclick="setOrdersFilter(\'pending\')">قيد المراجعة</button>' +
+        '<button class="category-pill ' + (ordersFilter === 'accepted' ? 'active' : '') + '" onclick="setOrdersFilter(\'accepted\')">تم القبول</button>' +
         '<button class="category-pill ' + (ordersFilter === 'delivery' ? 'active' : '') + '" onclick="setOrdersFilter(\'delivery\')">قيد التوصيل</button>' +
         '<button class="category-pill ' + (ordersFilter === 'done' ? 'active' : '') + '" onclick="setOrdersFilter(\'done\')">مكتملة</button></div>';
     if (!allOrders.length) {
