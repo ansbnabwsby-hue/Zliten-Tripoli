@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zliten-tripoli-v10';
+const CACHE_NAME = 'zliten-tripoli-v11';
 const APP_SHELL = [
   './',
   './index.html',

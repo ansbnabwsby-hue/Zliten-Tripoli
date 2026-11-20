@@ -202,13 +202,110 @@ header { padding:16px 20px; display:flex; justify-content:space-between; align-i
 	.live-dot { width:9px;height:9px;border-radius:50%;background:var(--success);box-shadow:0 0 0 4px rgba(46,204,113,.14); }
 	.live-dot.waiting { background:var(--warning);box-shadow:0 0 0 4px rgba(243,156,18,.14); }
 	.live-privacy { margin-top:9px;color:var(--text-muted);font-size:.72rem;line-height:1.6; }
-	.delivery-head { display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px; }
-	.driver-online { display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:20px;background:rgba(46,204,113,.12);color:var(--success);font-size:.75rem;white-space:nowrap; }
-	.driver-toolbar { display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;margin-bottom:12px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.03);color:var(--text-muted);font-size:.8rem; }
-	.delivery-meta { display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;color:var(--text-muted);font-size:.78rem; }
-	.delivery-meta span { padding:4px 7px;border-radius:8px;background:rgba(255,255,255,.04); }
-	.delivery-actions { display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;align-items:center; }
-	.delivery-actions .btn { flex:1 1 auto;min-width:92px; }
+	.driver-page { display:flex;flex-direction:column;gap:13px;padding-bottom:8px; }
+	.driver-hero { position:relative;overflow:hidden;padding:18px;border:1px solid rgba(0,212,255,.24);border-radius:24px;background:radial-gradient(circle at 100% 0,rgba(0,212,255,.2),transparent 43%),linear-gradient(145deg,#10254a,#091126 72%);box-shadow:0 12px 28px rgba(0,0,0,.2); }
+	.driver-hero::after { content:'';font-family:'Font Awesome 6 Free';font-weight:900;position:absolute;left:-10px;bottom:-38px;font-size:130px;color:rgba(255,255,255,.035);transform:rotate(-18deg);pointer-events:none; }
+	.driver-hero-top,.driver-hero-copy,.driver-completion { position:relative;z-index:1; }
+	.driver-hero-top { display:flex;align-items:center;justify-content:space-between;gap:10px; }
+	.driver-brand-icon { width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.2);border-radius:14px;background:rgba(0,212,255,.15);color:#8beaff;font-size:1.15rem; }
+	.driver-connection { display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid transparent;border-radius:20px;font-size:.68rem;font-weight:700;white-space:nowrap; }
+	.driver-connection i { font-size:.48rem; }
+	.driver-connection.is-connected { color:#8be8b0;background:rgba(46,204,113,.12);border-color:rgba(46,204,113,.2); }
+	.driver-connection.is-disconnected { color:#ffd17d;background:rgba(243,156,18,.12);border-color:rgba(243,156,18,.24); }
+	.driver-hero-copy { margin:13px 0 16px; }
+	.driver-hero-eyebrow,.driver-section-eyebrow { color:var(--primary);font-size:.68rem;font-weight:800; }
+	.driver-hero-copy h3 { margin:2px 0 3px;color:#fff;font-size:1.35rem; }
+	.driver-hero-copy p { color:#b9c8dc;font-size:.78rem; }
+	.driver-completion { padding:11px 12px;border:1px solid rgba(255,255,255,.1);border-radius:15px;background:rgba(255,255,255,.055); }
+	.driver-completion-copy { display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:#d3dfef;font-size:.75rem; }
+	.driver-completion-copy span { display:flex;align-items:center;gap:7px; }
+	.driver-completion-copy i { color:#ffd166; }
+	.driver-completion-copy b { color:#fff;font-size:.9rem; }
+	.driver-progress-track { height:7px;overflow:hidden;border-radius:10px;background:rgba(255,255,255,.13); }
+	.driver-progress-track span { display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#12b8d8,#4ee2ad);transition:width .35s ease; }
+	.driver-quick-actions { display:flex;gap:7px;overflow-x:auto;padding:0 1px 2px;scrollbar-width:none; }
+	.driver-quick-actions::-webkit-scrollbar { display:none; }
+	.driver-quick-actions .btn { flex:0 0 auto;padding:9px 11px;font-size:.7rem; }
+	.driver-stats-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px; }
+	.driver-stat-card { min-width:0;display:grid;grid-template-columns:38px 1fr;grid-template-rows:auto auto;align-items:center;column-gap:9px;padding:12px;border:1px solid var(--border);border-radius:17px;background:var(--card); }
+	.driver-stat-icon { grid-row:1 / span 2;width:36px;height:36px;display:grid;place-items:center;border-radius:12px;font-size:.87rem; }
+	.driver-stat-icon.is-cyan { color:#0aaecb;background:rgba(0,212,255,.13); }
+	.driver-stat-icon.is-blue { color:#61a9ff;background:rgba(68,142,255,.13); }
+	.driver-stat-icon.is-green { color:#31c779;background:rgba(46,204,113,.13); }
+	.driver-stat-icon.is-gold { color:#e4a51e;background:rgba(243,156,18,.15); }
+	.driver-stat-card strong { font-size:1.15rem;line-height:1.1; }
+	.driver-stat-card small { margin-top:3px;color:var(--text-muted);font-size:.65rem;white-space:nowrap; }
+	.driver-cash-card { padding:14px 15px;border:1px solid rgba(0,212,255,.2);border-radius:19px;background:linear-gradient(115deg,rgba(0,119,182,.24),rgba(17,25,54,.9) 68%); }
+	.driver-cash-heading { display:flex;align-items:center;gap:11px; }
+	.driver-cash-icon { width:40px;height:40px;display:grid;place-items:center;border-radius:14px;background:rgba(0,212,255,.15);color:#8beaff;font-size:1rem; }
+	.driver-cash-heading div { display:flex;flex-direction:column;gap:1px; }
+	.driver-cash-heading small,.driver-cash-footer { color:var(--text-muted);font-size:.69rem; }
+	.driver-cash-heading strong { color:var(--text);font-size:1.2rem;line-height:1.3; }
+	.driver-cash-heading em { color:var(--primary);font-size:.72rem;font-style:normal; }
+	.driver-cash-footer { display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;padding-top:10px;border-top:1px solid var(--border); }
+	.driver-cash-footer span { display:flex;align-items:center;gap:6px; }
+	.driver-cash-footer span i { color:var(--primary); }
+	.driver-cash-footer b { color:var(--text); }
+	.driver-cash-footer button { border:0;background:transparent;color:var(--text-muted);font:inherit;font-size:.66rem;cursor:pointer; }
+	.driver-cash-footer button:hover { color:var(--warning); }
+	.driver-section-nav { position:sticky;top:68px;z-index:20;display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:6px;border:1px solid var(--border);border-radius:16px;background:var(--glass);backdrop-filter:blur(14px); }
+	.driver-section-nav button { display:flex;align-items:center;justify-content:center;gap:7px;min-height:39px;border:0;border-radius:11px;background:transparent;color:var(--text-muted);font:inherit;font-size:.72rem;font-weight:700;cursor:pointer; }
+	.driver-section-nav button:first-child { background:rgba(0,212,255,.1);color:var(--primary); }
+	.driver-section-nav button b { min-width:20px;padding:1px 5px;border-radius:12px;background:rgba(255,255,255,.1);font-size:.65rem; }
+	.driver-section { display:flex;flex-direction:column;gap:10px;scroll-margin-top:125px; }
+	.driver-section-heading { display:flex;align-items:center;justify-content:space-between;gap:10px;padding:3px 2px; }
+	.driver-section-heading h3 { margin:1px 0 0;font-size:1.05rem; }
+	.driver-section-count { min-width:32px;height:32px;display:grid;place-items:center;border:1px solid rgba(0,212,255,.2);border-radius:11px;background:rgba(0,212,255,.09);color:var(--primary);font-weight:800;font-size:.78rem; }
+	.driver-section-count.is-available { border-color:rgba(243,156,18,.2);background:rgba(243,156,18,.1);color:var(--warning); }
+	.driver-order-card { overflow:hidden;padding:14px;border:1px solid var(--border);border-radius:19px;background:var(--card);box-shadow:var(--shadow-sm); }
+	.driver-assigned-card { border-right:3px solid var(--primary); }
+	.driver-available-card { border-right:3px solid var(--warning); }
+	.driver-order-heading { display:flex;align-items:flex-start;justify-content:space-between;gap:9px;margin-bottom:12px; }
+	.driver-order-kicker { color:var(--text-muted);font-size:.64rem; }
+	.driver-order-heading h4 { margin-top:1px;font-size:.92rem; }
+	.driver-task-status { display:inline-flex;align-items:center;gap:5px;max-width:58%;padding:6px 8px;border-radius:20px;font-size:.63rem;font-weight:700;text-align:center; }
+	.driver-task-status.is-moving { color:#4cb4ff;background:rgba(68,142,255,.12); }
+	.driver-task-status.is-arrived { color:var(--success);background:rgba(46,204,113,.12); }
+	.driver-task-status.is-open { color:var(--warning);background:rgba(243,156,18,.12); }
+	.driver-customer-row { display:flex;align-items:center;gap:9px;padding:10px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.025); }
+	.driver-avatar { width:36px;height:36px;display:grid;place-items:center;flex:0 0 36px;border-radius:12px;background:rgba(0,212,255,.12);color:var(--primary); }
+	.driver-customer-copy { display:flex;flex:1;flex-direction:column;gap:1px;min-width:0; }
+	.driver-customer-copy strong { overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.8rem; }
+	.driver-customer-copy small,.driver-available-summary small,.driver-location-row small { color:var(--text-muted);font-size:.64rem; }
+	.driver-call-button { width:35px;height:35px;display:grid;place-items:center;border:1px solid rgba(46,204,113,.2);border-radius:11px;background:rgba(46,204,113,.1);color:var(--success);text-decoration:none; }
+	.driver-location-row { display:flex;align-items:flex-start;gap:9px;margin:11px 1px; }
+	.driver-location-row>i { margin-top:4px;color:var(--primary); }
+	.driver-location-row div { min-width:0; }
+	.driver-location-row p { margin-top:2px;font-size:.77rem;line-height:1.5;overflow-wrap:anywhere; }
+	.driver-detail-chips { display:flex;gap:6px;flex-wrap:wrap;margin:10px 0; }
+	.driver-detail-chips span { display:inline-flex;align-items:center;gap:5px;padding:6px 8px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.025);color:var(--text-muted);font-size:.65rem; }
+	.driver-detail-chips span:first-child { color:var(--success); }
+	.driver-note { display:flex;align-items:flex-start;gap:8px;margin:9px 0;padding:9px 10px;border:1px solid rgba(243,156,18,.22);border-radius:12px;background:rgba(243,156,18,.08);color:var(--text-muted);font-size:.7rem;line-height:1.6;overflow-wrap:anywhere; }
+	.driver-note>i { margin-top:3px;color:var(--warning); }
+	.driver-note b { color:var(--text); }
+	.driver-map-link { display:flex;align-items:center;gap:7px;width:fit-content;margin:9px 0;color:var(--primary);font-size:.71rem;font-weight:700;text-decoration:none; }
+	.driver-map-link i:last-child { font-size:.58rem;opacity:.7; }
+	.driver-card-actions { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:11px; }
+	.driver-card-actions .btn { width:100%;min-width:0;min-height:40px;padding:8px 6px;border-radius:12px;font-size:.69rem; }
+	.driver-arrived-label { display:flex;align-items:center;justify-content:center;gap:6px;min-height:40px;border:1px solid rgba(46,204,113,.2);border-radius:12px;background:rgba(46,204,113,.08);color:var(--success);font-size:.67rem;font-weight:700; }
+	.driver-available-summary { display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.025); }
+	.driver-available-summary>div { display:flex;flex:1;flex-direction:column;gap:2px;min-width:0; }
+	.driver-available-summary strong { overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.76rem; }
+	.driver-summary-separator { width:1px;height:30px;background:var(--border); }
+	.driver-claim-button { min-height:44px;margin-top:9px;border-radius:13px;font-size:.78rem; }
+	.driver-empty { display:flex;flex-direction:column;align-items:center;gap:7px;padding:22px 14px;border:1px dashed var(--border);border-radius:18px;background:rgba(255,255,255,.02);text-align:center; }
+	.driver-empty>span { width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:rgba(0,212,255,.1);color:var(--primary); }
+	.driver-empty strong { font-size:.82rem; }
+	.driver-empty p { color:var(--text-muted);font-size:.7rem; }
+	.driver-empty button { margin-top:3px;padding:8px 11px;border:1px solid var(--border);border-radius:11px;background:rgba(0,212,255,.08);color:var(--primary);font:inherit;font-size:.68rem;font-weight:700;cursor:pointer; }
+	.driver-empty-compact { padding:18px 12px; }
+	:root.light .driver-hero { background:radial-gradient(circle at 100% 0,rgba(0,212,255,.24),transparent 43%),linear-gradient(145deg,#173d64,#10233c 72%); }
+	:root.light .driver-stat-icon.is-cyan { color:#0788a0; }
+	:root.light .driver-stat-icon.is-blue { color:#367dc8; }
+	:root.light .driver-stat-icon.is-green { color:#168b4b; }
+	:root.light .driver-stat-icon.is-gold { color:#a66e05; }
+	@media(max-width:360px) { .driver-hero { padding:15px; }.driver-order-card { padding:11px; }.driver-task-status { font-size:.58rem;padding:5px 6px; }.driver-card-actions { gap:5px; }.driver-card-actions .btn { font-size:.64rem; } }
+	@media(prefers-reduced-motion:reduce) { .driver-progress-track span { transition:none; } }
 
 /* مركز التواصل */
 .mail-page,.chat-page,.dev-panel { display:flex; flex-direction:column; gap:14px; }
@@ -1826,55 +1923,98 @@ function renderDriver(container) {
         return;
     }
     let priority = { now:0, '30':1, '60':2, '120':3 };
-    let available = db.orders.filter(function(o) { return o.status === 'تم القبول ✅ (بانتظار سائق)' && !o.driverId; }).slice().sort(function(a,b) { return (priority[a.deliveryTime] !== undefined ? priority[a.deliveryTime] : 9) - (priority[b.deliveryTime] !== undefined ? priority[b.deliveryTime] : 9); });
-    let myTasks = db.orders.filter(function(o) { return o.driverId === currentUser.id && o.status.indexOf('تسليم') === -1; }).slice().sort(function(a,b) { return (priority[a.deliveryTime] !== undefined ? priority[a.deliveryTime] : 9) - (priority[b.deliveryTime] !== undefined ? priority[b.deliveryTime] : 9); });
+    let byPriority = function(a, b) { return (priority[a.deliveryTime] !== undefined ? priority[a.deliveryTime] : 9) - (priority[b.deliveryTime] !== undefined ? priority[b.deliveryTime] : 9); };
+    let available = db.orders.filter(function(o) { return o.status === 'تم القبول ✅ (بانتظار سائق)' && !o.driverId; }).slice().sort(byPriority);
+    let myTasks = db.orders.filter(function(o) { return o.driverId === currentUser.id && String(o.status || '').indexOf('تسليم') === -1; }).slice().sort(byPriority);
     let today = new Date().toISOString().slice(0,10);
-    let completedToday = db.orders.filter(function(o) { return o.driverId === currentUser.id && o.status.indexOf('تسليم') !== -1 && ((o.deliveredAt && o.deliveredAt.slice(0,10) === today) || (!o.deliveredAt && o.createdAt && o.createdAt.indexOf(new Date().toLocaleDateString('ar-LY')) !== -1)); }).length;
-    let todayCash = db.orders.filter(function(o) { return o.driverId === currentUser.id && o.deliveredAt && o.deliveredAt.slice(0,10) === today; }).reduce(function(sum,o) { return sum + Number(o.collectedAmount || o.total || 0); }, 0);
+    let completedToday = db.orders.filter(function(o) { return o.driverId === currentUser.id && String(o.status || '').indexOf('تسليم') !== -1 && ((o.deliveredAt && o.deliveredAt.slice(0,10) === today) || (!o.deliveredAt && o.createdAt && o.createdAt.indexOf(new Date().toLocaleDateString('ar-LY')) !== -1)); }).length;
+    let todayCash = db.orders.filter(function(o) { return o.driverId === currentUser.id && o.deliveredAt && o.deliveredAt.slice(0,10) === today; }).reduce(function(sum, o) { return sum + Number(o.collectedAmount || o.total || 0); }, 0);
     let completionRate = (completedToday + myTasks.length) ? Math.round((completedToday / (completedToday + myTasks.length)) * 100) : 0;
     let avgRatingValue = currentUser.ratingCount ? Number((currentUser.rating / currentUser.ratingCount).toFixed(1)) : 0;
     let avgRating = avgRatingValue ? avgRatingValue.toFixed(1) : 'جديد';
+    let isOnline = !!firebaseConnected && !!firebaseDataLoaded && (typeof navigator === 'undefined' || navigator.onLine !== false);
+    let safe = function(value) { return escapeHtml(value === undefined || value === null ? '' : String(value)); };
+    let money = function(value) { let amount = Number(value || 0); return (isFinite(amount) ? amount : 0).toLocaleString('ar-LY', { maximumFractionDigits:2 }); };
+    let timeLabel = function(value) { return value === '30' ? 'خلال 30 دقيقة' : value === '60' ? 'خلال ساعة' : value === '120' ? 'خلال ساعتين' : 'بأقرب وقت'; };
+    let mapUrl = function(order) {
+        if (!order.coordinates) return '';
+        let lat = Number(order.coordinates.lat), lng = Number(order.coordinates.lng);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) return '';
+        return 'https://www.google.com/maps?q=' + encodeURIComponent(lat + ',' + lng);
+    };
+    let renderOrderDetails = function(order) {
+        let items = Array.isArray(order.items) ? order.items.length : 0;
+        return '<div class="driver-detail-chips"><span><i class="fas fa-money-bill-wave"></i> ' + money(order.total) + ' د.ل</span><span><i class="fas fa-box"></i> ' + items + ' منتجات</span><span><i class="fas fa-clock"></i> ' + safe(timeLabel(order.deliveryTime)) + '</span></div>';
+    };
 
-    container.innerHTML = '<div class="animate-fade">' +
-        '<div class="delivery-head"><div><h3>🛵 مركز التوصيل</h3><small style="color:var(--text-muted)">رتّب مهماتك وتابع التسليم من مكان واحد</small></div><span class="driver-online"><i class="fas fa-circle" style="font-size:.55rem"></i> متاح</span></div>' +
-        '<div class="driver-toolbar"><span><i class="fas fa-bolt" style="color:var(--warning)"></i> نسبة إنجاز اليوم: <b>' + completionRate + '%</b></span><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="requestDriverLocationAccess()"><i class="fas fa-location-arrow"></i> تفعيل موقعي</button><button class="btn btn-ghost btn-sm" onclick="navigate(\'driver\')"><i class="fas fa-sync-alt"></i> تحديث</button></div></div>' +
-        '<div class="wallet-card cash-card"><div class="wallet-label">💰 الكاش المجمع</div><div class="wallet-balance">' + (currentUser.cashCollected || 0) + ' د.ل</div><div style="font-size:.75rem;opacity:.85">اليوم: ' + todayCash + ' د.ل • المبلغ الذي تم تحصيله من الطلبات المسلّمة</div></div>' +
-        '<div class="grid-3" style="margin-bottom:16px;">' +
-        '<div class="stat-card"><div class="stat-value">' + (myTasks.length) + '</div><div class="stat-label">🚚 مهامي</div></div>' +
-        '<div class="stat-card"><div class="stat-value">' + available.length + '</div><div class="stat-label">📋 متاحة</div></div>' +
-        '<div class="stat-card"><div class="stat-value">' + completedToday + '</div><div class="stat-label">✅ اليوم</div></div></div>' +
-        '<div class="card" style="text-align:center;"><div style="font-size:0.9rem;color:var(--text-muted);">⭐ تقييمك</div><div class="rating-stars" style="font-size:1.5rem;">' + '★'.repeat(Math.round(avgRatingValue)) + '☆'.repeat(5-Math.round(avgRatingValue)) + '</div><div style="color:var(--primary);font-weight:700;">' + avgRating + '</div></div>' +
-        '<div style="display:flex;gap:10px;margin-bottom:15px;">' +
-        '<button class="btn btn-outline btn-sm" onclick="suggestHotZone()"><i class="fas fa-fire"></i> منطقة ساخنة 🔥</button>' +
-        '<button class="btn btn-ghost btn-sm" onclick="resetDriverCash()"><i class="fas fa-redo"></i> تصفير الكاش</button></div>' +
-        '<h4>🚚 مهامي (' + myTasks.length + ')</h4>' +
-        (myTasks.map(function(o) {
-            let mapLink = o.coordinates ? 'https://www.google.com/maps?q=' + o.coordinates.lat + ',' + o.coordinates.lng : '#';
-            return '<div class="card delivery-order-card">' +
-                '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
-                '<b>' + o.userName + '</b><span class="status-badge status-delivery">' + o.status + '</span></div>' +
-                '<div style="color:var(--text-muted);font-size:0.85rem;">📍 ' + o.location + '</div>' +
-                '<div class="delivery-meta"><span>📞 ' + o.phone + '</span><span>💰 ' + (o.total || 0) + ' د.ل</span><span>📦 ' + (o.items || []).length + ' منتجات</span></div>' +
-                (o.notes ? '<div class="card" style="padding:9px;margin:8px 0;background:rgba(243,156,18,.1);border-color:var(--warning);"><b>📝 ملاحظات الزبون:</b> ' + o.notes + '</div>' : '') +
-                (o.deliveryTime && o.deliveryTime !== 'now' ? '<div style="color:var(--warning);font-size:0.85rem;">⏰ التوصيل: ' + (o.deliveryTime === '30' ? '30 دقيقة' : o.deliveryTime === '60' ? 'ساعة' : 'ساعتين') + '</div>' : '') +
-                (o.coordinates ? '<a href="' + mapLink + '" target="_blank" style="color:var(--primary);display:block;margin:8px 0;font-size:0.9rem;"><i class="fas fa-map-marked-alt"></i> فتح الموقع في الخرائط</a>' : '') +
-                '<div class="delivery-actions">' +
-                (o.status.indexOf('وصلت') === -1 ? '<button class="btn btn-sm btn-warning" onclick="setDriverOrderStatus(\'' + o.id + '\',\'وصلت للموقع 📍\')"><i class="fas fa-map-pin"></i> وصلت</button>' : '<span class="status-badge status-accepted">📍 وصلت للموقع</span>') +
-                '<button class="btn btn-sm btn-success" onclick="openDeliverModal(\'' + o.id + '\')"><i class="fas fa-check-circle"></i> تم التسليم</button>' +
-                '<a class="btn btn-sm btn-ghost" href="tel:' + o.phone + '"><i class="fas fa-phone"></i> اتصال</a>' +
-                '<button class="btn btn-sm btn-outline" onclick="copyDeliveryAddress(\'' + String(o.location).replace(/'/g, "\\'") + '\')"><i class="fas fa-copy"></i> نسخ</button>' +
-                '<button class="btn btn-sm btn-outline" onclick="navigate(\'track\',\'' + o.id + '\')"><i class="fas fa-comments"></i> تتبع</button></div></div>';
-        }).join('') || '<p style="color:var(--text-muted)">لا مهام حالياً</p>') +
-        '<h4 style="margin-top:20px;">📋 طلبات متاحة (' + available.length + ')</h4>' +
-        (available.map(function(o) {
-            let store = db.stores.find(function(s) { return s.id === o.storeId; });
-            return '<div class="card delivery-order-card available">' +
-                '<div style="display:flex;justify-content:space-between;align-items:center;">' +
-                '<div><b>' + (store ? store.name : 'متجر') + '</b><div style="color:var(--text-muted);font-size:0.85rem;">' + o.userName + '</div></div>' +
-                '<button class="btn btn-sm btn-primary" onclick="pickOrderDriver(\'' + o.id + '\')"><i class="fas fa-hand-paper"></i> استلام</button></div>' +
-                '<div style="color:var(--text-muted);font-size:0.85rem;margin-top:6px;">📍 ' + o.location + '</div>' +
-                '<div class="delivery-meta"><span>💰 ' + (o.total || 0) + ' د.ل</span><span>📦 ' + (o.items || []).length + ' منتجات</span>' + (o.deliveryTime && o.deliveryTime !== 'now' ? '<span>⏰ ' + (o.deliveryTime === '30' ? '30 د' : o.deliveryTime === '60' ? 'ساعة' : 'ساعتان') + '</span>' : '<span>⚡ الآن</span>') + '</div></div>';
-        }).join('') || '<p style="color:var(--text-muted)">لا توجد طلبات متاحة</p>') + '</div>';
+    let assignedHtml = myTasks.map(function(order) {
+        let orderId = safe(order.id);
+        let orderRef = safe(String(order.id || '').slice(-6));
+        let status = String(order.status || 'جاري التوصيل');
+        let arrived = status.indexOf('وصلت') !== -1;
+        let phone = String(order.phone || '');
+        let phoneLink = phone.replace(/[^0-9+*#]/g, '');
+        let location = String(order.location || 'لم يحدد العنوان');
+        let href = mapUrl(order);
+        return '<article class="driver-order-card driver-assigned-card">' +
+            '<div class="driver-order-heading"><div><span class="driver-order-kicker">مهمة توصيل</span><h4>طلب #' + orderRef + '</h4></div><span class="driver-task-status ' + (arrived ? 'is-arrived' : 'is-moving') + '"><i class="fas ' + (arrived ? 'fa-location-dot' : 'fa-motorcycle') + '"></i> ' + safe(status) + '</span></div>' +
+            '<div class="driver-customer-row"><span class="driver-avatar"><i class="fas fa-user"></i></span><div class="driver-customer-copy"><strong>' + safe(order.userName || 'الزبون') + '</strong><small>العميل</small></div>' + (phoneLink ? '<a class="driver-call-button" href="tel:' + safe(phoneLink) + '" aria-label="اتصال بالزبون"><i class="fas fa-phone"></i></a>' : '') + '</div>' +
+            '<div class="driver-location-row"><i class="fas fa-location-dot"></i><div><small>عنوان التسليم</small><p>' + safe(location) + '</p></div></div>' +
+            renderOrderDetails(order) +
+            (order.notes ? '<div class="driver-note"><i class="fas fa-note-sticky"></i><span><b>ملاحظات العميل</b><br>' + safe(order.notes) + '</span></div>' : '') +
+            (href ? '<a class="driver-map-link" href="' + href + '" target="_blank" rel="noopener noreferrer"><i class="fas fa-map-marked-alt"></i> افتح الموقع في الخرائط <i class="fas fa-arrow-up-left-from-square"></i></a>' : '') +
+            '<div class="driver-card-actions">' +
+            (arrived ? '<span class="driver-arrived-label"><i class="fas fa-circle-check"></i> تم تأكيد الوصول</span>' : '<button type="button" class="btn btn-sm btn-warning" data-driver-action="arrived" data-order-id="' + orderId + '"><i class="fas fa-location-dot"></i> وصلت للموقع</button>') +
+            '<button type="button" class="btn btn-sm btn-success" data-driver-action="deliver" data-order-id="' + orderId + '"><i class="fas fa-check-circle"></i> إتمام التسليم</button>' +
+            '<button type="button" class="btn btn-sm btn-ghost" data-driver-action="copy" data-order-id="' + orderId + '"><i class="fas fa-copy"></i> نسخ العنوان</button>' +
+            '<button type="button" class="btn btn-sm btn-outline" data-driver-action="track" data-order-id="' + orderId + '"><i class="fas fa-comments"></i> دردشة الطلب</button></div></article>';
+    }).join('');
+
+    let availableHtml = available.map(function(order) {
+        let store = db.stores.find(function(item) { return item.id === order.storeId; });
+        let orderId = safe(order.id);
+        let orderRef = safe(String(order.id || '').slice(-6));
+        let href = mapUrl(order);
+        return '<article class="driver-order-card driver-available-card">' +
+            '<div class="driver-order-heading"><div><span class="driver-order-kicker">طلب بانتظار سائق</span><h4>طلب #' + orderRef + '</h4></div><span class="driver-task-status is-open"><i class="fas fa-bolt"></i> متاح الآن</span></div>' +
+            '<div class="driver-available-summary"><div><small>المتجر</small><strong>' + safe(store ? store.name : 'متجر محلي') + '</strong></div><span class="driver-summary-separator"></span><div><small>العميل</small><strong>' + safe(order.userName || 'الزبون') + '</strong></div></div>' +
+            '<div class="driver-location-row"><i class="fas fa-location-dot"></i><div><small>منطقة التسليم</small><p>' + safe(order.location || 'لم يحدد العنوان') + '</p></div></div>' +
+            renderOrderDetails(order) +
+            (href ? '<a class="driver-map-link" href="' + href + '" target="_blank" rel="noopener noreferrer"><i class="fas fa-map-marked-alt"></i> معاينة الموقع على الخريطة</a>' : '') +
+            '<button type="button" class="btn btn-primary driver-claim-button" data-driver-action="claim" data-order-id="' + orderId + '"><i class="fas fa-hand-paper"></i> استلام هذه المهمة</button></article>';
+    }).join('');
+
+    container.innerHTML = '<div class="animate-fade driver-page">' +
+        '<section class="driver-hero"><div class="driver-hero-top"><div class="driver-brand-icon"><i class="fas fa-motorcycle"></i></div><span class="driver-connection ' + (isOnline ? 'is-connected' : 'is-disconnected') + '"><i class="fas fa-circle"></i> ' + (isOnline ? 'متصل ومتزامن' : 'المزامنة غير متاحة') + '</span></div><div class="driver-hero-copy"><span class="driver-hero-eyebrow">مركز السائق</span><h3>أهلاً ' + safe(currentUser.name || 'بك') + '</h3><p>كل مهامك وتفاصيل التوصيل في مكان واحد.</p></div><div class="driver-completion"><div class="driver-completion-copy"><span><i class="fas fa-bolt"></i> إنجاز اليوم</span><b>' + completionRate + '%</b></div><div class="driver-progress-track"><span style="width:' + completionRate + '%"></span></div></div></section>' +
+        '<div class="driver-quick-actions"><button type="button" class="btn btn-sm btn-ghost" onclick="requestDriverLocationAccess()"><i class="fas fa-location-arrow"></i> تفعيل موقعي</button><button type="button" class="btn btn-sm btn-ghost" onclick="navigate(\'driver\')"><i class="fas fa-sync-alt"></i> تحديث اللوحة</button><button type="button" class="btn btn-sm btn-ghost" onclick="suggestHotZone()"><i class="fas fa-fire"></i> منطقة نشطة</button></div>' +
+        '<section class="driver-stats-grid" aria-label="ملخص الأداء"><article class="driver-stat-card"><span class="driver-stat-icon is-cyan"><i class="fas fa-motorcycle"></i></span><strong>' + myTasks.length + '</strong><small>مهام جارية</small></article><article class="driver-stat-card"><span class="driver-stat-icon is-blue"><i class="fas fa-clipboard-list"></i></span><strong>' + available.length + '</strong><small>طلبات متاحة</small></article><article class="driver-stat-card"><span class="driver-stat-icon is-green"><i class="fas fa-circle-check"></i></span><strong>' + completedToday + '</strong><small>توصيلات اليوم</small></article><article class="driver-stat-card"><span class="driver-stat-icon is-gold"><i class="fas fa-star"></i></span><strong>' + safe(avgRating) + '</strong><small>تقييمك · ' + Number(currentUser.ratingCount || 0) + ' تقييمات</small></article></section>' +
+        '<section class="driver-cash-card"><div class="driver-cash-heading"><span class="driver-cash-icon"><i class="fas fa-wallet"></i></span><div><small>إجمالي الكاش المجمع</small><strong>' + money(currentUser.cashCollected) + ' <em>د.ل</em></strong></div></div><div class="driver-cash-footer"><span><i class="fas fa-calendar-day"></i> اليوم <b>' + money(todayCash) + ' د.ل</b></span><button type="button" onclick="resetDriverCash()">تصفير الرصيد</button></div></section>' +
+        '<nav class="driver-section-nav" aria-label="أقسام لوحة السائق"><button type="button" data-driver-scroll="driver-section-tasks"><i class="fas fa-motorcycle"></i> مهامي <b>' + myTasks.length + '</b></button><button type="button" data-driver-scroll="driver-section-available"><i class="fas fa-clipboard-list"></i> المتاحة <b>' + available.length + '</b></button></nav>' +
+        '<section class="driver-section" id="driver-section-tasks"><div class="driver-section-heading"><div><span class="driver-section-eyebrow">تابع كل خطوة</span><h3>مهامي الجارية</h3></div><span class="driver-section-count">' + myTasks.length + '</span></div>' +
+        (assignedHtml || '<div class="driver-empty"><span><i class="fas fa-route"></i></span><strong>لا توجد مهام قيد التوصيل</strong><p>استلم طلباً متاحاً لتظهر تفاصيله هنا.</p><button type="button" data-driver-scroll="driver-section-available">استعرض الطلبات المتاحة <i class="fas fa-arrow-left"></i></button></div>') + '</section>' +
+        '<section class="driver-section" id="driver-section-available"><div class="driver-section-heading"><div><span class="driver-section-eyebrow">فرص قريبة منك</span><h3>طلبات بانتظار سائق</h3></div><span class="driver-section-count is-available">' + available.length + '</span></div>' +
+        (availableHtml || '<div class="driver-empty driver-empty-compact"><span><i class="fas fa-check-double"></i></span><strong>أنت على اطلاع</strong><p>لا توجد طلبات جديدة حالياً. حدّث اللوحة بعد قليل.</p></div>') + '</section></div>';
+
+    container.onclick = function(event) {
+        let target = event.target;
+        let scrollButton = target && target.closest ? target.closest('[data-driver-scroll]') : null;
+        if (scrollButton) {
+            let section = document.getElementById(scrollButton.getAttribute('data-driver-scroll'));
+            if (section) section.scrollIntoView({ behavior:'smooth', block:'start' });
+            return;
+        }
+        let actionButton = target && target.closest ? target.closest('[data-driver-action]') : null;
+        if (!actionButton) return;
+        let orderId = actionButton.getAttribute('data-order-id');
+        let action = actionButton.getAttribute('data-driver-action');
+        let order = db.orders.find(function(item) { return String(item.id) === orderId; });
+        if (action === 'claim') return pickOrderDriver(orderId);
+        if (!order) return showToast('لم نعثر على بيانات هذه المهمة. حدّث اللوحة وحاول مجدداً.', 'warning');
+        if (action === 'arrived') return setDriverOrderStatus(orderId, 'وصلت للموقع 📍');
+        if (action === 'deliver') return openDeliverModal(orderId);
+        if (action === 'copy') return copyDeliveryAddress(String(order.location || ''));
+        if (action === 'track') return navigate('track', orderId);
+    };
 }
 
 function openDeliverModal(oid) {
