@@ -50,7 +50,7 @@ function initLiveMap(orderId, isDriver) {
     if (!holder || typeof L === 'undefined') return;
     if (liveMap) { liveMap.remove(); liveMap = null; liveMarker = null; }
     liveMapOrderId = orderId;
-    liveMap = L.map(holder, { zoomControl:true, attributionControl:true }).setView([32.467, 14.568], 13);
+    liveMap = L.map(holder, { zoomControl:true, attributionControl:true }).setView([32.95, 11.86583], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap' }).addTo(liveMap);
     if (isDriver) {
         var status = document.getElementById('live-location-status');
