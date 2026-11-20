@@ -423,7 +423,21 @@ header { padding:16px 20px; display:flex; justify-content:space-between; align-i
 	.delivery-meta { display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;color:var(--text-muted);font-size:.78rem; }
 	.delivery-meta span { padding:4px 7px;border-radius:8px;background:rgba(255,255,255,.04); }
 	.delivery-actions { display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;align-items:center; }
-.delivery-actions .btn { flex:1 1 auto;min-width:92px; }
+	.delivery-actions .btn { flex:1 1 auto;min-width:92px; }
+	.customer-map-card { margin-top:14px; padding:0; overflow:hidden; border:1px solid rgba(0,212,255,.22); border-radius:20px; background:linear-gradient(145deg,rgba(0,212,255,.08),var(--card)); box-shadow:var(--shadow-sm); }
+	.customer-map-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:15px 15px 10px; }
+	.customer-map-title { display:flex; align-items:center; gap:10px; }
+	.customer-map-title>i { width:36px; height:36px; display:grid; place-items:center; border-radius:12px; background:rgba(0,212,255,.14); color:var(--primary); }
+	.customer-map-title strong { display:block; font-size:.9rem; }
+	.customer-map-title small { display:block; margin-top:3px; color:var(--text-muted); font-size:.68rem; }
+	.map-range-badge { flex:none; padding:6px 9px; border-radius:20px; background:rgba(46,204,113,.12); color:var(--success); font-size:.67rem; font-weight:700; }
+	.map-location-status { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:0 15px 10px; padding:9px 10px; border:1px solid var(--border); border-radius:12px; background:rgba(255,255,255,.035); font-size:.72rem; }
+	.map-location-status>span:first-child { color:var(--text-muted); }
+	.map-location-status>span:last-child { color:var(--warning); text-align:left; }
+	.map-location-status i { margin-left:5px; color:var(--primary); }
+	.customer-map { height:245px; margin:0; border:0; border-radius:0; }
+	.customer-map-footer { display:flex; align-items:center; gap:7px; padding:10px 15px 13px; color:var(--text-muted); font-size:.68rem; line-height:1.5; }
+	.customer-map-footer i { color:var(--primary); }
 	.orders-hero { background:linear-gradient(135deg,rgba(0,212,255,.18),rgba(14,31,75,.9)); border:1px solid rgba(0,212,255,.25); border-radius:22px; padding:20px; margin-bottom:14px; position:relative; overflow:hidden; }
 	.orders-hero::after { content:'📦'; position:absolute; left:18px; bottom:-18px; font-size:5rem; opacity:.12; transform:rotate(-12deg); }
 	.orders-hero h2 { margin:0 0 6px; font-size:1.35rem; }
@@ -558,8 +572,10 @@ let loadedAuthUid = '';
 let seenNotificationIds = {};
 let locationPermissionState = 'unknown';
 
-const ZLITEN_MAP_BOUNDS = [[32.38, 14.38], [32.60, 14.78]];
-const ZLITEN_AREAS = ['وسط زلطن', 'سوق الثلاثاء', 'الدافنية', 'ماجر', 'كعام', 'رأس جدير', 'المنارة', 'العلوص'];
+const ZLITEN_CENTER = [32.467, 14.568];
+const ZLITEN_SERVICE_RADIUS_KM = 20;
+const ZLITEN_MAP_BOUNDS = [[32.405, 14.46], [32.535, 14.68]];
+const ZLITEN_AREAS = ['مدينة زلطن فقط'];
 
 database.ref('.info/connected').on('value', function(snapshot) {
     firebaseConnected = !!snapshot.val();
@@ -1616,14 +1632,20 @@ function getCurrentLocation(callback) {
     if (!navigator.geolocation) return showToast('متصفحك لا يدعم تحديد الموقع', 'error');
     showToast('سيطلب الهاتف إذن الموقع الآن؛ وافق لإكمال الطلب', 'info', 4500);
     navigator.geolocation.getCurrentPosition(
-        function(pos) { locationPermissionState = 'granted'; currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy }; updateCustomerMap(currentLocation); let el = document.getElementById('location-status'); if (el) el.innerHTML = '✅ تم تفعيل الموقع بدقة ' + Math.round(pos.coords.accuracy) + 'م'; if (callback) callback(); },
+        function(pos) { locationPermissionState = 'granted'; currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy }; updateCustomerMap(currentLocation); let el = document.getElementById('location-status'); if (el) el.innerHTML = isInsideZliten(currentLocation) ? '✅ داخل نطاق زلطن • دقة ' + Math.round(pos.coords.accuracy) + 'م' : '⚠️ الموقع خارج نطاق زلطن'; if (callback) callback(); },
         function(err) { locationPermissionState = err && err.code === 1 ? 'denied' : 'error'; let el = document.getElementById('location-status'); if (el) el.innerHTML = '⚠️ يجب السماح بالموقع من أذونات الهاتف'; showModal('تفعيل الموقع مطلوب', '<div style="line-height:1.9">لا يمكن إرسال طلب توصيل بدون تحديد الموقع.<br><br><b>اضغط السماح أثناء ظهور نافذة الهاتف.</b><br>إذا اخترت الرفض سابقاً: افتح إعدادات الهاتف ← أذونات التطبيق ← الموقع، واختر السماح أثناء الاستخدام، ثم اضغط إعادة المحاولة.</div>', 'confirm', function(){ getCurrentLocation(callback); }); },
         { enableHighAccuracy:true, timeout:12000, maximumAge:30000 }
     );
 }
 
 function isInsideZliten(location) {
-    return !!location && Number(location.lat) >= ZLITEN_MAP_BOUNDS[0][0] && Number(location.lat) <= ZLITEN_MAP_BOUNDS[1][0] && Number(location.lng) >= ZLITEN_MAP_BOUNDS[0][1] && Number(location.lng) <= ZLITEN_MAP_BOUNDS[1][1];
+    if (!location || !Number.isFinite(Number(location.lat)) || !Number.isFinite(Number(location.lng))) return false;
+    var lat1 = Number(location.lat) * Math.PI / 180, lng1 = Number(location.lng) * Math.PI / 180;
+    var lat2 = ZLITEN_CENTER[0] * Math.PI / 180, lng2 = ZLITEN_CENTER[1] * Math.PI / 180;
+    var dLat = lat1 - lat2, dLng = lng1 - lng2;
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    var distanceKm = 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return distanceKm <= ZLITEN_SERVICE_RADIUS_KM;
 }
 
 let customerMap = null, customerMarker = null, customerAccuracyCircle = null;
@@ -1631,10 +1653,11 @@ function initCustomerMap() {
     var holder = document.getElementById('customer-map');
     if (!holder || typeof L === 'undefined') return;
     if (customerMap) { customerMap.remove(); customerMap = null; customerMarker = null; customerAccuracyCircle = null; }
-    var fallback = [32.467, 14.568];
+    var fallback = ZLITEN_CENTER;
     var start = currentLocation ? [currentLocation.lat, currentLocation.lng] : fallback;
     customerMap = L.map(holder, { zoomControl:true, attributionControl:true, maxBounds:ZLITEN_MAP_BOUNDS, maxBoundsViscosity:0.9, minZoom:11, maxZoom:18 }).setView(start, currentLocation ? 16 : 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap' }).addTo(customerMap);
+    L.circle(ZLITEN_CENTER, { radius:ZLITEN_SERVICE_RADIUS_KM * 1000, color:'#00d4ff', weight:1, dashArray:'6 7', fillColor:'#00d4ff', fillOpacity:.045 }).addTo(customerMap).bindTooltip('نطاق التوصيل داخل مدينة زلطن', { sticky:true });
     if (currentLocation) updateCustomerMap(currentLocation);
     setTimeout(function(){ if (customerMap) customerMap.invalidateSize(); }, 200);
 }
@@ -1685,10 +1708,11 @@ function renderCart(container) {
         '<textarea id="order-notes" placeholder="مثال: بدون شطة، بدون بصل، التوصيل أمام الباب..."></textarea>' +
         '<label>⏰ وقت التوصيل</label>' +
         '<select id="delivery-time"><option value="now">🚀 الآن (أسرع وقت)</option><option value="30">خلال 30 دقيقة</option><option value="60">خلال ساعة</option><option value="120">خلال ساعتين</option></select>' +
-        '<div style="display:flex;gap:10px;align-items:center;margin:10px 0">' +
-        '<button class="btn btn-outline btn-sm" style="width:auto;" onclick="getCurrentLocation()"><i class="fas fa-map-marker-alt"></i> تحديد موقعي</button>' +
-        '<span id="location-status" style="color:var(--gray);"></span></div>' +
-        '<div class="card" style="padding:10px;margin-top:8px;"><div style="font-size:.82rem;color:var(--text-muted);margin-bottom:6px;"><i class="fas fa-map-marked-alt"></i> نطاق التوصيل: زلطن والمناطق القريبة</div><div class="categories-scroll" style="margin:0 0 8px;gap:6px;">' + ZLITEN_AREAS.map(function(area){ return '<span class="category-pill" style="font-size:.72rem;padding:6px 10px;">📍 ' + area + '</span>'; }).join('') + '</div><div id="customer-map" class="customer-map"></div></div>' +
+        '<div style="display:flex;justify-content:flex-end;margin:10px 0 0">' +
+        '<button class="btn btn-outline btn-sm" style="width:auto;" onclick="getCurrentLocation()"><i class="fas fa-crosshairs"></i> تحديد موقعي بدقة</button></div>' +
+        '<div class="customer-map-card"><div class="customer-map-head"><div class="customer-map-title"><i class="fas fa-map-location-dot"></i><div><strong>موقع التوصيل</strong><small>حدد موقعك على الخريطة لإتمام الطلب</small></div></div><span class="map-range-badge"><i class="fas fa-circle-check"></i> زلطن فقط</span></div>' +
+        '<div class="map-location-status"><span><i class="fas fa-location-crosshairs"></i> حالة الموقع</span><span id="location-status">لم يتم التحديد بعد</span></div>' +
+        '<div id="customer-map" class="customer-map"></div><div class="customer-map-footer"><i class="fas fa-shield-halved"></i><span>يُستخدم موقعك للتحقق من نطاق التوصيل فقط، ولا يتم إرسال الطلب قبل تحديده.</span></div></div>' +
         '<button class="btn btn-primary btn-lg" onclick="confirmOrder()"><i class="fas fa-paper-plane"></i> تأكيد الطلب</button></div>';
     setTimeout(initCustomerMap, 0);
 }
@@ -1715,7 +1739,7 @@ function confirmOrder() {
     let time = document.getElementById('delivery-time') ? document.getElementById('delivery-time').value : 'now';
     if (!addr || !phone) return showToast('أدخل العنوان ورقم الهاتف', 'error');
     if (!currentLocation) return showToast('اضغط «تحديد موقعي» واسمح بإذن الموقع أولاً', 'error', 5000);
-    if (!isInsideZliten(currentLocation)) return showToast('التوصيل متاح داخل نطاق زلطن والمناطق المحددة فقط', 'error', 5000);
+    if (!isInsideZliten(currentLocation)) return showToast('التوصيل متاح داخل مدينة زلطن فقط', 'error', 5000);
     let storeId = cart[0].sid;
     let total = cart.reduce(function(s, i) { return s + i.price; }, 0);
     let discount = appliedCoupon ? Math.round(total * (appliedCoupon.discount / 100)) : 0;
@@ -3339,7 +3363,7 @@ window.addEventListener('appinstalled', function() {
 <script>
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js?v=11', { scope: './' }).then(function(registration) {
+    navigator.serviceWorker.register('sw.js?v=12', { scope: './' }).then(function(registration) {
       registration.addEventListener('updatefound', function() {
         var worker = registration.installing;
         if (worker) worker.addEventListener('statechange', function() {
