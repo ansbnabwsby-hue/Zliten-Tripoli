@@ -595,6 +595,73 @@ header { padding:16px 20px; display:flex; justify-content:space-between; align-i
     @media(max-width:400px){.orders-summary-item b{font-size:1.05rem}.order-progress-step{font-size:.57rem}.order-card-head{padding:13px 12px 10px}.order-card-body{padding:0 12px 12px}}
     @media (hover:none) { .card:hover,.order-card-pro:hover { transform:none;box-shadow:var(--shadow-sm);border-color:var(--border); } .btn-primary:hover { transform:none;box-shadow:0 4px 15px rgba(0,212,255,.3); } }
     @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important;animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important; } }
+	.checkout-page { max-width:1100px; margin:0 auto; }
+	.checkout-head { display:flex; align-items:flex-end; justify-content:space-between; gap:18px; margin:10px 0 20px; }
+	.checkout-head h2 { font-size:1.55rem; margin:4px 0; }
+	.checkout-head p,.checkout-section-note { color:var(--text-muted); font-size:.86rem; }
+	.checkout-eyebrow { color:var(--primary); font-size:.82rem; font-weight:800; }
+	.checkout-steps { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+	.checkout-steps span { display:flex; align-items:center; gap:6px; color:var(--text-muted); font-size:.76rem; white-space:nowrap; }
+	.checkout-steps b { width:24px; height:24px; display:grid; place-items:center; border-radius:50%; background:var(--card); border:1px solid var(--border); color:var(--text-muted); }
+	.checkout-steps .active { color:var(--primary); }
+	.checkout-steps .active b,.checkout-steps .done b { background:rgba(0,212,255,.14); border-color:var(--primary); color:var(--primary); }
+	.checkout-layout { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(260px,.8fr); align-items:start; gap:18px; }
+	.checkout-main { display:grid; gap:16px; min-width:0; }
+	.checkout-panel,.checkout-summary { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:18px; box-shadow:var(--shadow-sm); }
+	.checkout-section-head { display:flex; align-items:flex-start; gap:11px; margin-bottom:14px; }
+	.checkout-section-icon { width:38px; height:38px; flex:none; display:grid; place-items:center; border-radius:12px; background:rgba(0,212,255,.11); color:var(--primary); }
+	.checkout-section-head h3 { margin:0 0 2px; font-size:1.02rem; }
+	.checkout-items { display:grid; gap:0; }
+	.checkout-item { display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); }
+	.checkout-item:last-child { border-bottom:0; padding-bottom:0; }
+	.checkout-item:first-child { padding-top:0; }
+	.checkout-item-image { width:54px; height:54px; flex:none; display:grid; place-items:center; overflow:hidden; border-radius:13px; background:var(--dark); color:var(--primary); font-size:1.35rem; }
+	.checkout-item-image img { width:100%; height:100%; object-fit:cover; }
+	.checkout-item-info { flex:1; min-width:0; }
+	.checkout-item-info strong { display:block; overflow-wrap:anywhere; }
+	.checkout-item-info small { color:var(--text-muted); }
+	.checkout-item-price { flex:none; color:var(--success); font-weight:800; white-space:nowrap; }
+	.checkout-remove { display:inline-flex; align-items:center; gap:5px; border:0; padding:7px 8px; border-radius:10px; background:rgba(231,76,60,.1); color:var(--danger); cursor:pointer; font-size:.76rem; }
+	.checkout-fields { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+	.checkout-field { min-width:0; }
+	.checkout-field.full { grid-column:1/-1; }
+	.checkout-field label { display:block; margin-bottom:6px; font-size:.83rem; font-weight:700; }
+	.checkout-field input,.checkout-field textarea,.checkout-field select,.checkout-coupon-input { width:100%; min-height:45px; padding:11px 12px; border:1px solid var(--border); border-radius:12px; color:var(--text); background:var(--dark); }
+	.checkout-field textarea { min-height:84px; resize:vertical; }
+	.checkout-field input:focus,.checkout-field textarea:focus,.checkout-field select:focus,.checkout-coupon-input:focus { border-color:var(--primary); outline:2px solid rgba(0,212,255,.16); }
+	.checkout-summary { position:sticky; top:84px; }
+	.checkout-summary h3 { margin-bottom:12px; }
+	.checkout-summary-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 0; color:var(--text-muted); border-bottom:1px solid var(--border); }
+	.checkout-summary-row strong { color:var(--text); }
+	.checkout-summary-row.discount strong,.checkout-summary-row.discount { color:var(--success); }
+	.checkout-summary-row.total { margin:4px 0 14px; padding:13px 0 0; border-bottom:0; border-top:1px solid var(--border); color:var(--text); font-size:1.1rem; font-weight:800; }
+	.checkout-summary-row.total strong { color:var(--primary); font-size:1.25rem; }
+	.checkout-coupon { padding:13px 0 4px; border-top:1px solid var(--border); }
+	.checkout-coupon label { display:block; margin-bottom:7px; font-size:.82rem; font-weight:700; }
+	.checkout-coupon-controls { display:flex; gap:7px; }
+	.checkout-coupon-input { min-width:0; flex:1; }
+	.checkout-coupon-controls .btn { width:auto; padding:0 13px; min-height:44px; }
+	.checkout-coupon-status { min-height:22px; margin-top:7px; color:var(--success); font-size:.77rem; }
+	.checkout-coupon-clear { border:0; background:transparent; color:var(--danger); cursor:pointer; padding:3px 6px; }
+	.checkout-submit { margin-top:13px; }
+	.checkout-submit:disabled { cursor:wait; opacity:.65; transform:none; }
+	.checkout-submit-hint { margin-top:9px; color:var(--text-muted); font-size:.73rem; text-align:center; }
+	.checkout-consent { display:flex; align-items:flex-start; gap:10px; padding:13px; border:1px solid var(--border); border-radius:14px; background:rgba(0,212,255,.045); line-height:1.8; }
+	.checkout-consent input { width:19px; height:19px; flex:none; margin-top:4px; accent-color:var(--primary); }
+	.checkout-consent label { cursor:pointer; font-size:.84rem; }
+	.checkout-policy-link { display:inline; border:0; padding:0; background:transparent; color:var(--primary); text-decoration:underline; cursor:pointer; font:inherit; }
+	.checkout-consent-help { margin:9px 0 0; color:var(--text-muted); font-size:.75rem; }
+	.checkout-signature { margin-top:15px; }
+		.checkout-signature-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:7px; }
+		.checkout-signature-head span { font-weight:800; font-size:.87rem; }
+		.signature-clear { border:1px solid var(--border); border-radius:9px; padding:6px 10px; color:var(--text-muted); background:transparent; cursor:pointer; font-size:.76rem; }
+		.order-signature-pad { display:block; width:100%; height:150px; border:1px solid #d5dde3; border-radius:12px; background:#fff; touch-action:none; -webkit-user-select:none; user-select:none; cursor:crosshair; }
+		.signature-caption { margin-top:6px; color:var(--text-muted); font-size:.74rem; }
+	.signature-typed { margin-top:10px; }
+	.signature-typed label { display:block; margin-bottom:5px; font-size:.8rem; }
+	.signature-typed input { width:100%; min-height:43px; padding:10px 12px; border:1px solid var(--border); border-radius:11px; color:var(--text); background:var(--dark); }
+	@media(max-width:800px){.checkout-head{align-items:flex-start;flex-direction:column}.checkout-layout{grid-template-columns:1fr}.checkout-summary{position:static}}
+	@media(max-width:520px){.checkout-panel,.checkout-summary{padding:14px;border-radius:16px}.checkout-fields{grid-template-columns:1fr}.checkout-field.full{grid-column:auto}.checkout-item{gap:8px}.checkout-item-image{width:46px;height:46px}.checkout-remove span{display:none}.checkout-steps{gap:5px}.checkout-steps span{font-size:.68rem}.checkout-steps b{width:21px;height:21px}}
 
 </style>
 </head>
@@ -673,6 +740,8 @@ let db = {
     ]
 };
 let currentUser = null, cart = [], tempImageBase64 = "", currentLocation = null;
+let orderSubmitInProgress = false;
+const ORDER_CONSENT_TEXT = 'أقرّ بصحة بيانات الطلب، وأوافق على استخدامها لتجهيز الطلب وتوصيله والتواصل بشأنه، وأوافق على سياسة الاستخدام المعروضة في التطبيق.';
 let firebaseDataLoaded = false;
 let activePage = 'home', activePageParam = null;
 let devPanelTab = 'overview', devPanelSearch = '';
@@ -1914,12 +1983,22 @@ function initCustomerMap() {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap' }).addTo(customerMap);
     L.circle(ZALTAN_CENTER, { radius:ZALTAN_SERVICE_RADIUS_KM * 1000, color:'#00d4ff', weight:1, dashArray:'6 7', fillColor:'#00d4ff', fillOpacity:.045 }).addTo(customerMap).bindTooltip('نطاق التوصيل داخل مدينة زلطن', { sticky:true });
     if (currentLocation) updateCustomerMap(currentLocation);
+    customerMap.on('click', function(event) { setCustomerMapSelection(event.latlng); });
     setTimeout(function(){ if (customerMap) customerMap.invalidateSize(); }, 200);
+}
+function setCustomerMapSelection(point) {
+    currentLocation = { lat:Number(point.lat), lng:Number(point.lng), accuracy:0 };
+    updateCustomerMap(currentLocation);
+    var status = document.getElementById('location-status');
+    if (status) status.textContent = isInsideZaltan(currentLocation) ? 'تم تحديد نقطة التسليم داخل نطاق زلطن' : 'النقطة المختارة خارج نطاق التوصيل';
 }
 function updateCustomerMap(location) {
     if (!customerMap || !location) return;
     var point = [Number(location.lat), Number(location.lng)];
-    if (!customerMarker) customerMarker = L.marker(point).addTo(customerMap).bindPopup('موقع التوصيل');
+    if (!customerMarker) {
+        customerMarker = L.marker(point, { draggable:true }).addTo(customerMap).bindPopup('موقع التسليم');
+        customerMarker.on('dragend', function(event) { setCustomerMapSelection(event.target.getLatLng()); });
+    }
     else customerMarker.setLatLng(point);
     if (customerAccuracyCircle) customerAccuracyCircle.setLatLng(point).setRadius(Number(location.accuracy || 30));
     else customerAccuracyCircle = L.circle(point, { radius:Number(location.accuracy || 30), color:'#00d4ff', fillColor:'#00d4ff', fillOpacity:.12 }).addTo(customerMap);
@@ -1928,48 +2007,130 @@ function updateCustomerMap(location) {
 
 function renderCart(container) {
     if (!cart.length) {
-        container.innerHTML = '<div style="text-align:center;margin-top:60px" class="animate-fade"><i class="fas fa-shopping-basket fa-4x" style="color:var(--primary)"></i><h3 style="margin:16px 0;">السلة فارغة</h3><button class="btn btn-primary" onclick="navigate(\'home\')">تصفح المتاجر</button></div>';
+        container.innerHTML = '<div class="empty-state animate-fade" style="text-align:center;padding:48px 18px;"><i class="fas fa-shopping-basket fa-4x" style="color:var(--primary)"></i><h3 style="margin:16px 0 6px;">سلتك فارغة حالياً</h3><p style="color:var(--text-muted);margin-bottom:18px;">اختر ما تحتاجه من المتاجر ثم ارجع لإكمال الطلب.</p><button class="btn btn-primary" onclick="navigate(\'home\')">تصفح المتاجر</button></div>';
         return;
     }
-    let total = cart.reduce(function(s, i) { return s + i.price; }, 0);
+    let total = cart.reduce(function(s, i) { return s + Number(i.price || 0); }, 0);
     let discount = 0;
     if (appliedCoupon) discount = Math.round(total * (appliedCoupon.discount / 100));
     let finalTotal = total - discount;
     let addrs = currentUser.addresses || [];
-    let addrOptions = addrs.map(function(a, i) { return '<option value="' + i + '">' + a.label + ' - ' + a.text.substring(0, 30) + '</option>'; }).join('');
+    let addrOptions = addrs.map(function(a, i) { return '<option value="' + i + '">' + escapeHtml(a.label || 'عنوان') + ' — ' + escapeHtml((a.text || '').substring(0, 36)) + '</option>'; }).join('');
+    let locationText = !currentLocation ? 'لم يتم التحديد بعد' : (isInsideZaltan(currentLocation) ? 'الموقع محدد داخل نطاق زلطن' : 'الموقع خارج نطاق التوصيل');
 
-    container.innerHTML = '<div class="animate-fade"><h3 style="margin-bottom:16px;">🛒 سلة المشتريات</h3>' +
-        cart.map(function(item, idx) {
-            return '<div class="card" style="display:flex;justify-content:space-between;align-items:center;">' +
-                '<div style="display:flex;align-items:center;gap:12px;">' +
-                (item.img ? '<img src="' + item.img + '" style="width:50px;height:50px;border-radius:10px;object-fit:cover;">' : '<div style="width:50px;height:50px;border-radius:10px;background:var(--gradient-1);display:flex;align-items:center;justify-content:center;">📦</div>') +
-                '<span>' + item.name + '</span></div>' +
-                '<div style="display:flex;align-items:center;gap:12px;">' +
-                '<span style="color:var(--success);font-weight:700;">' + item.price + ' د.ل</span>' +
-                '<i class="fas fa-trash" style="color:var(--danger);cursor:pointer;" onclick="cart.splice(' + idx + ',1);updateCartBadge();navigate(\'cart\')"></i></div></div>';
-        }).join('') +
-        (appliedCoupon ? '<div class="card" style="background:rgba(46,204,113,0.1);border-color:var(--success);"><div style="display:flex;justify-content:space-between;align-items:center;"><span>🎟️ خصم (' + appliedCoupon.code + ')</span><span style="color:var(--success);font-weight:700;">-' + discount + ' د.ل</span></div></div>' : '') +
-        '<div class="card card-gradient-1" style="text-align:center;font-size:1.3rem;font-weight:700;">الإجمالي: ' + finalTotal + ' د.ل</div>' +
-        '<div class="card" style="padding:12px;">' +
-        '<div style="display:flex;gap:8px;">' +
-        '<input id="coupon-code" placeholder="أدخل كود الخصم" style="flex:1;margin:0;">' +
-        '<button class="btn btn-sm btn-warning" onclick="applyCoupon()" style="width:auto;">تطبيق</button>' +
-        '</div></div>' +
-        '<label>📍 عنوان التوصيل</label>' +
-        (addrOptions ? '<select id="addr-select" onchange="fillAddressFromSelect(this.value)"><option value="">اختر عنوان محفوظ...</option>' + addrOptions + '</select>' : '') +
-        '<textarea id="order-address" placeholder="أو اكتب عنوان جديد..."></textarea>' +
-        '<input id="order-phone" placeholder="رقم الهاتف" value="' + (currentUser.phone || '') + '">' +
-        '<label>📝 ملاحظات إضافية للطلب <small>(اختياري)</small></label>' +
-        '<textarea id="order-notes" placeholder="مثال: بدون شطة، بدون بصل، التوصيل أمام الباب..."></textarea>' +
-        '<label>⏰ وقت التوصيل</label>' +
-        '<select id="delivery-time"><option value="now">🚀 الآن (أسرع وقت)</option><option value="30">خلال 30 دقيقة</option><option value="60">خلال ساعة</option><option value="120">خلال ساعتين</option></select>' +
-        '<div style="display:flex;justify-content:flex-end;margin:10px 0 0">' +
-        '<button class="btn btn-outline btn-sm" style="width:auto;" onclick="getCurrentLocation()"><i class="fas fa-crosshairs"></i> تحديد موقعي بدقة</button></div>' +
-        '<div class="customer-map-card"><div class="customer-map-head"><div class="customer-map-title"><i class="fas fa-map-location-dot"></i><div><strong>موقع التوصيل</strong><small>حدد موقعك على الخريطة لإتمام الطلب</small></div></div><span class="map-range-badge"><i class="fas fa-circle-check"></i> زلطن فقط</span></div>' +
-        '<div class="map-location-status"><span><i class="fas fa-location-crosshairs"></i> حالة الموقع</span><span id="location-status">لم يتم التحديد بعد</span></div>' +
-        '<div id="customer-map" class="customer-map"></div><div class="customer-map-footer"><i class="fas fa-shield-halved"></i><span>يُستخدم موقعك للتحقق من نطاق التوصيل فقط، ولا يتم إرسال الطلب قبل تحديده.</span></div></div>' +
-        '<button class="btn btn-primary btn-lg" onclick="confirmOrder()"><i class="fas fa-paper-plane"></i> تأكيد الطلب</button></div>';
+    container.innerHTML = '<div class="checkout-page animate-fade">' +
+        '<div class="checkout-head"><div><span class="checkout-eyebrow">إتمام الطلب</span><h2>راجع طلبك وأكمل بيانات التوصيل</h2><p>خطوات واضحة وآمنة قبل إرسال الطلب إلى المتجر.</p></div>' +
+        '<div class="checkout-steps" aria-label="مراحل إتمام الطلب"><span class="done"><b>1</b>السلة</span><span class="active"><b>2</b>التوصيل</span><span><b>3</b>الموافقة والتوقيع</span></div></div>' +
+        '<div class="checkout-layout"><div class="checkout-main">' +
+        '<section class="checkout-panel" aria-labelledby="checkout-items-title"><div class="checkout-section-head"><span class="checkout-section-icon"><i class="fas fa-basket-shopping"></i></span><div><h3 id="checkout-items-title">محتويات السلة</h3><p class="checkout-section-note">' + cart.length + ' منتج — راجع الكميات والأسعار قبل المتابعة.</p></div></div>' +
+        '<div class="checkout-items">' + cart.map(function(item, idx) {
+            return '<article class="checkout-item"><div class="checkout-item-image">' + (item.img ? '<img src="' + escapeHtml(item.img) + '" alt="">' : '<i class="fas fa-box"></i>') + '</div>' +
+                '<div class="checkout-item-info"><strong>' + escapeHtml(item.name || 'منتج') + '</strong><small>السعر للقطعة</small></div>' +
+                '<strong class="checkout-item-price">' + Number(item.price || 0) + ' د.ل</strong>' +
+                '<button type="button" class="checkout-remove" aria-label="إزالة ' + escapeHtml(item.name || 'المنتج') + ' من السلة" onclick="cart.splice(' + idx + ',1);updateCartBadge();navigate(\'cart\')"><i class="fas fa-trash"></i><span>إزالة</span></button></article>';
+        }).join('') + '</div></section>' +
+        '<section class="checkout-panel" aria-labelledby="checkout-delivery-title"><div class="checkout-section-head"><span class="checkout-section-icon"><i class="fas fa-truck-fast"></i></span><div><h3 id="checkout-delivery-title">بيانات التوصيل</h3><p class="checkout-section-note">أدخل معلومات تساعد المتجر والسائق على إيصال طلبك.</p></div></div>' +
+        '<div class="checkout-fields">' +
+        (addrOptions ? '<div class="checkout-field full"><label for="addr-select">عنوان محفوظ</label><select id="addr-select" onchange="fillAddressFromSelect(this.value)"><option value="">اختر عنواناً محفوظاً (اختياري)</option>' + addrOptions + '</select></div>' : '') +
+        '<div class="checkout-field full"><label for="order-address">العنوان بالتفصيل <span style="color:var(--danger)">*</span></label><textarea id="order-address" autocomplete="street-address" placeholder="الحي، الشارع، أقرب علامة مميزة..."></textarea></div>' +
+        '<div class="checkout-field"><label for="order-phone">رقم الهاتف <span style="color:var(--danger)">*</span></label><input id="order-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="رقم يمكن التواصل معك عبره" value="' + escapeHtml(currentUser.phone || '') + '"></div>' +
+        '<div class="checkout-field"><label for="delivery-time">وقت التوصيل</label><select id="delivery-time"><option value="now">الآن — أسرع وقت متاح</option><option value="30">خلال 30 دقيقة</option><option value="60">خلال ساعة</option><option value="120">خلال ساعتين</option></select></div>' +
+        '<div class="checkout-field full"><label for="order-notes">ملاحظات للمتجر أو السائق <span class="checkout-section-note">(اختياري)</span></label><textarea id="order-notes" placeholder="مثال: بدون بصل، أو التوصيل أمام الباب..."></textarea></div>' +
+        '</div></section>' +
+        '<section class="checkout-panel" aria-labelledby="checkout-location-title"><div class="checkout-section-head"><span class="checkout-section-icon"><i class="fas fa-map-location-dot"></i></span><div><h3 id="checkout-location-title">موقع التسليم</h3><p class="checkout-section-note">حدد نقطة التسليم بدقة؛ التوصيل متاح داخل زلطن.</p></div></div>' +
+        '<div style="display:flex;justify-content:flex-start;margin:0 0 10px"><button type="button" class="btn btn-outline btn-sm" style="width:auto" onclick="getCurrentLocation()"><i class="fas fa-crosshairs"></i> استخدام موقعي الحالي</button></div>' +
+        '<div class="customer-map-card"><div class="customer-map-head"><div class="customer-map-title"><i class="fas fa-map-location-dot"></i><div><strong>اختر نقطة التسليم على الخريطة</strong><small>اضغط على الخريطة أو اسحب الدبوس إلى موقعك.</small></div></div><span class="map-range-badge"><i class="fas fa-circle-check"></i> زلطن فقط</span></div>' +
+        '<div class="map-location-status"><span><i class="fas fa-location-crosshairs"></i> حالة الموقع</span><span id="location-status">' + locationText + '</span></div>' +
+        '<div id="customer-map" class="customer-map"></div><div class="customer-map-footer"><i class="fas fa-shield-halved"></i><span>يُرفق الموقع بالطلب لتحديد إمكانية التوصيل ومساعدة السائق على الوصول إلى نقطة التسليم.</span></div></div></section>' +
+        '<section class="checkout-panel" aria-labelledby="checkout-consent-title"><div class="checkout-section-head"><span class="checkout-section-icon"><i class="fas fa-file-signature"></i></span><div><h3 id="checkout-consent-title">الإقرار والموافقة</h3><p class="checkout-section-note">اقرأ سياسة الاستخدام قبل الموافقة على إرسال الطلب.</p></div></div>' +
+        '<div class="checkout-consent"><input id="checkout-consent" type="checkbox"><div><label for="checkout-consent">' + escapeHtml(ORDER_CONSENT_TEXT) + '</label><div><button type="button" class="checkout-policy-link" onclick="showPolicy()">قراءة سياسة الاستخدام</button></div></div></div>' +
+        '<p class="checkout-consent-help">الموافقة والتوقيع مرتبطان بهذا الطلب فقط. اعرض السياسة الحالية عبر الرابط قبل الإرسال.</p>' +
+        '<div class="checkout-signature"><div class="checkout-signature-head"><span>التوقيع داخل المربع الأبيض</span><button type="button" class="signature-clear" onclick="clearCheckoutSignature()"><i class="fas fa-eraser"></i> مسح التوقيع</button></div>' +
+        '<canvas id="order-signature-pad" class="order-signature-pad" width="900" height="240" aria-label="ارسم توقيعك بإصبعك أو بالفأرة داخل المربع الأبيض"></canvas>' +
+        '<p class="signature-caption" id="signature-status">ارسم توقيعك بإصبعك أو بالفأرة. إذا تعذّر الرسم، يمكنك كتابة اسمك في الحقل البديل.</p>' +
+        '<div class="signature-typed"><label for="order-signature-name">الاسم كتوقيع بديل (اختياري عند الرسم)</label><input id="order-signature-name" type="text" autocomplete="name" maxlength="80" placeholder="اكتب اسمك إذا لم تتمكن من الرسم"></div></div></section>' +
+        '</div><aside class="checkout-summary" aria-labelledby="checkout-summary-title"><h3 id="checkout-summary-title"><i class="fas fa-receipt" style="color:var(--primary);margin-left:6px"></i> ملخص الطلب</h3>' +
+        '<div class="checkout-summary-row"><span>قيمة المنتجات</span><strong id="checkout-subtotal">' + total + ' د.ل</strong></div>' +
+        '<div class="checkout-summary-row discount" id="checkout-discount-row" style="display:' + (appliedCoupon ? 'flex' : 'none') + '"><span>الخصم</span><strong id="checkout-discount">-' + discount + ' د.ل</strong></div>' +
+        '<div class="checkout-summary-row total"><span>الإجمالي</span><strong id="checkout-total">' + finalTotal + ' د.ل</strong></div>' +
+        '<div class="checkout-coupon"><label for="coupon-code">كود الخصم <span class="checkout-section-note">(اختياري)</span></label><div class="checkout-coupon-controls"><input id="coupon-code" class="checkout-coupon-input" placeholder="أدخل الكود" autocomplete="off"><button type="button" class="btn btn-warning" onclick="applyCoupon()">تطبيق</button></div>' +
+        '<div id="checkout-coupon-status" class="checkout-coupon-status">' + (appliedCoupon ? 'تم تطبيق الكود ' + escapeHtml(appliedCoupon.code) + ' <button type="button" class="checkout-coupon-clear" onclick="clearAppliedCoupon()">إزالة</button>' : '') + '</div></div>' +
+        '<button type="button" id="confirm-order-button" class="btn btn-primary checkout-submit" onclick="confirmOrder()"><i class="fas fa-paper-plane"></i> إرسال الطلب</button>' +
+        '<p class="checkout-submit-hint">سيُرسل الطلب بعد تحديد الموقع والموافقة والتوقيع.</p></aside></div></div>';
     setTimeout(initCustomerMap, 0);
+    initCheckoutSignaturePad();
+}
+
+function initCheckoutSignaturePad() {
+    var canvas = document.getElementById('order-signature-pad');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#172b3a';
+    ctx.lineWidth = 6;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    canvas.dataset.signed = 'false';
+    var drawing = false;
+    var lastPoint = null;
+    function point(event) {
+        var source = event.touches && event.touches.length ? event.touches[0] : (event.changedTouches && event.changedTouches.length ? event.changedTouches[0] : event);
+        var rect = canvas.getBoundingClientRect();
+        return { x:(source.clientX - rect.left) * canvas.width / Math.max(rect.width, 1), y:(source.clientY - rect.top) * canvas.height / Math.max(rect.height, 1) };
+    }
+    function startDrawing(event) {
+        if (event.button !== undefined && event.button !== 0) return;
+        if (event.cancelable) event.preventDefault();
+        drawing = true;
+        lastPoint = point(event);
+        canvas.dataset.signed = 'true';
+        if (event.pointerId !== undefined && canvas.setPointerCapture) {
+            try { canvas.setPointerCapture(event.pointerId); } catch (captureError) {}
+        }
+        ctx.beginPath();
+        ctx.arc(lastPoint.x, lastPoint.y, ctx.lineWidth / 2, 0, Math.PI * 2);
+        ctx.fillStyle = ctx.strokeStyle;
+        ctx.fill();
+        var status = document.getElementById('signature-status');
+        if (status) status.textContent = 'تم تسجيل التوقيع؛ يمكنك مسحه وإعادة الرسم إذا رغبت.';
+    }
+    function moveDrawing(event) {
+        if (!drawing) return;
+        if (event.cancelable) event.preventDefault();
+        var nextPoint = point(event);
+        ctx.beginPath();
+        ctx.moveTo(lastPoint.x, lastPoint.y);
+        ctx.lineTo(nextPoint.x, nextPoint.y);
+        ctx.stroke();
+        lastPoint = nextPoint;
+    }
+    function stopDrawing() { drawing = false; lastPoint = null; }
+    var supportsPointerEvents = typeof window !== 'undefined' && 'PointerEvent' in window;
+    if (supportsPointerEvents) {
+        canvas.addEventListener('pointerdown', startDrawing);
+        canvas.addEventListener('pointermove', moveDrawing);
+        ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function(name) { canvas.addEventListener(name, stopDrawing); });
+    } else {
+        canvas.addEventListener('touchstart', startDrawing, { passive:false });
+        canvas.addEventListener('touchmove', moveDrawing, { passive:false });
+        ['touchend', 'touchcancel'].forEach(function(name) { canvas.addEventListener(name, stopDrawing); });
+        canvas.addEventListener('mousedown', startDrawing);
+        document.addEventListener('mousemove', moveDrawing);
+        document.addEventListener('mouseup', stopDrawing);
+    }
+    canvas.addEventListener('contextmenu', function(event) { event.preventDefault(); });
+}
+
+function clearCheckoutSignature() {
+    var canvas = document.getElementById('order-signature-pad');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    if (ctx) { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+    canvas.dataset.signed = 'false';
+    var status = document.getElementById('signature-status');
+    if (status) status.textContent = 'تم مسح التوقيع. ارسم توقيعك أو اكتب اسمك في الحقل البديل.';
 }
 
 function fillAddressFromSelect(val) {
@@ -1979,41 +2140,109 @@ function fillAddressFromSelect(val) {
     if (addr) document.getElementById('order-address').value = addr.text;
 }
 
+function updateCheckoutSummary() {
+    var total = cart.reduce(function(sum, item) { return sum + Number(item.price || 0); }, 0);
+    var discount = appliedCoupon ? Math.round(total * (Number(appliedCoupon.discount || 0) / 100)) : 0;
+    var subtotalEl = document.getElementById('checkout-subtotal');
+    var discountRow = document.getElementById('checkout-discount-row');
+    var discountEl = document.getElementById('checkout-discount');
+    var totalEl = document.getElementById('checkout-total');
+    var couponStatus = document.getElementById('checkout-coupon-status');
+    if (subtotalEl) subtotalEl.textContent = total + ' د.ل';
+    if (discountRow) discountRow.style.display = appliedCoupon ? 'flex' : 'none';
+    if (discountEl) discountEl.textContent = '-' + discount + ' د.ل';
+    if (totalEl) totalEl.textContent = (total - discount) + ' د.ل';
+    if (couponStatus) couponStatus.innerHTML = appliedCoupon ? 'تم تطبيق الكود ' + escapeHtml(appliedCoupon.code) + ' <button type="button" class="checkout-coupon-clear" onclick="clearAppliedCoupon()">إزالة</button>' : '';
+}
+
 function applyCoupon() {
-    let code = document.getElementById('coupon-code').value.trim().toUpperCase();
+    let input = document.getElementById('coupon-code');
+    let code = input ? input.value.trim().toUpperCase() : '';
     if (!code) return;
     let coupon = db.coupons.find(function(c) { return c.code === code && c.active && usedCoupons.indexOf(code) === -1; });
-    if (coupon) { appliedCoupon = coupon; showToast('تم تطبيق كود الخصم! خصم ' + coupon.discount + '% 🎉'); navigate('cart'); }
+    if (coupon) { appliedCoupon = coupon; if (input) input.value = ''; updateCheckoutSummary(); showToast('تم تطبيق كود الخصم! خصم ' + coupon.discount + '%'); }
     else { showToast('كود غير صالح أو مستخدم', 'error'); }
 }
 
+function clearAppliedCoupon() {
+    appliedCoupon = null;
+    updateCheckoutSummary();
+    showToast('تمت إزالة كود الخصم');
+}
+
 function confirmOrder() {
+    if (orderSubmitInProgress) return;
     let addr = document.getElementById('order-address') ? document.getElementById('order-address').value : '';
     let phone = document.getElementById('order-phone') ? document.getElementById('order-phone').value : '';
     let notes = document.getElementById('order-notes') ? document.getElementById('order-notes').value.trim() : '';
     let time = document.getElementById('delivery-time') ? document.getElementById('delivery-time').value : 'now';
-    if (!addr || !phone) return showToast('أدخل العنوان ورقم الهاتف', 'error');
+    if (!cart.length) return showToast('السلة فارغة؛ أضف منتجاً قبل إرسال الطلب.', 'error');
+    if (!addr.trim() || !phone.trim()) return showToast('أكمل عنوان التوصيل ورقم الهاتف قبل المتابعة.', 'error');
     if (!currentLocation) return showToast('اضغط «تحديد موقعي» واسمح بإذن الموقع أولاً', 'error', 5000);
     if (!isInsideZaltan(currentLocation)) return showToast('التوصيل متاح داخل مدينة زلطن فقط', 'error', 5000);
+    let consentCheckbox = document.getElementById('checkout-consent');
+    if (!consentCheckbox || !consentCheckbox.checked) return showToast('يرجى الموافقة على الإقرار وسياسة الاستخدام قبل إرسال الطلب.', 'error', 5000);
+    let signatureCanvas = document.getElementById('order-signature-pad');
+    let typedSignature = document.getElementById('order-signature-name') ? document.getElementById('order-signature-name').value.trim() : '';
+    let hasDrawnSignature = !!(signatureCanvas && signatureCanvas.dataset.signed === 'true');
+    if (!hasDrawnSignature && typedSignature.length < 2) return showToast('أضف توقيعك في المربع الأبيض أو اكتب اسمك في حقل التوقيع البديل.', 'error', 5000);
     let customerAuthUid = firebaseAuth && firebaseAuth.currentUser ? firebaseAuth.currentUser.uid : '';
     if (!customerAuthUid) return showToast('سجّل الدخول بحساب موثّق قبل إرسال الطلب.', 'error');
     let storeId = cart[0].sid;
-    let total = cart.reduce(function(s, i) { return s + i.price; }, 0);
+    let total = cart.reduce(function(s, i) { return s + Number(i.price || 0); }, 0);
     let discount = appliedCoupon ? Math.round(total * (appliedCoupon.discount / 100)) : 0;
+    let consentAcceptedAt = Date.now();
+    let signatureImage = hasDrawnSignature ? signatureCanvas.toDataURL('image/png') : '';
     let order = {
         id: 'ORD' + Date.now(), userId: currentUser.id, userName: currentUser.name, customerAuthUid: customerAuthUid,
         storeId: storeId, items: JSON.parse(JSON.stringify(cart)), location: addr, phone: phone, notes: notes,
         status: 'قيد الانتظار ⏳', createdAt: new Date().toLocaleString('ar-LY'),
         driverId: null, coordinates: currentLocation, orderChat: [],
         coupon: appliedCoupon ? appliedCoupon.code : null, discount: discount, total: total - discount,
-        deliveryTime: time, deliveryProof: null
+        deliveryTime: time, deliveryProof: null,
+        customerConsent: {
+            accepted: true, acceptedAt: consentAcceptedAt, consentVersion: 'checkout-consent-v1',
+            consentText: ORDER_CONSENT_TEXT, policySnapshot: String(db.policy || ''),
+            signatureMethod: hasDrawnSignature ? 'drawn' : 'typed',
+            signatureImage: signatureImage || null, signatureText: hasDrawnSignature ? '' : typedSignature,
+            signerName: currentUser.name || typedSignature
+        }
     };
     db.orders.push(order);
     let store = db.stores.find(function(s) { return s.id === storeId; });
-    if (store) addNotification(store.ownerId, 'طلب جديد من ' + currentUser.name, '');
-    if (appliedCoupon) { usedCoupons.push(appliedCoupon.code); localStorage.setItem('z_used_coupons', JSON.stringify(usedCoupons)); }
-    cart = []; appliedCoupon = null; currentLocation = null;
-    sync(); showToast('تم إرسال الطلب بنجاح! 🎉'); navigate('orders');
+    let orderNotification = store ? addNotification(store.ownerId, 'طلب جديد من ' + currentUser.name, '', true) : null;
+    orderSubmitInProgress = true;
+    let submitButton = document.getElementById('confirm-order-button');
+    if (submitButton) { submitButton.disabled = true; submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ حفظ الطلب...'; }
+    sync().then(function(saved) {
+        if (!saved) {
+            db.orders = db.orders.filter(function(existingOrder) { return existingOrder.id !== order.id; });
+            if (orderNotification && store) {
+                let owner = db.users.find(function(user) { return user.id === store.ownerId; });
+                if (owner && owner.notifications) owner.notifications = owner.notifications.filter(function(notification) { return notification.id !== orderNotification.id; });
+            }
+            orderSubmitInProgress = false;
+            if (submitButton) { submitButton.disabled = false; submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال الطلب'; }
+            showToast('لم يُحفظ الطلب؛ أبقينا بياناتك والسلة كما هي لتتمكن من المحاولة لاحقاً.', 'error', 6000);
+            return false;
+        }
+        if (appliedCoupon) {
+            usedCoupons.push(appliedCoupon.code);
+            try { localStorage.setItem('z_used_coupons', JSON.stringify(usedCoupons)); } catch (storageError) {}
+        }
+        cart = []; appliedCoupon = null; currentLocation = null;
+        orderSubmitInProgress = false;
+        updateCartBadge();
+        showToast('تم إرسال الطلب بنجاح! 🎉');
+        navigate('orders');
+        return true;
+    }).catch(function() {
+        db.orders = db.orders.filter(function(existingOrder) { return existingOrder.id !== order.id; });
+        orderSubmitInProgress = false;
+        if (submitButton) { submitButton.disabled = false; submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال الطلب'; }
+        showToast('تعذر إتمام الإرسال؛ احتفظنا بالسلة لتتمكن من المحاولة مرة أخرى.', 'error', 6000);
+        return false;
+    });
 }
 
 function getOrderStatusMeta(status) {
