@@ -35,7 +35,7 @@
   --glass:rgba(255,255,255,0.9);
 }
 * { box-sizing:border-box; font-family:'Tajawal',sans-serif; -webkit-tap-highlight-color:transparent; outline:none; margin:0; padding:0; }
-body { background:var(--darker); color:var(--text); min-height:100vh; overflow-x:hidden; line-height:1.6; transition:background 0.3s,color 0.3s; }
+ body { background:var(--darker); color:var(--text); min-height:100vh; overflow-x:hidden; line-height:1.6; transition:background-color 0.18s,color 0.18s; }
 ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:var(--dark); } ::-webkit-scrollbar-thumb { background:var(--primary); border-radius:3px; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
 @keyframes slideInRight { from { opacity:0; transform:translateX(30px); } to { opacity:1; transform:translateX(0); } }
@@ -45,7 +45,7 @@ body { background:var(--darker); color:var(--text); min-height:100vh; overflow-x
 @keyframes shimmer { 0%{background-position:-200% 0;} 100%{background-position:200% 0;} }
 .animate-fade { animation:fadeIn 0.4s ease-out; } .animate-slide { animation:slideInRight 0.3s ease-out; }
 .animate-pulse { animation:pulse 2s infinite; } .animate-float { animation:float 3s ease-in-out infinite; }
-.btn { width:100%; padding:14px 20px; border-radius:16px; border:none; font-weight:700; font-size:0.95rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; transition:all 0.3s cubic-bezier(0.4,0,0.2,1); color:white; position:relative; overflow:hidden; }
+.btn { width:100%; padding:14px 20px; border-radius:16px; border:none; font-weight:700; font-size:0.95rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; transition:transform 0.16s ease,box-shadow 0.18s ease,background-color 0.18s ease,border-color 0.18s ease,color 0.18s ease; color:white; position:relative; overflow:hidden; }
 .btn::before { content:''; position:absolute; top:50%; left:50%; width:0; height:0; border-radius:50%; background:rgba(255,255,255,0.2); transform:translate(-50%,-50%); transition:width 0.6s,height 0.6s; }
 .btn:active::before { width:300px; height:300px; } .btn:active { transform:scale(0.96); }
 .btn-primary { background:var(--gradient-1); box-shadow:0 4px 15px rgba(0,212,255,0.3); }
@@ -57,24 +57,24 @@ body { background:var(--darker); color:var(--text); min-height:100vh; overflow-x
 .btn-ghost { background:rgba(255,255,255,0.05); border:1px solid var(--border); }
 .btn-ghost:hover { background:rgba(255,255,255,0.1); }
 .btn-sm { padding:10px 16px; font-size:0.85rem; width:auto; } .btn-lg { padding:16px 24px; font-size:1.1rem; }
-.card { background:var(--card); border-radius:20px; padding:20px; margin-bottom:16px; border:1px solid var(--border); box-shadow:var(--shadow-sm); transition:all 0.3s ease; position:relative; overflow:hidden; }
+.card { background:var(--card); border-radius:20px; padding:20px; margin-bottom:16px; border:1px solid var(--border); box-shadow:var(--shadow-sm); transition:transform 0.18s ease,box-shadow 0.18s ease,border-color 0.18s ease; position:relative; overflow:hidden; }
 .card::after { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--gradient-1); opacity:0; transition:opacity 0.3s; }
 .card:hover::after { opacity:1; } .card:hover { transform:translateY(-3px); box-shadow:var(--shadow-md),var(--shadow-glow); border-color:rgba(0,212,255,0.3); }
 .card-gradient-1 { background:var(--gradient-1); border:none; } .card-gradient-2 { background:var(--gradient-2); border:none; } .card-gradient-3 { background:var(--gradient-3); border:none; }
-input,textarea,select { width:100%; padding:14px 16px; margin:8px 0; border-radius:14px; border:2px solid var(--border); background:rgba(0,0,0,0.3); color:var(--text); font-size:0.95rem; transition:all 0.3s; }
+input,textarea,select { width:100%; padding:14px 16px; margin:8px 0; border-radius:14px; border:2px solid var(--border); background:rgba(0,0,0,0.3); color:var(--text); font-size:0.95rem; transition:border-color 0.18s ease,box-shadow 0.18s ease,background-color 0.18s ease; }
 input:focus,textarea:focus,select:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(0,212,255,0.1); background:rgba(0,0,0,0.5); }
 input::placeholder,textarea::placeholder { color:var(--text-muted); }
 label { display:block; margin-top:12px; margin-bottom:4px; font-size:0.85rem; color:var(--text-muted); font-weight:500; }
-header { padding:16px 20px; display:flex; justify-content:space-between; align-items:center; background:var(--glass); backdrop-filter:blur(20px); position:sticky; top:0; z-index:1000; border-bottom:1px solid var(--border); }
+header { padding:16px 20px; display:flex; justify-content:space-between; align-items:center; background:var(--glass); backdrop-filter:blur(10px); position:sticky; top:0; z-index:1000; border-bottom:1px solid var(--border); }
 .logo-text { font-size:1.3rem; font-weight:900; background:var(--gradient-1); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; display:flex; align-items:center; gap:8px; }
-.bottom-nav { position:fixed; bottom:0; width:100%; background:var(--glass); backdrop-filter:blur(20px); display:flex; justify-content:space-around; padding:8px 0 12px; border-top:1px solid var(--border); z-index:100; }
+.bottom-nav { position:fixed; bottom:0; width:100%; background:var(--glass); backdrop-filter:blur(10px); display:flex; justify-content:space-around; padding:8px 0 12px; border-top:1px solid var(--border); z-index:100; }
 .nav-link { color:var(--text-muted); text-decoration:none; font-size:0.7rem; text-align:center; cursor:pointer; transition:all 0.3s; padding:6px 12px; border-radius:12px; position:relative; }
 .nav-link i { font-size:1.4rem; display:block; margin-bottom:4px; transition:all 0.3s; }
 .nav-link.active { color:var(--primary); transform:translateY(-5px); }
 .nav-link.active i { text-shadow:0 0 15px var(--primary); transform:scale(1.1); }
 .nav-link.active::before { content:''; position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); width:20px; height:3px; background:var(--primary); border-radius:2px; }
 .badge { background:var(--danger); color:white; border-radius:50%; padding:2px 7px; font-size:0.7rem; position:absolute; top:-5px; right:-5px; font-weight:700; box-shadow:0 2px 8px rgba(231,76,60,0.4); }
-.modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; justify-content:center; align-items:center; backdrop-filter:blur(10px); padding:20px; }
+.modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; justify-content:center; align-items:center; backdrop-filter:blur(6px); padding:20px; }
 .modal-content { background:var(--card); border:1px solid var(--border); width:100%; max-width:480px; padding:24px; border-radius:24px; max-height:85vh; overflow-y:auto; box-shadow:var(--shadow-md); animation:fadeIn 0.3s ease-out; }
 .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
 .modal-title { color:var(--primary); font-size:1.2rem; font-weight:700; }
@@ -591,8 +591,10 @@ header { padding:16px 20px; display:flex; justify-content:space-between; align-i
 	.order-progress-step.active i { background:var(--primary); border-color:var(--primary); color:var(--dark); }
 	.order-progress-step.done i { background:var(--success); border-color:var(--success); color:white; }
 	.order-card-actions { display:flex; gap:8px; }
-	.order-card-actions .btn { flex:1; }
-	@media(max-width:400px){.orders-summary-item b{font-size:1.05rem}.order-progress-step{font-size:.57rem}.order-card-head{padding:13px 12px 10px}.order-card-body{padding:0 12px 12px}}
+    .order-card-actions .btn { flex:1; }
+    @media(max-width:400px){.orders-summary-item b{font-size:1.05rem}.order-progress-step{font-size:.57rem}.order-card-head{padding:13px 12px 10px}.order-card-body{padding:0 12px 12px}}
+    @media (hover:none) { .card:hover,.order-card-pro:hover { transform:none;box-shadow:var(--shadow-sm);border-color:var(--border); } .btn-primary:hover { transform:none;box-shadow:0 4px 15px rgba(0,212,255,.3); } }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important;animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important; } }
 
 </style>
 </head>
@@ -964,7 +966,15 @@ function applyAppData(data) {
 }
 
 function cacheAppData() {
-    try { localStorage.setItem('z_appdata_cache', JSON.stringify({ users:db.users, stores:db.stores, orders:db.orders, chats:db.chats, reports:db.reports, ad:db.ad, policy:db.policy, coupons:db.coupons, faq:db.faq, categories:db.categories })); } catch (e) {}
+    var now = Date.now();
+    if (!cacheAppData.windowStart) cacheAppData.windowStart = now;
+    if (cacheAppData.timer) clearTimeout(cacheAppData.timer);
+    var wait = Math.min(450, Math.max(0, 2000 - (now - cacheAppData.windowStart)));
+    cacheAppData.timer = setTimeout(function() {
+        cacheAppData.timer = null;
+        cacheAppData.windowStart = 0;
+        try { localStorage.setItem('z_appdata_cache', JSON.stringify({ users:db.users, stores:db.stores, orders:db.orders, chats:db.chats, reports:db.reports, ad:db.ad, policy:db.policy, coupons:db.coupons, faq:db.faq, categories:db.categories })); } catch (e) {}
+    }, wait);
 }
 
 function loadCachedAppData() {
@@ -2051,6 +2061,7 @@ function renderOrders(container) {
         container.innerHTML += '<div class="empty-state card"><i class="fas fa-filter"></i><p>لا توجد طلبات ضمن هذا التصنيف</p><button class="btn btn-outline btn-sm" onclick="setOrdersFilter(\'all\')">عرض كل الطلبات</button></div></div>';
         return;
     }
+    let orderCardsHtml = '';
     visibleOrders.forEach(function(o) {
         let meta = getOrderStatusMeta(o.status), store = db.stores.find(function(s) { return s.id === o.storeId; });
         let items = o.items || [], itemCount = items.reduce(function(sum, item) { return sum + (Number(item.quantity) || 1); }, 0);
@@ -2059,7 +2070,7 @@ function renderOrders(container) {
         let orderIndex = db.orders.indexOf(o);
         let storeReviewAction = meta.key !== 'done' ? '' : (o.storeReview ? '<span class="tag tag-success">تم تقييم المتجر</span>' : (canReviewOrder(o, 'store', o.storeId) ? '<button class="btn btn-sm btn-warning" data-rate-store-index="' + orderIndex + '"><i class="fas fa-star"></i> تقييم المتجر</button>' : ''));
         let driverReviewAction = meta.key !== 'done' || !o.driverId ? '' : (o.driverReview || o.driverRated ? '<span class="tag tag-success">تم تقييم السائق</span>' : (canReviewOrder(o, 'driver', o.driverId) ? '<button class="btn btn-sm btn-warning" data-rate-driver-index="' + orderIndex + '"><i class="fas fa-star"></i> تقييم السائق</button>' : ''));
-        container.innerHTML += '<div class="card order-card-pro animate-fade">' +
+        orderCardsHtml += '<div class="card order-card-pro">' +
             '<div class="order-card-head"><div class="order-store-line"><div class="order-store-icon"><i class="fas fa-shopping-bag"></i></div><div><b>' + (store ? store.name : 'طلب توصيل') + '</b><div class="order-number">طلب #' + shortId + ' • ' + (o.createdAt || '') + '</div></div></div><span class="status-badge ' + meta.cls + '"><i class="fas ' + meta.icon + '"></i> ' + meta.label + '</span></div>' +
             '<div class="order-card-body">' + renderOrderProgress(meta) +
             '<div class="order-info-row"><i class="fas fa-box"></i><span>' + itemCount + ' ' + (itemCount === 1 ? 'منتج' : 'منتجات') + '</span><span>•</span><span>' + timeLabel + '</span></div>' +
@@ -2069,7 +2080,7 @@ function renderOrders(container) {
             storeReviewAction + driverReviewAction +
             (meta.key === 'done' ? '<button class="btn btn-sm btn-outline" onclick="reorderItems(\'' + o.id + '\')"><i class="fas fa-rotate-right"></i> إعادة الطلب</button>' : '') + '</div></div></div>';
     });
-    container.innerHTML += '</div>';
+    container.innerHTML += orderCardsHtml + '</div>';
     container.querySelectorAll('[data-rate-store-index]').forEach(function(button) {
         button.addEventListener('click', function() { let order = db.orders[Number(button.getAttribute('data-rate-store-index'))]; if (order) rateStore(order.storeId, order.id); });
     });
