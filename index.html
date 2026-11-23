@@ -1639,11 +1639,9 @@ function renderStoreCards(stores) {
         var image = safeStoreImageSource(store.img);
         var category = store.category ? escapeHtml(getCategoryName(store.category)) : 'متجر محلي';
         var productCount = Array.isArray(store.products) ? store.products.filter(Boolean).length : 0;
-        var ratingCount = Number(store.ratingCount || 0);
-        if (!Number.isFinite(ratingCount) || ratingCount < 0) ratingCount = 0;
-        var ratingSum = Number(store.ratingSum || 0);
-        if (!Number.isFinite(ratingSum) || ratingSum < 0) ratingSum = 0;
-        var rating = ratingCount ? Math.max(0, Math.min(5, ratingSum / ratingCount)) : 0;
+        var ratingSummary = getStoreRatingSummary(store);
+        var ratingCount = ratingSummary.count;
+        var rating = ratingSummary.average;
         var ratingLabel = ratingCount ? rating.toFixed(1) : 'جديد';
         var roundedRating = Math.round(rating);
         var isOpen = store.isOpen !== false;
@@ -1668,7 +1666,7 @@ function handleStorefrontAction(event) {
     if (action === 'open') return navigate('store', storeId);
     if (action === 'favorite') return toggleFavorite(storeId);
     if (action === 'message') return messageStoreOwner(control.getAttribute('data-owner-id'));
-    if (action === 'rate') return rateStore(storeId);
+    if (action === 'rate') { var orderIndex = Number(control.getAttribute('data-order-index')); var order = Number.isInteger(orderIndex) ? db.orders[orderIndex] : null; return rateStore(storeId, order ? order.id : undefined); }
     if (action === 'add') {
         var store = db.stores.find(function(item) { return String(item.id) === storeId; });
         var productIndex = Number(control.getAttribute('data-product-index'));
@@ -1678,26 +1676,7 @@ function handleStorefrontAction(event) {
         if (!Number.isFinite(price) || price < 0) price = 0;
         return addToCart(store.id, product.name || 'منتج', price, safeStoreImageSource(product.img));
     }
-    let storesHtml = filteredStores.map(function(s) {
-        let ratingSummary = getStoreRatingSummary(s);
-        let avg = ratingSummary.count ? ratingSummary.average.toFixed(1) : 'جديد';
-        let roundedRating = ratingSummary.count ? Math.round(ratingSummary.average) : 0;
-        let isFav = favorites.indexOf(s.id) !== -1;
-        let productCount = s.products ? s.products.length : 0;
-        return '<div class="card animate-fade" onclick="navigate(\'store\', \'' + s.id + '\')" style="display:flex;gap:15px;align-items:center;cursor:pointer;">' +
-            (s.img ? '<img src="' + s.img + '" class="store-avatar">' : '<div class="store-avatar" style="display:flex;align-items:center;justify-content:center;font-size:2rem;">🏪</div>') +
-            '<div style="flex:1;min-width:0;">' +
-            '<div style="display:flex;justify-content:space-between;align-items:start;">' +
-            '<b style="font-size:1.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + s.name + '</b>' +
-            '<button class="fav-btn ' + (isFav ? 'active' : '') + '" onclick="event.stopPropagation();toggleFavorite(\'' + s.id + '\')"><i class="fas fa-heart"></i></button>' +
-            '</div>' +
-            '<div class="rating-stars">' + '★'.repeat(roundedRating) + '☆'.repeat(5-roundedRating) + ' <span style="color:var(--text-muted);font-size:0.85rem;">' + avg + '</span></div>' +
-            '<div style="display:flex;gap:8px;margin-top:6px;align-items:center;">' +
-            '<span class="tag tag-primary"><i class="fas fa-box"></i> ' + productCount + ' منتج</span>' +
-            (s.category ? '<span class="tag tag-success">' + getCategoryName(s.category) + '</span>' : '') +
-            (s.isOpen === false ? '<span class="tag" style="background:rgba(231,76,60,0.2);color:var(--danger);">مغلق</span>' : '<span class="tag tag-success">مفتوح</span>') +
-            '</div></div><i class="fas fa-chevron-left" style="color:var(--primary);"></i></div>';
-    }).join('');
+}
 
 function renderHome(container) {
     var filteredStores = getVisibleStores(searchQuery);
@@ -1727,33 +1706,15 @@ function handleSearch(query) {
     searchQuery = query;
     let storesList = document.getElementById('stores-list');
     if (!storesList) return;
-    let filteredStores = db.stores;
-    if (currentCategory !== 'all') filteredStores = filteredStores.filter(function(s) { return s.category === currentCategory; });
-    if (query) {
-        filteredStores = filteredStores.filter(function(s) {
-            return s.name.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
-                (s.products || []).some(function(p) { return p.name.toLowerCase().indexOf(query.toLowerCase()) !== -1; });
-        });
-    }
-    let storesHtml = filteredStores.map(function(s) {
-        let ratingSummary = getStoreRatingSummary(s);
-        let avg = ratingSummary.count ? ratingSummary.average.toFixed(1) : 'جديد';
-        let roundedRating = ratingSummary.count ? Math.round(ratingSummary.average) : 0;
-        let isFav = favorites.indexOf(s.id) !== -1;
-        return '<div class="card animate-fade" onclick="navigate(\'store\', \'' + s.id + '\')" style="display:flex;gap:15px;align-items:center;cursor:pointer;">' +
-            (s.img ? '<img src="' + s.img + '" class="store-avatar">' : '<div class="store-avatar" style="display:flex;align-items:center;justify-content:center;font-size:2rem;">🏪</div>') +
-            '<div style="flex:1;min-width:0;">' +
-            '<div style="display:flex;justify-content:space-between;align-items:start;">' +
-            '<b style="font-size:1.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + s.name + '</b>' +
-            '<button class="fav-btn ' + (isFav ? 'active' : '') + '" onclick="event.stopPropagation();toggleFavorite(\'' + s.id + '\')"><i class="fas fa-heart"></i></button>' +
-            '</div>' +
-            '<div class="rating-stars">' + '★'.repeat(roundedRating) + '☆'.repeat(5-roundedRating) + ' <span style="color:var(--text-muted);font-size:0.85rem;">' + avg + '</span></div>' +
-            '<div style="display:flex;gap:8px;margin-top:6px;">' +
-            '<span class="tag tag-primary"><i class="fas fa-box"></i> ' + (s.products ? s.products.length : 0) + ' منتج</span>' +
-            (s.isOpen === false ? '<span class="tag" style="background:rgba(231,76,60,0.2);color:var(--danger);">مغلق</span>' : '<span class="tag tag-success">مفتوح</span>') +
-            '</div></div><i class="fas fa-chevron-left" style="color:var(--primary);"></i></div>';
-    }).join('');
-    storesList.innerHTML = storesHtml || '<div class="empty-state"><i class="fas fa-search"></i><p>لا توجد نتائج للبحث</p></div>';
+    let filteredStores = getVisibleStores(query);
+    storesList.innerHTML = renderStoreCards(filteredStores) || '<div class="storefront-empty"><i class="fas fa-magnifying-glass"></i><strong>ما لقينا نتائج</strong><p>جرب كلمة ثانية أو غيّر التصنيف.</p></div>';
+    let clearButton = document.querySelector('.storefront-search-clear');
+    if (clearButton) clearButton.style.display = String(query || '').trim() ? 'grid' : 'none';
+    let count = document.getElementById('store-results-count');
+    if (count) count.textContent = filteredStores.length + ' متجر';
+    let openCount = filteredStores.filter(function(store) { return store.isOpen !== false; }).length;
+    let openSummary = document.querySelector('.storefront-open-count');
+    if (openSummary) openSummary.innerHTML = '<span class="storefront-open-dot"></span> ' + openCount + ' من المتاجر المعروضة مفتوحة الآن';
 }
 
 function toggleFavorite(storeId) {
@@ -1781,67 +1742,61 @@ function renderStoreView(container, storeId) {
     let store = db.stores.find(function(s) { return s.id === storeId; });
     if (!store) return navigate('home');
     if (!store.ownerId) store.ownerId = currentUser.id;
+    let storeName = escapeHtml(store.name || 'متجر محلي');
+    let safeStoreId = escapeHtml(store.id);
+    let image = safeStoreImageSource(store.img);
     let ratingSummary = getStoreRatingSummary(store);
-    let avg = ratingSummary.count ? ratingSummary.average.toFixed(1) : 'جديد';
-    let roundedRating = ratingSummary.count ? Math.round(ratingSummary.average) : 0;
-    let isFav = favorites.indexOf(storeId) !== -1;
+    let ratingCount = ratingSummary.count;
+    let rating = ratingSummary.average;
+    let ratingLabel = ratingCount ? rating.toFixed(1) : 'جديد';
+    let roundedRating = Math.round(rating);
+    let isFavorite = favorites.indexOf(storeId) !== -1;
     let isOwner = currentUser.id === store.ownerId;
+    let isOpen = store.isOpen !== false;
     let reviewOrder = !isOwner ? findEligibleReviewOrder('store', storeId) : null;
     let reviewOrderIndex = reviewOrder ? db.orders.indexOf(reviewOrder) : -1;
-    let productsHtml = (store.products || []).map(function(p, idx) {
-        return '<div class="card animate-fade" style="display:flex;gap:12px;align-items:center;animation-delay:' + (idx * 0.05) + 's;">' +
-            (p.img ? '<img src="' + p.img + '" class="product-img">' : '<div class="product-img" style="background:var(--gradient-1);display:flex;align-items:center;justify-content:center;font-size:1.8rem;">🍕</div>') +
-            '<div style="flex:1;min-width:0;">' +
-            '<b style="font-size:1rem;">' + p.name + '</b>' +
-            '<div style="color:var(--success);font-weight:700;font-size:1.1rem;">' + p.price + ' د.ل</div>' +
-            (p.description ? '<div style="color:var(--text-muted);font-size:0.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + p.description + '</div>' : '') +
-            '</div>' +
-            '<button class="btn btn-sm btn-primary" onclick="addToCart(\'' + store.id + '\',\'' + p.name.replace(/\'/g, "\\'") + '\',' + p.price + ',\'' + (p.img || '') + '\')"><i class="fas fa-cart-plus"></i></button>' +
-            '</div>';
-    }).join('') || '<div class="empty-state"><i class="fas fa-box-open"></i><p>لا توجد منتجات حالياً</p></div>';
+    let products = Array.isArray(store.products) ? store.products.map(function(product, index) { return { product: product, index: index }; }).filter(function(item) { return !!item.product; }) : [];
+    let productsHtml = products.map(function(item) {
+        let product = item.product;
+        let productImage = safeStoreImageSource(product.img);
+        let price = Number(product.price || 0);
+        if (!Number.isFinite(price) || price < 0) price = 0;
+        return '<article class="store-product-card">' +
+            '<div class="store-product-image">' + (productImage ? '<img src="' + escapeHtml(productImage) + '" alt="' + escapeHtml(product.name || 'منتج') + '" loading="lazy" decoding="async">' : '<span><i class="fas fa-utensils"></i></span>') + '</div>' +
+            '<div class="store-product-body"><h4>' + escapeHtml(product.name || 'منتج') + '</h4>' + (product.description ? '<p>' + escapeHtml(product.description) + '</p>' : '<p class="store-product-subtitle">اختيار مميز من المتجر</p>') +
+            '<div class="store-product-footer"><strong>' + price.toLocaleString('ar-LY', { maximumFractionDigits:2 }) + ' <small>د.ل</small></strong><button type="button" class="store-add-button" data-store-action="add" data-store-id="' + safeStoreId + '" data-product-index="' + item.index + '" aria-label="إضافة ' + escapeHtml(product.name || 'المنتج') + ' إلى السلة"><i class="fas fa-plus"></i><span>أضف</span></button></div></div></article>';
+    }).join('') || '<div class="storefront-empty store-products-empty"><i class="fas fa-box-open"></i><strong>المتجر يجهّز منتجاته</strong><p>لا توجد منتجات معروضة حالياً.</p></div>';
+
     let verifiedStoreReviews = db.orders.filter(function(order) {
         let review = order && order.storeReview;
-        let rating = review ? Number(review.rating) : 0;
-        return order && String(order.storeId) === String(store.id) && isReviewDeliveryStatus(order.status) && review && review.reviewerUid === order.customerAuthUid && String(review.reviewerId) === String(order.userId) && review.targetType === 'store' && String(review.targetId) === String(store.id) && rating >= 1 && rating <= 5;
+        let reviewRating = review ? Number(review.rating) : 0;
+        return order && String(order.storeId) === String(store.id) && isReviewDeliveryStatus(order.status) && review && review.reviewerUid === order.customerAuthUid && String(review.reviewerId) === String(order.userId) && review.targetType === 'store' && String(review.targetId) === String(store.id) && reviewRating >= 1 && reviewRating <= 5;
     }).map(function(order) {
-        return Object.assign({}, order.storeReview, { reviewerName: order.userName || 'زبون', date: new Date(order.storeReview.createdAt).toLocaleString('ar-LY') });
+        return Object.assign({}, order.storeReview, { reviewerName: order.storeReview.reviewerName || order.userName || 'زبون', date: order.storeReview.createdAt ? new Date(order.storeReview.createdAt).toLocaleString('ar-LY') : '' });
     }).reverse();
     let archivedStoreReviews = Array.isArray(store.reviews) ? store.reviews.filter(function(review) { return review && typeof review === 'object'; }) : [];
-    let reviewsHtml = '';
     function renderReviewCards(rows) {
-        return rows.slice(0, 3).map(function(r) {
-            let rating = Math.max(0, Math.min(5, Number(r.rating) || 0));
-            return '<div class="card" style="padding:12px;"><div style="display:flex;justify-content:space-between;align-items:center;"><b>' + escapeHtml(r.reviewerName || r.user || 'زبون') + '</b><span class="rating-stars">' + '★'.repeat(rating) + '☆'.repeat(5-rating) + '</span></div>' +
-                (r.comment ? '<p style="margin-top:6px;color:var(--text-muted);font-size:0.9rem;">' + escapeHtml(r.comment) + '</p>' : '') +
-                '<small style="color:var(--text-muted);">' + escapeHtml(r.date || (r.createdAt ? new Date(r.createdAt).toLocaleString('ar-LY') : '')) + '</small></div>';
+        return rows.slice(0, 5).map(function(review) {
+            let reviewRating = Number(review.rating || 0);
+            if (!Number.isFinite(reviewRating)) reviewRating = 0;
+            reviewRating = Math.max(0, Math.min(5, reviewRating));
+            let rounded = Math.round(reviewRating);
+            return '<article class="store-review-card"><div class="store-review-heading"><span class="store-review-avatar"><i class="fas fa-user"></i></span><div><strong>' + escapeHtml(review.reviewerName || review.user || 'زبون') + '</strong><small>' + escapeHtml(review.date || '') + '</small></div><span class="store-review-stars" aria-label="' + reviewRating + ' من 5">' + '★'.repeat(rounded) + '☆'.repeat(5 - rounded) + '</span></div>' + (review.comment ? '<p>' + escapeHtml(review.comment) + '</p>' : '') + '</article>';
         }).join('');
     }
-    if (verifiedStoreReviews.length) reviewsHtml += '<section style="margin-top:16px;"><h4 style="margin-bottom:12px;">💬 تقييمات موثقة (' + ratingSummary.count + ')</h4>' + renderReviewCards(verifiedStoreReviews) + '</section>';
-    if (archivedStoreReviews.length) reviewsHtml += '<details style="margin-top:16px;"><summary class="card" style="cursor:pointer;">تقييمات سابقة غير موثقة (' + archivedStoreReviews.length + ')</summary>' + renderReviewCards(archivedStoreReviews) + '</details>';
-    container.innerHTML = '<div class="animate-fade">' +
-        '<button class="btn btn-sm btn-outline" style="margin-bottom:12px" onclick="navigate(\'home\')"><i class="fas fa-arrow-right"></i> عودة</button>' +
-        '<div class="card" style="text-align:center;position:relative;overflow:visible;">' +
-        (store.img ? '<img src="' + store.img + '" style="width:100%;max-height:180px;object-fit:cover;border-radius:16px;margin-bottom:16px;">' : '') +
-        '<div style="position:absolute;top:10px;left:10px;">' +
-        '<button class="fav-btn ' + (isFav ? 'active' : '') + '" style="background:var(--card);border-radius:50%;width:40px;height:40px;" onclick="toggleFavorite(\'' + store.id + '\')"><i class="fas fa-heart"></i></button>' +
-        '</div>' +
-        '<h2 style="color:var(--primary);margin-bottom:8px;">' + store.name + '</h2>' +
-        '<div class="rating-stars" style="font-size:1.3rem;margin-bottom:8px;">' + '★'.repeat(roundedRating) + '☆'.repeat(5-roundedRating) + ' <span style="color:var(--text-muted);">(' + avg + ') • ' + ratingSummary.count + ' تقييم</span></div>' +
-        '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px;">' +
-        (store.category ? '<span class="tag tag-primary">' + getCategoryName(store.category) + '</span>' : '') +
-        (store.isOpen === false ? '<span class="tag" style="background:rgba(231,76,60,0.2);color:var(--danger);">🔴 مغلق الآن</span>' : '<span class="tag tag-success">🟢 مفتوح</span>') +
-        '</div>' +
-        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px;">' +
-        (!isOwner ? '<button class="btn btn-sm btn-outline" onclick="messageStoreOwner(\'' + store.ownerId + '\')"><i class="fas fa-comment"></i> مراسلة</button>' : '') +
-        (!isOwner && reviewOrderIndex >= 0 ? '<button class="btn btn-sm btn-warning" data-rate-store-order="' + reviewOrderIndex + '"><i class="fas fa-star"></i> قيّم طلبك المستلم</button>' : (!isOwner ? '<span class="tag" style="color:var(--text-muted);">يظهر التقييم بعد تسليم طلبك</span>' : '')) +
-        '</div></div>' +
-        '<h4 style="margin:20px 0 12px;display:flex;align-items:center;gap:8px;"><i class="fas fa-box-open"></i> المنتجات<span style="font-size:0.8rem;color:var(--text-muted);margin-right:auto;">' + (store.products ? store.products.length : 0) + ' منتج</span></h4>' +
-        productsHtml + reviewsHtml + '</div>';
-    let storeRatingButton = container.querySelector('[data-rate-store-order]');
-    if (storeRatingButton) storeRatingButton.addEventListener('click', function() {
-        let order = db.orders[Number(storeRatingButton.getAttribute('data-rate-store-order'))];
-        if (order) rateStore(storeId, order.id);
-    });
+    let reviewsHtml = '<section class="store-reviews"><div class="store-detail-section-heading"><div><span class="storefront-eyebrow">تقييمات مرتبطة بطلب مكتمل</span><h3>آراء الزبائن</h3></div><span class="storefront-count">' + ratingCount + ' موثق</span></div>' +
+        (verifiedStoreReviews.length ? renderReviewCards(verifiedStoreReviews) : '<div class="storefront-empty store-review-empty"><i class="fas fa-comment-dots"></i><strong>لا توجد تقييمات موثقة بعد</strong><p>تظهر التقييمات بعد إتمام الطلب واستلامه.</p></div>') +
+        (archivedStoreReviews.length ? '<details class="store-legacy-reviews"><summary>تقييمات سابقة غير موثقة (' + archivedStoreReviews.length + ')</summary>' + renderReviewCards(archivedStoreReviews) + '</details>' : '') + '</section>';
+
+    container.innerHTML = '<div class="animate-fade storefront-detail-page">' +
+        '<button type="button" class="btn btn-sm btn-ghost storefront-back" onclick="navigate(\'home\')"><i class="fas fa-arrow-right"></i> كل المتاجر</button>' +
+        '<section class="store-detail-hero">' + (image ? '<img class="store-detail-cover" src="' + escapeHtml(image) + '" alt="' + storeName + '" decoding="async">' : '<div class="store-detail-cover-placeholder"><i class="fas fa-store"></i><span>متجر محلي من زلطن</span></div>') +
+        '<div class="store-detail-overlay"><div class="store-detail-top"><button type="button" class="store-detail-favorite ' + (isFavorite ? 'active' : '') + '" data-store-action="favorite" data-store-id="' + safeStoreId + '" aria-label="' + (isFavorite ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة') + '"><i class="fas fa-heart"></i></button><span class="store-detail-status ' + (isOpen ? 'is-open' : 'is-closed') + '"><i class="fas fa-circle"></i> ' + (isOpen ? 'مفتوح الآن' : 'مغلق الآن') + '</span></div>' +
+        '<div class="store-detail-title"><span>' + (store.category ? escapeHtml(getCategoryName(store.category)) : 'متجر محلي') + '</span><h1>' + storeName + '</h1><div class="store-detail-rating"><span>' + '★'.repeat(roundedRating) + '☆'.repeat(5 - roundedRating) + '</span><b>' + ratingLabel + '</b><small>' + (ratingCount ? 'من ' + ratingCount + ' تقييم موثق' : 'لا توجد تقييمات بعد') + '</small></div></div></div></section>' +
+        '<div class="store-detail-actions">' + (!isOwner && store.ownerId ? '<button type="button" class="btn btn-outline" data-store-action="message" data-owner-id="' + escapeHtml(store.ownerId) + '"><i class="fas fa-comment-dots"></i> مراسلة المتجر</button>' : '') +
+        (!isOwner && reviewOrderIndex >= 0 ? '<button type="button" class="btn btn-warning" data-store-action="rate" data-store-id="' + safeStoreId + '" data-order-index="' + reviewOrderIndex + '"><i class="fas fa-star"></i> قيّم طلبك المستلم</button>' : (!isOwner ? '<span class="storefront-count">يظهر التقييم بعد تسليم طلبك</span>' : '')) + '</div>' +
+        '<section class="store-product-section"><div class="store-detail-section-heading"><div><span class="storefront-eyebrow">مختارة لك</span><h3>منتجات المتجر</h3></div><span class="storefront-count">' + products.length + ' منتج</span></div><div class="store-product-grid">' + productsHtml + '</div></section>' + reviewsHtml + '</div>';
+    container.onclick = handleStorefrontAction;
 }
 
 function messageStoreOwner(ownerId) {
