@@ -520,6 +520,7 @@ header { padding:16px 20px; display:flex; justify-content:space-between; align-i
 .dev-record-main small,.dev-product-row small { display:block; color:var(--text-muted); font-size:.66rem; overflow-wrap:anywhere; }
 .dev-record-actions { display:flex; align-items:center; gap:6px; flex:0 0 auto; }
 .dev-record-actions .btn { min-width:34px; }
+@media(max-width:519px) { .dev-record-actions { flex-direction:column; align-items:stretch; } }
 .dev-status-tag { display:inline-flex; align-items:center; border-radius:20px; padding:4px 8px; font-size:.63rem; white-space:nowrap; }
 .dev-status-tag.pending { color:var(--warning); background:rgba(243,156,18,.13); }
 .dev-status-tag.normal { color:var(--success); background:rgba(46,204,113,.12); }
@@ -1700,8 +1701,12 @@ function safeStoreImageSource(value) {
     return '';
 }
 
+function isStoreBlocked(store) {
+    return !!(store && store.isBlocked === true);
+}
+
 function getVisibleStores(query) {
-    var visible = db.stores.filter(function(store) { return store && (currentCategory === 'all' || store.category === currentCategory); });
+    var visible = db.stores.filter(function(store) { return store && !isStoreBlocked(store) && (currentCategory === 'all' || store.category === currentCategory); });
     var term = String(query || '').trim().toLowerCase();
     if (!term) return visible;
     return visible.filter(function(store) {
@@ -1805,8 +1810,9 @@ function toggleFavorite(storeId) {
 }
 
 function randomStoreOrProduct() {
-    if (!db.stores.length) { showToast('لا توجد متاجر', 'error'); return; }
-    let store = db.stores[Math.floor(Math.random() * db.stores.length)];
+    let availableStores = db.stores.filter(function(store) { return store && !isStoreBlocked(store); });
+    if (!availableStores.length) { showToast('لا توجد متاجر متاحة حالياً', 'error'); return; }
+    let store = availableStores[Math.floor(Math.random() * availableStores.length)];
     if (store.products && store.products.length) {
         let prod = store.products[Math.floor(Math.random() * store.products.length)];
         let price = Number(prod.price || 0);
@@ -1820,6 +1826,10 @@ function randomStoreOrProduct() {
 function renderStoreView(container, storeId) {
     let store = db.stores.find(function(s) { return s.id === storeId; });
     if (!store) return navigate('home');
+    if (isStoreBlocked(store) && !isDeveloperUser() && currentUser.id !== store.ownerId) {
+        container.innerHTML = '<div class="empty-state animate-fade"><i class="fas fa-store-slash"></i><h3>المتجر غير متاح حالياً</h3><p>قد يكون المتجر متوقفاً مؤقتاً. يمكنك العودة إلى قائمة المتاجر.</p><button class="btn btn-primary btn-sm" onclick="navigate(\'home\')">العودة للمتاجر</button></div>';
+        return;
+    }
     if (!store.ownerId) store.ownerId = currentUser.id;
     let storeName = escapeHtml(store.name || 'متجر محلي');
     let safeStoreId = escapeHtml(store.id);
@@ -1905,6 +1915,9 @@ function rateStore(storeId, orderId) {
 }
 
 function addToCart(sid, name, price, img) {
+    var store = db.stores.find(function(item) { return String(item.id) === String(sid); });
+    if (store && isStoreBlocked(store)) return showToast('هذا المتجر محجوب حالياً ولا يمكن إضافة منتجاته.', 'warning', 4500);
+    if (cart.length && String(cart[0].sid) !== String(sid)) return showToast('السلة مخصصة لمتجر واحد. أتمم طلبك الحالي أو أزل منتجاته قبل اختيار متجر آخر.', 'warning', 5000);
     cart.push({ sid: sid, name: name, price: price, img: img });
     updateCartBadge();
     showToast('تم إضافة ' + escapeHtml(name) + ' للسلة 🛒');
@@ -2010,6 +2023,13 @@ function renderCart(container) {
         container.innerHTML = '<div class="empty-state animate-fade" style="text-align:center;padding:48px 18px;"><i class="fas fa-shopping-basket fa-4x" style="color:var(--primary)"></i><h3 style="margin:16px 0 6px;">سلتك فارغة حالياً</h3><p style="color:var(--text-muted);margin-bottom:18px;">اختر ما تحتاجه من المتاجر ثم ارجع لإكمال الطلب.</p><button class="btn btn-primary" onclick="navigate(\'home\')">تصفح المتاجر</button></div>';
         return;
     }
+    var hasMixedStores = cart.some(function(item) { return String(item.sid) !== String(cart[0].sid); });
+    var hasBlockedStore = cart.some(function(item) {
+        var store = db.stores.find(function(candidate) { return String(candidate.id) === String(item.sid); });
+        return !store || isStoreBlocked(store);
+    });
+    var cartWarning = hasBlockedStore ? '<div class="card" style="margin-bottom:14px;border-color:var(--warning);color:var(--text);"><i class="fas fa-circle-exclamation" style="color:var(--warning);"></i> أحد المتاجر في سلتك غير متاح الآن. أزل منتجاته قبل إرسال الطلب.</div>' :
+        (hasMixedStores ? '<div class="card" style="margin-bottom:14px;border-color:var(--warning);color:var(--text);"><i class="fas fa-circle-exclamation" style="color:var(--warning);"></i> السلة تحتوي منتجات من متاجر مختلفة. أزل منتجات أحد المتاجر لإكمال الطلب.</div>' : '');
     let total = cart.reduce(function(s, i) { return s + Number(i.price || 0); }, 0);
     let discount = 0;
     if (appliedCoupon) discount = Math.round(total * (appliedCoupon.discount / 100));
@@ -2018,7 +2038,7 @@ function renderCart(container) {
     let addrOptions = addrs.map(function(a, i) { return '<option value="' + i + '">' + escapeHtml(a.label || 'عنوان') + ' — ' + escapeHtml((a.text || '').substring(0, 36)) + '</option>'; }).join('');
     let locationText = !currentLocation ? 'لم يتم التحديد بعد' : (isInsideZaltan(currentLocation) ? 'الموقع محدد داخل نطاق زلطن' : 'الموقع خارج نطاق التوصيل');
 
-    container.innerHTML = '<div class="checkout-page animate-fade">' +
+    container.innerHTML = '<div class="checkout-page animate-fade">' + cartWarning +
         '<div class="checkout-head"><div><span class="checkout-eyebrow">إتمام الطلب</span><h2>راجع طلبك وأكمل بيانات التوصيل</h2><p>خطوات واضحة وآمنة قبل إرسال الطلب إلى المتجر.</p></div>' +
         '<div class="checkout-steps" aria-label="مراحل إتمام الطلب"><span class="done"><b>1</b>السلة</span><span class="active"><b>2</b>التوصيل</span><span><b>3</b>الموافقة والتوقيع</span></div></div>' +
         '<div class="checkout-layout"><div class="checkout-main">' +
@@ -2180,6 +2200,10 @@ function confirmOrder() {
     if (!addr.trim() || !phone.trim()) return showToast('أكمل عنوان التوصيل ورقم الهاتف قبل المتابعة.', 'error');
     if (!currentLocation) return showToast('اضغط «تحديد موقعي» واسمح بإذن الموقع أولاً', 'error', 5000);
     if (!isInsideZaltan(currentLocation)) return showToast('التوصيل متاح داخل مدينة زلطن فقط', 'error', 5000);
+    let storeId = cart[0].sid;
+    if (cart.some(function(item) { return String(item.sid) !== String(storeId); })) return showToast('السلة تحتوي منتجات من متاجر مختلفة. أزل منتجات أحد المتاجر قبل المتابعة.', 'error', 5000);
+    let store = db.stores.find(function(item) { return String(item.id) === String(storeId); });
+    if (!store || isStoreBlocked(store)) return showToast('المتجر المرتبط بالسلة غير متاح حالياً. أزل منتجاته من السلة لاختيار متجر آخر.', 'error', 5000);
     let consentCheckbox = document.getElementById('checkout-consent');
     if (!consentCheckbox || !consentCheckbox.checked) return showToast('يرجى الموافقة على الإقرار وسياسة الاستخدام قبل إرسال الطلب.', 'error', 5000);
     let signatureCanvas = document.getElementById('order-signature-pad');
@@ -2188,7 +2212,6 @@ function confirmOrder() {
     if (!hasDrawnSignature && typedSignature.length < 2) return showToast('أضف توقيعك في المربع الأبيض أو اكتب اسمك في حقل التوقيع البديل.', 'error', 5000);
     let customerAuthUid = firebaseAuth && firebaseAuth.currentUser ? firebaseAuth.currentUser.uid : '';
     if (!customerAuthUid) return showToast('سجّل الدخول بحساب موثّق قبل إرسال الطلب.', 'error');
-    let storeId = cart[0].sid;
     let total = cart.reduce(function(s, i) { return s + Number(i.price || 0); }, 0);
     let discount = appliedCoupon ? Math.round(total * (appliedCoupon.discount / 100)) : 0;
     let consentAcceptedAt = Date.now();
@@ -2209,7 +2232,6 @@ function confirmOrder() {
         }
     };
     db.orders.push(order);
-    let store = db.stores.find(function(s) { return s.id === storeId; });
     let orderNotification = store ? addNotification(store.ownerId, 'طلب جديد من ' + currentUser.name, '', true) : null;
     orderSubmitInProgress = true;
     let submitButton = document.getElementById('confirm-order-button');
@@ -2321,6 +2343,8 @@ function renderOrders(container) {
 function reorderItems(orderId) {
     let order = db.orders.find(function(o) { return o.id === orderId; });
     if (!order || !order.items || !order.items.length) return showToast('لا توجد منتجات لإعادة الطلب', 'error');
+    let store = db.stores.find(function(item) { return String(item.id) === String(order.storeId); });
+    if (!store || isStoreBlocked(store)) return showToast('لا يمكن إعادة الطلب لأن المتجر غير متاح حالياً.', 'warning', 4500);
     cart = JSON.parse(JSON.stringify(order.items)); appliedCoupon = null; updateCartBadge(); showToast('تمت إضافة منتجات الطلب إلى السلة'); navigate('cart');
 }
 
@@ -2391,7 +2415,8 @@ function renderStoreOwnerPanel(container) {
             '<i class="fas fa-trash" style="color:var(--danger);cursor:pointer;" onclick="deleteProduct(\'' + p.id + '\')"></i></div></div>';
     }).join('');
 
-    container.innerHTML = '<div class="animate-fade"><h3 style="margin-bottom:16px;">🏪 ' + myStore.name + '</h3>' +
+    container.innerHTML = '<div class="animate-fade">' + (isStoreBlocked(myStore) ? '<div class="card" role="status" style="margin-bottom:12px;border-color:var(--warning);"><i class="fas fa-store-slash" style="color:var(--warning);"></i> متجرك محجوب إدارياً ولا يظهر للزبائن حالياً. يمكنك إدارة منتجاتك؛ إلغاء الحجب متاح للإدارة فقط.</div>' : '') +
+        '<h3 style="margin-bottom:16px;">🏪 ' + myStore.name + '</h3>' +
         '<div class="grid-2" style="margin-bottom:16px;">' +
         '<div class="stat-card"><div class="stat-value">' + totalRevenue + '</div><div class="stat-label">💰 إجمالي المبيعات</div></div>' +
         '<div class="stat-card"><div class="stat-value">' + pendingCount + '</div><div class="stat-label">⏳ طلبات معلقة</div></div>' +
@@ -3143,7 +3168,7 @@ function saveProfile() {
 }
 
 function renderFavorites(container) {
-    let favStores = db.stores.filter(function(s) { return favorites.indexOf(s.id) !== -1; });
+    let favStores = db.stores.filter(function(s) { return !isStoreBlocked(s) && favorites.indexOf(s.id) !== -1; });
     container.innerHTML = '<div class="animate-fade"><h3 style="margin-bottom:16px;">❤️ المتاجر المفضلة</h3>';
     if (!favStores.length) {
         container.innerHTML += '<div class="empty-state"><i class="fas fa-heart-broken"></i><p>لا توجد متاجر في المفضلة</p><button class="btn btn-primary btn-sm" onclick="navigate(\'home\')">تصفح المتاجر</button></div></div>';
@@ -3376,6 +3401,7 @@ function bindDevPanelActions(root) {
             else if (action === 'report-status') devUpdateReportStatus(id);
             else if (action === 'delete-report') devDeleteReport(id);
             else if (action === 'toggle-store') devToggleStore(id);
+            else if (action === 'toggle-store-block') devToggleStoreBlock(id);
             else if (action === 'delete-store') devDeleteStore(id);
             else if (action === 'edit-product') devEditProduct(button.getAttribute('data-store-id'), button.getAttribute('data-product-id'));
             else if (action === 'delete-product') devDeleteProduct(button.getAttribute('data-store-id'), button.getAttribute('data-product-id'));
@@ -3415,7 +3441,7 @@ function renderSuperAdminPanel() {
         '<button type="button" class="dev-alert-card ' + (pendingOrders.length ? 'needs-action' : '') + '" data-dev-tab="orders"><span class="dev-alert-icon"><i class="fas fa-box-open"></i></span><span><b>' + pendingOrders.length + ' طلبات تنتظر الإجراء</b><small>راجع الحالات قبل قبول أو متابعة الطلب.</small></span><i class="fas fa-chevron-left"></i></button>' +
         '<button type="button" class="dev-alert-card ' + (openReports.length ? 'needs-action' : '') + '" data-dev-tab="reports"><span class="dev-alert-icon"><i class="fas fa-flag"></i></span><span><b>' + openReports.length + ' بلاغات مفتوحة</b><small>حدّث حالة البلاغ بعد مراجعته.</small></span><i class="fas fa-chevron-left"></i></button></div>' +
         '<div class="dev-panel-note"><i class="fas fa-circle-info"></i><span>الإحصاءات محسوبة من البيانات المحمّلة في هذا الجهاز؛ لا تُعرض كأرقام تقديرية.</span></div>' +
-        '<div class="dev-stats-grid"><div class="dev-stat"><span>المستخدمون</span><b>' + uniqueUsers.length + '</b><i class="fas fa-users"></i></div><div class="dev-stat"><span>المتاجر المفتوحة</span><b>' + db.stores.filter(function(store) { return store.isOpen !== false; }).length + ' / ' + db.stores.length + '</b><i class="fas fa-store"></i></div><div class="dev-stat"><span>إجمالي الطلبات</span><b>' + db.orders.length + '</b><i class="fas fa-box"></i></div><div class="dev-stat"><span>البلاغات المفتوحة</span><b>' + openReports.length + '</b><i class="fas fa-flag"></i></div></div>';
+        '<div class="dev-stats-grid"><div class="dev-stat"><span>المستخدمون</span><b>' + uniqueUsers.length + '</b><i class="fas fa-users"></i></div><div class="dev-stat"><span>المتاجر المفتوحة</span><b>' + db.stores.filter(function(store) { return !isStoreBlocked(store) && store.isOpen !== false; }).length + ' / ' + db.stores.length + '</b><i class="fas fa-store"></i></div><div class="dev-stat"><span>المتاجر المحجوبة</span><b>' + db.stores.filter(isStoreBlocked).length + '</b><i class="fas fa-store-slash"></i></div><div class="dev-stat"><span>إجمالي الطلبات</span><b>' + db.orders.length + '</b><i class="fas fa-box"></i></div><div class="dev-stat"><span>البلاغات المفتوحة</span><b>' + openReports.length + '</b><i class="fas fa-flag"></i></div></div>';
 
     var ordersHtml = '<div class="dev-list" id="dev-list">' + db.orders.slice().reverse().map(function(order) {
         var store = db.stores.find(function(item) { return item.id === order.storeId; });
@@ -3435,8 +3461,10 @@ function renderSuperAdminPanel() {
     }).join('') + '<p id="dev-no-results" class="muted-empty" hidden>لا توجد نتائج تطابق البحث.</p></div>';
 
     var storesHtml = db.stores.map(function(store) {
+        var blocked = isStoreBlocked(store);
         var open = store.isOpen !== false;
-        return '<article class="dev-record" data-dev-searchable><div class="dev-record-main"><div class="dev-record-title"><b>' + escapeHtml(store.name || 'متجر') + '</b><span class="dev-status-tag ' + (open ? 'normal' : 'pending') + '">' + (open ? 'مفتوح' : 'مغلق') + '</span></div><p>' + (store.products || []).length + ' منتج · المعرّف ' + escapeHtml(store.id || '') + '</p></div><div class="dev-record-actions"><button type="button" class="btn btn-sm btn-outline" data-dev-action="toggle-store" data-id="' + escapeHtml(store.id) + '">' + (open ? 'إيقاف' : 'فتح') + '</button><button type="button" class="btn btn-sm btn-danger" data-dev-action="delete-store" data-id="' + escapeHtml(store.id) + '" aria-label="حذف المتجر"><i class="fas fa-trash"></i></button></div></article>';
+        var statusLabel = blocked ? 'محجوب' : (open ? 'مفتوح' : 'مغلق');
+        return '<article class="dev-record" data-dev-searchable><div class="dev-record-main"><div class="dev-record-title"><b>' + escapeHtml(store.name || 'متجر') + '</b><span class="dev-status-tag ' + (blocked || !open ? 'pending' : 'normal') + '">' + statusLabel + '</span></div><p>' + (store.products || []).length + ' منتج · المعرّف ' + escapeHtml(store.id || '') + '</p></div><div class="dev-record-actions"><button type="button" class="btn btn-sm btn-outline" data-dev-action="toggle-store" data-id="' + escapeHtml(store.id) + '">' + (open ? 'إيقاف' : 'فتح') + '</button><button type="button" class="btn btn-sm ' + (blocked ? 'btn-success' : 'btn-danger') + '" data-dev-action="toggle-store-block" data-id="' + escapeHtml(store.id) + '" aria-label="' + (blocked ? 'إلغاء حجب المتجر' : 'حجب المتجر') + '">' + (blocked ? 'إلغاء الحجب' : 'حجب') + '</button><button type="button" class="btn btn-sm btn-danger" data-dev-action="delete-store" data-id="' + escapeHtml(store.id) + '" aria-label="حذف المتجر"><i class="fas fa-trash"></i></button></div></article>';
     }).join('');
 
     var catalogHtml = '<div class="dev-content-grid"><section class="dev-form-card"><h4><i class="fas fa-bullhorn"></i> الإعلان العام</h4><textarea id="new-ad" rows="3">' + escapeHtml(db.ad || '') + '</textarea><button type="button" class="btn btn-primary btn-sm" data-dev-action="save-ad">حفظ الإعلان</button><h4><i class="fas fa-file-shield"></i> سياسة الاستخدام</h4><textarea id="new-policy" rows="5">' + escapeHtml(db.policy || '') + '</textarea><button type="button" class="btn btn-primary btn-sm" data-dev-action="save-policy">حفظ السياسة</button></section>' +
@@ -3612,6 +3640,36 @@ function devToggleStore(sid) {
     });
 }
 
+function captureStoreBlockState(store) {
+    var fields = ['isBlocked', 'blockedAt', 'unblockedAt'];
+    var snapshot = {};
+    fields.forEach(function(field) { snapshot[field] = { exists:Object.prototype.hasOwnProperty.call(store, field), value:store[field] }; });
+    return snapshot;
+}
+
+function restoreStoreBlockState(store, snapshot) {
+    Object.keys(snapshot).forEach(function(field) {
+        if (snapshot[field].exists) store[field] = snapshot[field].value;
+        else delete store[field];
+    });
+}
+
+function devToggleStoreBlock(sid) {
+    if (!requireDeveloperWrite()) return;
+    var store = db.stores.find(function(item) { return String(item.id) === String(sid); });
+    if (!store) return showToast('المتجر غير موجود', 'error');
+    var wasBlocked = isStoreBlocked(store);
+    showModal(wasBlocked ? 'إلغاء حجب المتجر' : 'حجب المتجر',
+        wasBlocked ? 'سيعود «' + escapeHtml(store.name || 'المتجر') + '» للظهور حسب حالة فتحه الحالية. هل تريد إلغاء الحجب؟' : 'سيختفي «' + escapeHtml(store.name || 'المتجر') + '» عن الزبائن ولن تُقبل طلبات جديدة منه. لن تُحذف بياناته أو طلباته السابقة. هل تريد المتابعة؟',
+        'confirm', function() {
+            var previous = captureStoreBlockState(store);
+            store.isBlocked = !wasBlocked;
+            if (wasBlocked) store.unblockedAt = Date.now();
+            else store.blockedAt = Date.now();
+            persistDevChange(wasBlocked ? 'تم إلغاء حجب المتجر' : 'تم حجب المتجر وتعطيل الطلبات الجديدة', function() { restoreStoreBlockState(store, previous); });
+        });
+}
+
 function devDeleteStore(sid) {
     if (!requireDeveloperWrite()) return;
     var store = db.stores.find(function(item) { return item.id === sid; });
@@ -3689,6 +3747,7 @@ function redeemReward(cost) {
 function renderDeals(container) {
     let deals = [];
     db.stores.forEach(function(s) {
+        if (isStoreBlocked(s)) return;
         if (s.products) {
             s.products.forEach(function(p) {
                 if (p.dealPrice && p.dealPrice < p.price) {
@@ -3741,6 +3800,8 @@ function renderQuickReorder(container) {
 function reorder(orderId) {
     let order = db.orders.find(function(o) { return o.id === orderId; });
     if (!order) return;
+    let store = db.stores.find(function(item) { return String(item.id) === String(order.storeId); });
+    if (!store || isStoreBlocked(store)) return showToast('لا يمكن إعادة الطلب لأن المتجر غير متاح حالياً.', 'warning', 4500);
     cart = JSON.parse(JSON.stringify(order.items));
     updateCartBadge();
     showToast('تم نسخ المنتجات للسلة 🛒');
@@ -3807,13 +3868,17 @@ function toggleWishlist(productId, storeId) {
 
 function renderWishlist(container) {
     container.innerHTML = '<div class="animate-fade"><h3 style="margin-bottom:16px;">💙 قائمة الأمنيات</h3>';
-    if (!wishlist.length) {
-        container.innerHTML += '<div class="empty-state"><i class="fas fa-bookmark"></i><p>لا توجد منتجات محفوظة</p></div></div>';
+    let visibleWishlist = wishlist.filter(function(item) {
+        let store = db.stores.find(function(candidate) { return String(candidate.id) === String(item.sid); });
+        return store && !isStoreBlocked(store) && (store.products || []).some(function(product) { return product && String(product.id) === String(item.pid); });
+    });
+    if (!visibleWishlist.length) {
+        container.innerHTML += '<div class="empty-state"><i class="fas fa-bookmark"></i><p>لا توجد منتجات متاحة في قائمة الأمنيات حالياً</p></div></div>';
         return;
     }
-    wishlist.forEach(function(w) {
-        let store = db.stores.find(function(s) { return s.id === w.sid; });
-        let product = store && store.products ? store.products.find(function(p) { return p.id === w.pid; }) : null;
+    visibleWishlist.forEach(function(w) {
+        let store = db.stores.find(function(s) { return String(s.id) === String(w.sid); });
+        let product = store && store.products ? store.products.find(function(p) { return String(p.id) === String(w.pid); }) : null;
         if (!product) return;
         container.innerHTML += '<div class="card animate-fade" style="display:flex;gap:12px;align-items:center;">' +
             (product.img ? '<img src="' + product.img + '" class="product-img">' : '<div class="product-img" style="background:var(--gradient-1);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">📦</div>') +
