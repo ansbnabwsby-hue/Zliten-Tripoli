@@ -372,6 +372,38 @@ header { padding:16px 20px; display:flex; justify-content:space-between; align-i
 	.storefront-open-count { display:flex;align-items:center;gap:7px;color:var(--text-muted);font-size:.66rem; }
 	.storefront-open-dot { width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 0 4px rgba(46,204,113,.1); }
 	.storefront-empty { grid-column:1 / -1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:154px;padding:19px 14px;border:1px dashed var(--border);border-radius:17px;background:rgba(255,255,255,.02);text-align:center; }
+	.app-share-panel h4,.zaltan-shop-form h3 { display:flex;align-items:center;gap:8px;margin:0 0 8px; }
+	.app-share-panel h4 i,.zaltan-shop-form h3 i { color:var(--primary); }
+	.app-share-panel p { margin:0 0 12px;color:var(--text-muted);font-size:.8rem;line-height:1.6; }
+	.share-actions { display:flex;flex-wrap:wrap;gap:9px; }
+	.share-actions .btn { width:auto;min-height:42px;text-decoration:none; }
+	.zaltan-shop-banner { display:flex;align-items:center;justify-content:space-between;gap:14px;margin:15px 0;padding:17px;border:1px solid rgba(0,212,255,.28);border-radius:19px;background:radial-gradient(circle at 100% 0,rgba(0,212,255,.18),transparent 50%),linear-gradient(145deg,rgba(0,119,182,.13),rgba(255,255,255,.025)); }
+	.zaltan-shop-banner h3 { margin:3px 0;color:var(--text); }
+	.zaltan-shop-banner p { margin:0;color:var(--text-muted);font-size:.75rem;line-height:1.6; }
+	.zaltan-shop-banner .btn { width:auto;flex:0 0 auto; }
+	.zaltan-shop-page { display:flex;flex-direction:column;gap:11px; }
+	.zaltan-shop-hero { display:flex;align-items:center;gap:14px;padding:18px;border:1px solid var(--border);border-radius:20px;background:radial-gradient(circle at 100% 0,rgba(46,204,113,.16),transparent 45%),linear-gradient(145deg,var(--card),rgba(0,212,255,.045)); }
+	.shop-hero-icon { display:grid;place-items:center;flex:0 0 52px;width:52px;height:52px;border-radius:16px;background:rgba(46,204,113,.14);color:var(--success);font-size:1.35rem; }
+	.zaltan-shop-hero h2 { margin:3px 0 5px; }
+	.zaltan-shop-hero p { color:var(--text-muted);font-size:.78rem;line-height:1.65; }
+	.shop-budget-notice { display:flex;align-items:flex-start;gap:10px;color:var(--text-muted);font-size:.74rem;line-height:1.65;border-color:rgba(46,204,113,.3); }
+	.shop-budget-notice i { color:var(--success);margin-top:2px; }
+	.zaltan-shop-form { display:flex;flex-direction:column;gap:8px; }
+	.zaltan-shop-form input,.zaltan-shop-form textarea,.zaltan-shop-form select { margin:0 0 4px; }
+	.shop-field-hint { color:var(--text-muted);font-size:.68rem;line-height:1.5; }
+	.shop-location-box { display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid var(--border);border-radius:13px;background:rgba(255,255,255,.025); }
+	.shop-location-box>div { display:flex;flex-direction:column;gap:5px;min-width:0; }
+	.shop-location-box small { color:var(--text-muted);font-size:.7rem; }
+	.shop-location-box .btn { width:auto;flex:0 0 auto; }
+	.shop-consent { display:flex;align-items:flex-start;gap:8px;margin:6px 0;color:var(--text-muted);font-size:.73rem;line-height:1.6; }
+	.shop-consent input { flex:0 0 auto;width:18px;height:18px;margin:1px 0 0; }
+	.shop-submit-button { width:100%;min-height:48px; }
+	.shop-order-details { margin:9px 0;padding:11px;border:1px solid var(--border);border-radius:13px;background:rgba(255,255,255,.025);font-size:.74rem; }
+	.shop-order-details>b { color:var(--primary); }
+	.shop-order-details ul { display:flex;flex-direction:column;gap:4px;margin:7px 0;padding-right:20px; }
+	.shop-order-details small { display:block;margin-top:4px;color:var(--text-muted); }
+	@media(max-width:520px) { .zaltan-shop-banner { align-items:stretch;flex-direction:column; }.zaltan-shop-banner .btn { width:100%; }.share-actions { flex-direction:column; }.share-actions .btn { width:100%; }.shop-location-box { align-items:stretch;flex-direction:column; }.shop-location-box .btn { width:100%; } }
+
 	.storefront-empty>i { color:var(--primary);font-size:1.45rem; }
 	.storefront-empty strong { font-size:.82rem; }
 	.storefront-empty p { color:var(--text-muted);font-size:.7rem; }
@@ -693,6 +725,7 @@ header { padding:16px 20px; display:flex; justify-content:space-between; align-i
   <div style="padding:10px 14px; cursor:pointer; border-radius:10px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'" onclick="navigate('favorites'); toggleQuickMenu();"><i class="fas fa-heart" style="color:var(--danger); margin-left:8px;"></i> المفضلة</div>
   <div style="padding:10px 14px; cursor:pointer; border-radius:10px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'" onclick="navigate('addresses'); toggleQuickMenu();"><i class="fas fa-map-marker-alt" style="color:var(--success); margin-left:8px;"></i> عناويني</div>
   <div style="padding:10px 14px; cursor:pointer; border-radius:10px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'" onclick="navigate('support'); toggleQuickMenu();"><i class="fas fa-headset" style="color:var(--warning); margin-left:8px;"></i> الدعم والمساعدة</div>
+  <div style="padding:10px 14px; cursor:pointer; border-radius:10px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'" onclick="navigate('zaltan-shop'); toggleQuickMenu();"><i class="fas fa-basket-shopping" style="color:var(--success); margin-left:8px;"></i> زلطن شوب</div>
   <div style="padding:10px 14px; cursor:pointer; border-radius:10px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'" onclick="navigate('guide'); toggleQuickMenu();"><i class="fas fa-book-open" style="color:var(--primary); margin-left:8px;"></i> طريقة الاستخدام</div>
   <div style="padding:10px 14px; cursor:pointer; border-radius:10px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'" onclick="showPolicy(); toggleQuickMenu();"><i class="fas fa-file-alt" style="color:var(--warning); margin-left:8px;"></i> سياسة الاستخدام</div>
   <div style="height:1px; background:var(--border); margin:6px 0;"></div>
@@ -717,6 +750,10 @@ const firebaseAuth = firebase.auth();
 const googleProvider = new firebase.auth.GoogleAuthProvider();
 let firebaseConnected = false;
 const DEVELOPER_EMAIL = 'muhammadmoad5@gmail.com';
+const APP_SHARE_URL = 'https://zliten-tripol.web.app/';
+const OFFICIAL_FACEBOOK_URL = 'https://www.facebook.com/share/1AEC5M4Yd4/';
+const ZALTAN_SHOP_ID = 'zaltan-shop';
+const ZALTAN_SHOP_MAX_BUDGET = 100000;
 
 // ==================== البيانات العامة ====================
 let db = {
@@ -845,6 +882,36 @@ function toggleQuickMenu() {
     let menu = document.getElementById('quick-menu');
     menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
 }
+
+function shareApp() {
+    var shareData = { title:'زلطن تريبول', text:'نزّل تطبيق زلطن تريبول واطلب احتياجاتك من زلطن بسهولة.', url:APP_SHARE_URL };
+    if (navigator.share) {
+        return navigator.share(shareData).then(function() { showToast('شكراً لمشاركة زلطن تريبول'); }).catch(function(error) {
+            if (error && error.name === 'AbortError') return;
+            copyAppLink();
+        });
+    }
+    copyAppLink();
+}
+
+function copyAppLink() {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(APP_SHARE_URL).then(function() { showToast('تم نسخ رابط التطبيق لمشاركته'); }).catch(function() {
+            var field = document.createElement('textarea'); field.value = APP_SHARE_URL; field.style.position = 'fixed'; field.style.opacity = '0'; document.body.appendChild(field); field.select();
+            var copied = false; try { copied = document.execCommand('copy'); } catch (error) {} document.body.removeChild(field);
+            showToast(copied ? 'تم نسخ رابط التطبيق لمشاركته' : 'رابط التطبيق: ' + APP_SHARE_URL, copied ? 'success' : 'info', 6000);
+        });
+        return;
+    }
+    var field = document.createElement('textarea'); field.value = APP_SHARE_URL; field.style.position = 'fixed'; field.style.opacity = '0'; document.body.appendChild(field); field.select();
+    var copied = false; try { copied = document.execCommand('copy'); } catch (error) {} document.body.removeChild(field);
+    showToast(copied ? 'تم نسخ رابط التطبيق لمشاركته' : 'رابط التطبيق: ' + APP_SHARE_URL, copied ? 'success' : 'info', 6000);
+}
+
+function renderSharePanel() {
+    return '<section class="card app-share-panel"><h4><i class="fas fa-bullhorn"></i> ساعدنا في نشر زلطن تريبول</h4><p>شارك رابط التطبيق مع أهلك وأصحابك لتسهيل الوصول إلى متاجر وخدمات زلطن.</p><div class="share-actions"><button type="button" class="btn btn-primary" onclick="shareApp()"><i class="fas fa-share-nodes"></i> مشاركة التطبيق</button><a class="btn btn-outline" href="' + OFFICIAL_FACEBOOK_URL + '" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook"></i> تواصل معنا على فيسبوك</a></div></section>';
+}
+
 
 function getFirebaseStatus() {
     if (!firebaseDataLoaded) return { label:firebaseConnected ? 'جارٍ تحميل البيانات — الحفظ متوقف' : 'نسخة مؤقتة — الحفظ متوقف', className:'is-offline' };
@@ -1333,6 +1400,7 @@ function navigate(page, param, options) {
     else if (page === 'coupons') renderCoupons(content);
     else if (page === 'addresses') renderAddresses(content);
     else if (page === 'support') renderSupport(content);
+    else if (page === 'zaltan-shop') renderZaltanShop(content);
     else if (page === 'guide') renderGuide(content);
     else if (page === 'loyalty') renderLoyalty(content);
     else if (page === 'deals') renderDeals(content);
@@ -1778,6 +1846,7 @@ function renderHome(container) {
         '<label class="storefront-search"><i class="fas fa-search"></i><input type="search" id="search-input" aria-label="ابحث عن متجر أو منتج" placeholder="اسم متجر أو منتج..." autocomplete="off" value="' + escapeHtml(searchQuery) + '" oninput="handleSearch(this.value)"><button type="button" class="storefront-search-clear" aria-label="مسح البحث" style="display:' + (searchQuery ? 'grid' : 'none') + '" onclick="document.getElementById(\'search-input\').value=\'\';handleSearch(\'\')"><i class="fas fa-times"></i></button></label>' +
         '<div class="categories-scroll hide-scroll" aria-label="تصنيفات المتاجر">' + categoriesHtml + '</div>' +
         '<div class="storefront-shortcuts"><button type="button" onclick="randomStoreOrProduct()"><i class="fas fa-wand-magic-sparkles"></i> اقترح لي</button><button type="button" onclick="navigate(\'coupons\')"><i class="fas fa-ticket-alt"></i> كوبونات</button><button type="button" onclick="navigate(\'favorites\')"><i class="fas fa-heart"></i> المفضلة</button></div>' +
+        '<section class="zaltan-shop-banner"><div><span class="storefront-eyebrow">خدمة التسوّق حسب طلبك</span><h3>زلطن شوب</h3><p>اكتب احتياجاتك من أي سوق وحدد الحد الأعلى لمشترياتك، ونوصلها لبابك.</p></div><button type="button" class="btn btn-primary" onclick="navigate(\'zaltan-shop\')"><i class="fas fa-basket-shopping"></i> اطلب أي شيء</button></section>' +
         '<section class="storefront-results"><div class="storefront-section-heading"><div><span class="storefront-eyebrow">اكتشف ما حولك</span><h3>متاجر تريبول</h3></div><span class="storefront-count" id="store-results-count">' + filteredStores.length + ' متجر</span></div>' +
         '<div id="stores-list" class="storefront-grid">' + (renderStoreCards(filteredStores) || '<div class="storefront-empty"><i class="fas fa-store-slash"></i><strong>ما لقينا متاجر هنا</strong><p>' + (searchQuery ? 'جرب كلمة ثانية أو غيّر التصنيف.' : 'ستظهر المتاجر عند إضافتها إلى السوق.') + '</p></div>') + '</div></section>' +
         '<div class="storefront-open-count"><span class="storefront-open-dot"></span> ' + openCount + ' من المتاجر المعروضة مفتوحة الآن</div></div>';
@@ -2267,6 +2336,114 @@ function confirmOrder() {
     });
 }
 
+function fillZaltanShopAddress(value) {
+    if (value === '') return;
+    var address = (currentUser.addresses || [])[Number(value)];
+    var field = document.getElementById('zaltan-shop-address');
+    if (address && field) field.value = address.text || '';
+}
+
+function updateZaltanShopLocationStatus() {
+    var status = document.getElementById('zaltan-shop-location-status');
+    if (!status) return;
+    if (!currentLocation) status.textContent = 'لم يتم تحديد موقع التوصيل بعد';
+    else status.textContent = isInsideZaltan(currentLocation) ? 'تم تحديد الموقع داخل نطاق زلطن' : 'الموقع المحدد خارج نطاق زلطن';
+}
+
+function renderZaltanShop(container) {
+    var addressOptions = (currentUser.addresses || []).map(function(address, index) {
+        return '<option value="' + index + '">' + escapeHtml(address.label || 'عنوان محفوظ') + ' — ' + escapeHtml(String(address.text || '').slice(0, 45)) + '</option>';
+    }).join('');
+    container.innerHTML = '<div class="animate-fade zaltan-shop-page">' +
+        '<button type="button" class="btn btn-ghost btn-sm" onclick="navigate(\'home\')"><i class="fas fa-arrow-right"></i> العودة للمتاجر</button>' +
+        '<section class="zaltan-shop-hero"><span class="shop-hero-icon"><i class="fas fa-basket-shopping"></i></span><div><span class="storefront-eyebrow">أنت تختار، ونحن نساعدك</span><h2>زلطن شوب</h2><p>تبي خبزة من سوق معين وخضرة من مكان ثاني؟ اكتب طلبك وحدد ميزانيتك، وسنرتب معك الشراء والتوصيل.</p></div></section>' +
+        '<div class="card shop-budget-notice"><i class="fas fa-shield-halved"></i><span>سقف الميزانية يخص قيمة المشتريات فقط. لن يُتجاوز دون موافقتك. قد تُضاف أجرة توصيل إن وجدت، وسيتم تأكيدها قبل تنفيذ الطلب.</span></div>' +
+        '<section class="card zaltan-shop-form"><h3><i class="fas fa-list-check"></i> ماذا تريد أن نشتري؟</h3>' +
+        '<label for="zaltan-shop-items">قائمة الأغراض <span class="checkout-section-note">(كل غرض في سطر، بحد أقصى 30 غرضاً)</span></label>' +
+        '<textarea id="zaltan-shop-items" rows="6" maxlength="3000" placeholder="خبزة عربية — 2\nكيلو طماطم\nخيار وخس\nاكتب الكمية أو المواصفات بجانب كل غرض"></textarea>' +
+        '<label for="zaltan-shop-market">السوق أو المنطقة المفضلة <span class="checkout-section-note">(اختياري)</span></label><input id="zaltan-shop-market" maxlength="100" placeholder="مثال: سوق الجمعة أو سوق الخضرة القريب من...">' +
+        '<label for="zaltan-shop-budget">الحد الأعلى لقيمة المشتريات (د.ل) <span style="color:var(--danger)">*</span></label><input id="zaltan-shop-budget" type="number" min="1" max="' + ZALTAN_SHOP_MAX_BUDGET + '" step="0.5" inputmode="decimal" placeholder="مثال: 50"><small class="shop-field-hint">اختر مبلغاً يغطي الأغراض. لن نشتري بما يتجاوز هذا السقف إلا بعد موافقتك.</small>' +
+        '<label for="zaltan-shop-substitution">إذا لم يتوفر غرض</label><select id="zaltan-shop-substitution"><option value="ask">اتصلوا بي قبل استبداله</option><option value="skip">اتركوا الغرض غير المتوفر</option></select>' +
+        '<label for="zaltan-shop-notes">ملاحظات إضافية <span class="checkout-section-note">(اختياري)</span></label><textarea id="zaltan-shop-notes" rows="3" maxlength="500" placeholder="النوع أو الحجم أو العلامة التجارية المفضلة..."></textarea></section>' +
+        '<section class="card zaltan-shop-form"><h3><i class="fas fa-truck-fast"></i> أين نوصل طلبك؟</h3>' +
+        (addressOptions ? '<label for="zaltan-shop-saved-address">اختر عنواناً محفوظاً</label><select id="zaltan-shop-saved-address" onchange="fillZaltanShopAddress(this.value)"><option value="">اختيار عنوان محفوظ (اختياري)</option>' + addressOptions + '</select>' : '') +
+        '<label for="zaltan-shop-address">عنوان التسليم بالتفصيل <span style="color:var(--danger)">*</span></label><textarea id="zaltan-shop-address" rows="3" maxlength="300" placeholder="الحي، الشارع، وأقرب علامة مميزة"></textarea>' +
+        '<label for="zaltan-shop-phone">رقم الهاتف <span style="color:var(--danger)">*</span></label><input id="zaltan-shop-phone" type="tel" inputmode="tel" autocomplete="tel" value="' + escapeHtml(currentUser.phone || '') + '" placeholder="رقم للتواصل معك">' +
+        '<label for="zaltan-shop-time">وقت التوصيل المفضل</label><select id="zaltan-shop-time"><option value="now">بأقرب وقت</option><option value="30">خلال 30 دقيقة</option><option value="60">خلال ساعة</option><option value="120">خلال ساعتين</option></select>' +
+        '<div class="shop-location-box"><div><b><i class="fas fa-location-dot"></i> موقع التسليم</b><small id="zaltan-shop-location-status">' + (currentLocation ? (isInsideZaltan(currentLocation) ? 'تم تحديد الموقع داخل نطاق زلطن' : 'الموقع المحدد خارج نطاق زلطن') : 'لم يتم تحديد موقع التوصيل بعد') + '</small></div><button type="button" class="btn btn-outline btn-sm" onclick="getCurrentLocation(updateZaltanShopLocationStatus)"><i class="fas fa-crosshairs"></i> تحديد موقعي</button></div>' +
+        '<label class="shop-consent"><input type="checkbox" id="zaltan-shop-consent"><span>أوافق على التواصل معي بشأن الطلب، وأفهم أن المشتريات لن تتجاوز سقف الميزانية الذي حددته دون موافقتي.</span></label>' +
+        '<button type="button" id="zaltan-shop-submit" class="btn btn-primary shop-submit-button" onclick="submitZaltanShopOrder()"><i class="fas fa-paper-plane"></i> إرسال طلب زلطن شوب</button>' +
+        '<p class="shop-field-hint">سيظهر الطلب في «طلباتي» بعد تأكيد حفظه، ويمكنك متابعة حالته من هناك.</p></section></div>';
+}
+
+function isZaltanShopOrder(order) {
+    return !!order && (order.orderType === ZALTAN_SHOP_ID || order.isZaltanShop === true || order.storeId === ZALTAN_SHOP_ID);
+}
+
+function submitZaltanShopOrder() {
+    if (orderSubmitInProgress) return;
+    var itemsField = document.getElementById('zaltan-shop-items');
+    var items = itemsField ? itemsField.value.split(/\r?\n/).map(function(item) { return item.trim(); }).filter(Boolean) : [];
+    var budgetField = document.getElementById('zaltan-shop-budget');
+    var budget = budgetField ? Number(budgetField.value) : 0;
+    var addressField = document.getElementById('zaltan-shop-address');
+    var address = addressField ? addressField.value.trim() : '';
+    var phoneField = document.getElementById('zaltan-shop-phone');
+    var phone = phoneField ? phoneField.value.trim() : '';
+    var marketField = document.getElementById('zaltan-shop-market');
+    var market = marketField ? marketField.value.trim() : '';
+    var notesField = document.getElementById('zaltan-shop-notes');
+    var notes = notesField ? notesField.value.trim() : '';
+    var substitution = document.getElementById('zaltan-shop-substitution').value;
+    var time = document.getElementById('zaltan-shop-time').value;
+    if (!items.length || items.length > 30 || items.some(function(item) { return item.length > 160; })) return showToast('اكتب من غرض واحد إلى 30 غرضاً، واجعل وصف كل غرض أقل من 160 حرفاً.', 'error', 5000);
+    if (!Number.isFinite(budget) || budget <= 0 || budget > ZALTAN_SHOP_MAX_BUDGET) return showToast('أدخل سقفاً صحيحاً للميزانية من 1 إلى ' + ZALTAN_SHOP_MAX_BUDGET + ' د.ل.', 'error');
+    if (!address || !phone || phone.replace(/\D/g, '').length < 7) return showToast('أكمل عنوان التسليم ورقم هاتف صحيحاً للتواصل.', 'error');
+    if (!currentLocation) return showToast('حدد موقع التسليم من زر «تحديد موقعي» قبل إرسال الطلب.', 'error', 5000);
+    if (!isInsideZaltan(currentLocation)) return showToast('طلبات التوصيل متاحة داخل نطاق زلطن فقط.', 'error', 5000);
+    var consent = document.getElementById('zaltan-shop-consent');
+    if (!consent || !consent.checked) return showToast('يرجى الموافقة على شروط تنفيذ طلب المشتريات.', 'error');
+    var customerAuthUid = firebaseAuth && firebaseAuth.currentUser ? firebaseAuth.currentUser.uid : '';
+    if (!customerAuthUid) return showToast('سجّل الدخول بحساب موثّق قبل إرسال الطلب.', 'error');
+    var requestItems = items.map(function(description) { return { name:description, quantity:1, price:0 }; });
+    var order = {
+        id:'SHOP' + Date.now(), orderType:ZALTAN_SHOP_ID, isZaltanShop:true, storeId:ZALTAN_SHOP_ID,
+        userId:currentUser.id, userName:currentUser.name, customerAuthUid:customerAuthUid,
+        items:requestItems, shoppingItems:items, shoppingMarket:market,
+        budgetLimit:budget, total:0, actualShoppingSpend:null, collectedAmount:null,
+        location:address, phone:phone, coordinates:{ lat:Number(currentLocation.lat), lng:Number(currentLocation.lng), accuracy:Number(currentLocation.accuracy || 0) },
+        notes:notes, substitutionPreference:substitution, status:'قيد الانتظار ⏳',
+        createdAt:new Date().toLocaleString('ar-LY'), deliveryTime:time, driverId:null, deliveryProof:null, orderChat:[]
+    };
+    db.orders.push(order);
+    var devNotifications = [];
+    db.users.filter(function(user) { return user && (user.type === 'developer' || user.role === 'developer' || user.isDeveloper === true || user.type === 'admin' || user.role === 'admin'); }).forEach(function(user) {
+        var notification = addNotification(user.id, 'طلب مشتريات جديد في زلطن شوب من ' + currentUser.name, '', true);
+        if (notification) devNotifications.push({ user:user, id:notification.id });
+    });
+    orderSubmitInProgress = true;
+    var submitButton = document.getElementById('zaltan-shop-submit');
+    if (submitButton) { submitButton.disabled = true; submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ إرسال الطلب...'; }
+    sync().then(function(saved) {
+        if (!saved) {
+            db.orders = db.orders.filter(function(existing) { return existing.id !== order.id; });
+            devNotifications.forEach(function(entry) { if (Array.isArray(entry.user.notifications)) entry.user.notifications = entry.user.notifications.filter(function(item) { return item.id !== entry.id; }); });
+            orderSubmitInProgress = false;
+            if (submitButton) { submitButton.disabled = false; submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال طلب زلطن شوب'; }
+            showToast('لم يُحفظ طلب المشتريات؛ لم نعتبره مرسلاً. تحقق من الاتصال أو صلاحيات الحفظ وحاول لاحقاً.', 'error', 6500);
+            return;
+        }
+        orderSubmitInProgress = false;
+        showToast('تم إرسال طلب زلطن شوب للمراجعة بنجاح.');
+        navigate('orders');
+    }).catch(function() {
+        db.orders = db.orders.filter(function(existing) { return existing.id !== order.id; });
+        orderSubmitInProgress = false;
+        if (submitButton) { submitButton.disabled = false; submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال طلب زلطن شوب'; }
+        showToast('تعذر حفظ الطلب. لم نعتبره مرسلاً؛ حاول مرة أخرى لاحقاً.', 'error', 6000);
+    });
+}
+
 function getOrderStatusMeta(status) {
     status = status || '';
     if (status.indexOf('تسليم') !== -1) return { key:'done', index:4, label:'تم التسليم', icon:'fa-check-double', cls:'status-done' };
@@ -2315,21 +2492,24 @@ function renderOrders(container) {
     let orderCardsHtml = '';
     visibleOrders.forEach(function(o) {
         let meta = getOrderStatusMeta(o.status), store = db.stores.find(function(s) { return s.id === o.storeId; });
+        let isShopOrder = isZaltanShopOrder(o);
         let items = o.items || [], itemCount = items.reduce(function(sum, item) { return sum + (Number(item.quantity) || 1); }, 0);
+        let shoppingDetailsHtml = isShopOrder ? '<div class="shop-order-details"><b><i class="fas fa-basket-shopping"></i> قائمة المشتريات</b><ul>' + (o.shoppingItems || []).map(function(item) { return '<li>' + escapeHtml(item) + '</li>'; }).join('') + '</ul>' + (o.shoppingMarket ? '<small>السوق المفضل: ' + escapeHtml(o.shoppingMarket) + '</small>' : '') + '<small>سقف المشتريات: ' + Number(o.budgetLimit || 0).toLocaleString('ar-LY') + ' د.ل</small></div>' : '';
         let timeLabel = o.deliveryTime === 'now' ? 'الآن' : o.deliveryTime === '30' ? 'خلال 30 دقيقة' : o.deliveryTime === '60' ? 'خلال ساعة' : 'خلال ساعتين';
         let shortId = String(o.id || '').slice(-6);
         let orderIndex = db.orders.indexOf(o);
-        let storeReviewAction = meta.key !== 'done' ? '' : (o.storeReview ? '<span class="tag tag-success">تم تقييم المتجر</span>' : (canReviewOrder(o, 'store', o.storeId) ? '<button class="btn btn-sm btn-warning" data-rate-store-index="' + orderIndex + '"><i class="fas fa-star"></i> تقييم المتجر</button>' : ''));
+        let storeReviewAction = isShopOrder || meta.key !== 'done' ? '' : (o.storeReview ? '<span class="tag tag-success">تم تقييم المتجر</span>' : (canReviewOrder(o, 'store', o.storeId) ? '<button class="btn btn-sm btn-warning" data-rate-store-index="' + orderIndex + '"><i class="fas fa-star"></i> تقييم المتجر</button>' : ''));
         let driverReviewAction = meta.key !== 'done' || !o.driverId ? '' : (o.driverReview || o.driverRated ? '<span class="tag tag-success">تم تقييم السائق</span>' : (canReviewOrder(o, 'driver', o.driverId) ? '<button class="btn btn-sm btn-warning" data-rate-driver-index="' + orderIndex + '"><i class="fas fa-star"></i> تقييم السائق</button>' : ''));
         orderCardsHtml += '<div class="card order-card-pro">' +
-            '<div class="order-card-head"><div class="order-store-line"><div class="order-store-icon"><i class="fas fa-shopping-bag"></i></div><div><b>' + (store ? store.name : 'طلب توصيل') + '</b><div class="order-number">طلب #' + shortId + ' • ' + (o.createdAt || '') + '</div></div></div><span class="status-badge ' + meta.cls + '"><i class="fas ' + meta.icon + '"></i> ' + meta.label + '</span></div>' +
+            '<div class="order-card-head"><div class="order-store-line"><div class="order-store-icon"><i class="fas fa-shopping-bag"></i></div><div><b>' + (isShopOrder ? 'زلطن شوب' : store ? store.name : 'طلب توصيل') + '</b><div class="order-number">طلب #' + shortId + ' • ' + escapeHtml(o.createdAt || '') + '</div></div></div><span class="status-badge ' + meta.cls + '"><i class="fas ' + meta.icon + '"></i> ' + meta.label + '</span></div>' +
             '<div class="order-card-body">' + renderOrderProgress(meta) +
-            '<div class="order-info-row"><i class="fas fa-box"></i><span>' + itemCount + ' ' + (itemCount === 1 ? 'منتج' : 'منتجات') + '</span><span>•</span><span>' + timeLabel + '</span></div>' +
-            '<div class="order-info-row"><i class="fas fa-location-dot"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (o.location || 'عنوان التوصيل محفوظ') + '</span></div>' +
-            '<div class="order-total-box"><small>إجمالي الطلب</small><strong>' + (o.total || 0) + ' د.ل</strong></div>' +
+            '<div class="order-info-row"><i class="fas fa-box"></i><span>' + itemCount + ' ' + (itemCount === 1 ? 'غرض' : 'أغراض') + '</span><span>•</span><span>' + timeLabel + '</span></div>' +
+            shoppingDetailsHtml +
+            '<div class="order-info-row"><i class="fas fa-location-dot"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escapeHtml(o.location || 'عنوان التوصيل محفوظ') + '</span></div>' +
+            '<div class="order-total-box"><small>' + (isShopOrder ? 'سقف المشتريات' : 'إجمالي الطلب') + '</small><strong>' + (isShopOrder ? Number(o.budgetLimit || 0) : Number(o.total || 0)).toLocaleString('ar-LY') + ' د.ل</strong></div>' +
             '<div class="order-card-actions"><button class="btn btn-sm btn-outline" onclick="navigate(\'track\',\'' + o.id + '\')"><i class="fas fa-map-marked-alt"></i> تتبع الطلب</button>' +
             storeReviewAction + driverReviewAction +
-            (meta.key === 'done' ? '<button class="btn btn-sm btn-outline" onclick="reorderItems(\'' + o.id + '\')"><i class="fas fa-rotate-right"></i> إعادة الطلب</button>' : '') + '</div></div></div>';
+            (meta.key === 'done' && !isShopOrder ? '<button class="btn btn-sm btn-outline" onclick="reorderItems(\'' + o.id + '\')"><i class="fas fa-rotate-right"></i> إعادة الطلب</button>' : '') + '</div></div></div>';
     });
     container.innerHTML += orderCardsHtml + '</div>';
     container.querySelectorAll('[data-rate-store-index]').forEach(function(button) {
@@ -2494,14 +2674,15 @@ function acceptOrder(orderId) {
     var previousStatus = order.status;
     var acceptedStatus = 'تم القبول ✅ (بانتظار سائق)';
     var queuedNotifications = [];
+    var isShopOrder = isZaltanShopOrder(order);
     function queueNotification(userId, text) {
         var notification = addNotification(userId, text, '', true);
         if (notification) queuedNotifications.push({ userId:userId, notificationId:notification.id });
     }
     order.status = acceptedStatus;
-    queueNotification(order.userId, 'تم قبول طلبك من المتجر وهو الآن بانتظار سائق');
+    queueNotification(order.userId, isShopOrder ? 'تمت مراجعة طلب زلطن شوب، وهو الآن بانتظار سائق للتسوق والتوصيل' : 'تم قبول طلبك من المتجر وهو الآن بانتظار سائق');
     db.users.filter(function(user) { return user.type === 'driver'; }).forEach(function(driver) {
-        queueNotification(driver.id, '🚀 طلب جديد في منطقتك من ' + order.userName);
+        queueNotification(driver.id, isShopOrder ? '🛒 طلب مشتريات جديد في زلطن شوب بانتظار سائق: ' + order.userName : '🚀 طلب جديد في منطقتك من ' + order.userName);
     });
     sync().then(function(saved) {
         if (!saved) {
@@ -2572,7 +2753,13 @@ function renderDriver(container) {
     };
     let renderOrderDetails = function(order) {
         let items = Array.isArray(order.items) ? order.items.length : 0;
-        return '<div class="driver-detail-chips"><span><i class="fas fa-money-bill-wave"></i> ' + money(order.total) + ' د.ل</span><span><i class="fas fa-box"></i> ' + items + ' منتجات</span><span><i class="fas fa-clock"></i> ' + safe(timeLabel(order.deliveryTime)) + '</span></div>';
+        let amountLabel = isZaltanShopOrder(order) ? 'سقف الشراء حتى ' + money(order.budgetLimit) + ' د.ل' : money(order.total) + ' د.ل';
+        return '<div class="driver-detail-chips"><span><i class="fas fa-money-bill-wave"></i> ' + safe(amountLabel) + '</span><span><i class="fas fa-box"></i> ' + items + (isZaltanShopOrder(order) ? ' أغراض' : ' منتجات') + '</span><span><i class="fas fa-clock"></i> ' + safe(timeLabel(order.deliveryTime)) + '</span></div>';
+    };
+    let renderShoppingDetails = function(order) {
+        if (!isZaltanShopOrder(order)) return '';
+        let lines = Array.isArray(order.shoppingItems) ? order.shoppingItems : [];
+        return '<div class="driver-note"><i class="fas fa-basket-shopping"></i><span><b>قائمة زلطن شوب</b><br>' + lines.map(function(item) { return '• ' + safe(item); }).join('<br>') + (order.shoppingMarket ? '<br><small>السوق المفضل: ' + safe(order.shoppingMarket) + '</small>' : '') + '<br><small>الاستبدال: ' + (order.substitutionPreference === 'skip' ? 'اترك الغرض غير المتوفر' : 'اتصل بالزبون أولاً') + '</small></span></div>';
     };
 
     let assignedHtml = myTasks.map(function(order) {
@@ -2588,7 +2775,7 @@ function renderDriver(container) {
             '<div class="driver-order-heading"><div><span class="driver-order-kicker">مهمة توصيل</span><h4>طلب #' + orderRef + '</h4></div><span class="driver-task-status ' + (arrived ? 'is-arrived' : 'is-moving') + '"><i class="fas ' + (arrived ? 'fa-location-dot' : 'fa-motorcycle') + '"></i> ' + safe(status) + '</span></div>' +
             '<div class="driver-customer-row"><span class="driver-avatar"><i class="fas fa-user"></i></span><div class="driver-customer-copy"><strong>' + safe(order.userName || 'الزبون') + '</strong><small>العميل</small></div>' + (phoneLink ? '<a class="driver-call-button" href="tel:' + safe(phoneLink) + '" aria-label="اتصال بالزبون"><i class="fas fa-phone"></i></a>' : '') + '</div>' +
             '<div class="driver-location-row"><i class="fas fa-location-dot"></i><div><small>عنوان التسليم</small><p>' + safe(location) + '</p></div></div>' +
-            renderOrderDetails(order) +
+            renderOrderDetails(order) + renderShoppingDetails(order) +
             (order.notes ? '<div class="driver-note"><i class="fas fa-note-sticky"></i><span><b>ملاحظات العميل</b><br>' + safe(order.notes) + '</span></div>' : '') +
             (href ? '<a class="driver-map-link" href="' + href + '" target="_blank" rel="noopener noreferrer"><i class="fas fa-map-marked-alt"></i> افتح الموقع في الخرائط <i class="fas fa-arrow-up-left-from-square"></i></a>' : '') +
             '<div class="driver-card-actions">' +
@@ -2605,9 +2792,9 @@ function renderDriver(container) {
         let href = mapUrl(order);
         return '<article class="driver-order-card driver-available-card">' +
             '<div class="driver-order-heading"><div><span class="driver-order-kicker">طلب بانتظار سائق</span><h4>طلب #' + orderRef + '</h4></div><span class="driver-task-status is-open"><i class="fas fa-bolt"></i> متاح الآن</span></div>' +
-            '<div class="driver-available-summary"><div><small>المتجر</small><strong>' + safe(store ? store.name : 'متجر محلي') + '</strong></div><span class="driver-summary-separator"></span><div><small>العميل</small><strong>' + safe(order.userName || 'الزبون') + '</strong></div></div>' +
+            '<div class="driver-available-summary"><div><small>' + (isZaltanShopOrder(order) ? 'الخدمة' : 'المتجر') + '</small><strong>' + safe(store ? store.name : isZaltanShopOrder(order) ? 'زلطن شوب' : 'متجر محلي') + '</strong></div><span class="driver-summary-separator"></span><div><small>العميل</small><strong>' + safe(order.userName || 'الزبون') + '</strong></div></div>' +
             '<div class="driver-location-row"><i class="fas fa-location-dot"></i><div><small>منطقة التسليم</small><p>' + safe(order.location || 'لم يحدد العنوان') + '</p></div></div>' +
-            renderOrderDetails(order) +
+            renderOrderDetails(order) + renderShoppingDetails(order) +
             (href ? '<a class="driver-map-link" href="' + href + '" target="_blank" rel="noopener noreferrer"><i class="fas fa-map-marked-alt"></i> معاينة الموقع على الخريطة</a>' : '') +
             '<button type="button" class="btn btn-primary driver-claim-button" data-driver-action="claim" data-order-id="' + orderId + '"><i class="fas fa-hand-paper"></i> استلام هذه المهمة</button></article>';
     }).join('');
@@ -2647,13 +2834,26 @@ function renderDriver(container) {
 
 function openDeliverModal(oid) {
     tempImageBase64 = '';
-    showModal("📸 إثبات التسليم", '<div style="text-align:center;"><p>التقط صورة كإثبات للتسليم (اختياري)</p><div class="delivery-proof" onclick="document.getElementById(\'proof-input\').click()"><i class="fas fa-camera fa-2x" style="color:var(--primary);margin-bottom:8px;"></i><div>اضغط لاختيار صورة</div></div><input id="proof-input" type="file" accept="image/*" style="display:none;" onchange="encodeImage(this)"></div><input id="deliver-amount" type="number" placeholder="المبلغ المستلم (د.ل)">', 'confirm', function() {
-        let amount = parseInt(document.getElementById('deliver-amount').value);
-        if (!amount) return showToast('أدخل المبلغ المستلم', 'error');
+    var deliveryOrder = db.orders.find(function(item) { return item.id === oid; });
+    if (!deliveryOrder || deliveryOrder.driverId !== currentUser.id) return showToast('هذه المهمة ليست مسجلة باسمك', 'error');
+    var isShopOrder = isZaltanShopOrder(deliveryOrder);
+    var purchaseField = isShopOrder ? '<p>سقف مشتريات العميل: <b>' + Number(deliveryOrder.budgetLimit || 0).toLocaleString('ar-LY') + ' د.ل</b></p><label for="shop-actual-spend">قيمة المشتريات الفعلية (د.ل)</label><input id="shop-actual-spend" type="number" min="0.01" max="' + Number(deliveryOrder.budgetLimit || 0) + '" step="0.01" placeholder="المبلغ في الفاتورة">' : '';
+    showModal("📸 إثبات التسليم", '<div style="text-align:center;"><p>التقط صورة كإثبات للتسليم (اختياري)</p><div class="delivery-proof" onclick="document.getElementById(\'proof-input\').click()"><i class="fas fa-camera fa-2x" style="color:var(--primary);margin-bottom:8px;"></i><div>اضغط لاختيار صورة</div></div><input id="proof-input" type="file" accept="image/*" style="display:none;" onchange="encodeImage(this)"></div>' + purchaseField + '<label for="deliver-amount">' + (isShopOrder ? 'الإجمالي المستلم من العميل (د.ل)' : 'المبلغ المستلم (د.ل)') + '</label><input id="deliver-amount" type="number" min="0.01" step="0.01" placeholder="المبلغ المستلم">', 'confirm', function() {
+        let amount = Number(document.getElementById('deliver-amount').value);
+        if (!Number.isFinite(amount) || amount <= 0) return showToast('أدخل المبلغ المستلم', 'error');
         let order = db.orders.find(function(o) { return o.id === oid; });
+        if (!order || order.driverId !== currentUser.id) return showToast('هذه المهمة ليست مسجلة باسمك', 'error');
+        var actualShoppingSpend = 0;
+        if (isShopOrder) {
+            actualShoppingSpend = Number(document.getElementById('shop-actual-spend').value);
+            if (!Number.isFinite(actualShoppingSpend) || actualShoppingSpend <= 0) return showToast('أدخل قيمة المشتريات حسب الفاتورة.', 'error');
+            if (actualShoppingSpend > Number(order.budgetLimit || 0)) return showToast('قيمة الفاتورة أعلى من سقف العميل. لا تكمل الشراء قبل أخذ موافقته وتحديث الطلب.', 'error', 6000);
+            if (amount < actualShoppingSpend) return showToast('الإجمالي المستلم لا يمكن أن يكون أقل من قيمة المشتريات.', 'error');
+        }
         order.status = 'تم التسليم ✅';
         order.deliveredAt = new Date().toISOString();
         order.collectedAmount = amount;
+        if (isShopOrder) order.actualShoppingSpend = actualShoppingSpend;
         stopLiveLocationTracking(true);
         database.ref('liveLocations/' + oid).remove().catch(function(){});
         order.deliveryProof = tempImageBase64 || null;
@@ -2661,7 +2861,7 @@ function openDeliverModal(oid) {
         let u = db.users.find(function(u) { return u.id === currentUser.id; });
         if (u) u.cashCollected = currentUser.cashCollected;
         if (!order.orderChat) order.orderChat = [];
-        order.orderChat.push({ sender: 'system', text: 'تم تسليم الطلب واستلام ' + amount + ' د.ل' });
+        order.orderChat.push({ sender: 'system', text: 'تم تسليم الطلب واستلام ' + amount + ' د.ل' + (isShopOrder ? '؛ قيمة المشتريات ' + actualShoppingSpend + ' د.ل' : '') });
         addNotification(order.userId, 'تم تسليم طلبك. شكراً لاستخدامك زلطن');
         sync(); navigate('driver'); showToast('تم التسليم وإضافة ' + amount + ' د.ل 💰');
     });
@@ -2806,6 +3006,7 @@ function renderOrderTracking(container, orderId) {
     let order = db.orders.find(function(o) { return o.id === orderId; });
     if (!order) return navigate('home');
     let store = db.stores.find(function(s) { return s.id === order.storeId; });
+    let isShopOrder = isZaltanShopOrder(order);
     let isCustomer = order.userId === currentUser.id;
     let isStoreOwner = store && store.ownerId === currentUser.id;
     let isDriver = order.driverId === currentUser.id;
@@ -2828,6 +3029,7 @@ function renderOrderTracking(container, orderId) {
         let senderName = m.sender === currentUser.id ? 'أنت' : (sender ? sender.name : 'مستخدم');
         return '<div class="chat-bubble ' + (m.sender === currentUser.id ? 'bubble-left' : 'bubble-right') + '"><span class="chat-message-text"><b>' + escapeHtml(senderName) + ':</b> ' + messageText + '</span><small class="chat-message-meta">' + messageTime + '</small></div>';
     }).join('');
+    let shopTrackingHtml = isShopOrder ? '<div class="shop-order-details"><b><i class="fas fa-basket-shopping"></i> طلب زلطن شوب</b><ul>' + (order.shoppingItems || []).map(function(item) { return '<li>' + escapeHtml(item) + '</li>'; }).join('') + '</ul>' + (order.shoppingMarket ? '<small>السوق المفضل: ' + escapeHtml(order.shoppingMarket) + '</small>' : '') + '<small>سقف المشتريات: ' + Number(order.budgetLimit || 0).toLocaleString('ar-LY') + ' د.ل</small>' + (Number(order.actualShoppingSpend) > 0 ? '<small>قيمة المشتريات المسجلة: ' + Number(order.actualShoppingSpend).toLocaleString('ar-LY') + ' د.ل</small>' : '') + '</div>' : '';
 
     container.innerHTML = '<div class="animate-fade">' +
             '<button class="btn btn-sm btn-outline" style="margin-bottom:12px" onclick="goBackFromOrder()"><i class="fas fa-arrow-right"></i> عودة</button>' +
@@ -2838,10 +3040,11 @@ function renderOrderTracking(container, orderId) {
         '<div class="step ' + (step2 ? 'active' : '') + ' ' + (step3 ? 'completed' : '') + '"><div class="step-circle"><i class="fas fa-check"></i></div><div class="step-label">قبول</div></div>' +
         '<div class="step ' + (step3 ? 'active' : '') + ' ' + (step4 ? 'completed' : '') + '"><div class="step-circle"><i class="fas fa-motorcycle"></i></div><div class="step-label">توصيل</div></div>' +
         '<div class="step ' + (step4 ? 'active completed' : '') + '"><div class="step-circle"><i class="fas fa-home"></i></div><div class="step-label">تسليم</div></div></div>' +
-        '<p><b>الحالة:</b> <span class="status-badge ' + (order.status.indexOf('انتظار') !== -1 ? 'status-pending' : order.status.indexOf('قبول') !== -1 ? 'status-accepted' : order.status.indexOf('توصيل') !== -1 ? 'status-delivery' : 'status-done') + '">' + order.status + '</span></p>' +
-        '<p><b>الزبون:</b> ' + order.userName + ' | 📞 ' + order.phone + '</p>' +
-        '<p><b>العنوان:</b> ' + order.location + '</p>' +
-        (order.notes ? '<div class="card" style="padding:10px;margin:8px 0;background:rgba(243,156,18,.1);border-color:var(--warning);"><b>📝 ملاحظات الطلب:</b><br>' + order.notes + '</div>' : '') +
+        '<p><b>الحالة:</b> <span class="status-badge ' + (order.status.indexOf('انتظار') !== -1 ? 'status-pending' : order.status.indexOf('قبول') !== -1 ? 'status-accepted' : order.status.indexOf('توصيل') !== -1 ? 'status-delivery' : 'status-done') + '">' + escapeHtml(order.status) + '</span></p>' +
+        '<p><b>الزبون:</b> ' + escapeHtml(order.userName) + ' | 📞 ' + escapeHtml(order.phone) + '</p>' +
+        '<p><b>العنوان:</b> ' + escapeHtml(order.location) + '</p>' +
+        shopTrackingHtml +
+        (order.notes ? '<div class="card" style="padding:10px;margin:8px 0;background:rgba(243,156,18,.1);border-color:var(--warning);"><b>📝 ملاحظات الطلب:</b><br>' + escapeHtml(order.notes) + '</div>' : '') +
         (order.deliveryTime && order.deliveryTime !== 'now' ? '<p><b>وقت التوصيل المطلوب:</b> ' + (order.deliveryTime === '30' ? '30 دقيقة' : order.deliveryTime === '60' ? 'ساعة' : 'ساعتين') + '</p>' : '') +
         (order.coordinates ? '<a href="' + mapLink + '" target="_blank" class="btn btn-outline btn-sm" style="margin:8px 0;width:auto;display:inline-flex;"><i class="fas fa-map-marker-alt"></i> عرض الموقع على الخريطة</a>' : '') +
         (driver ? '<p><b>السائق:</b> ' + escapeHtml(driver.name) + (getDriverRatingSummary(driver).count ? ' ⭐ ' + getDriverRatingSummary(driver).average.toFixed(1) : '') + '</p>' : '') +
@@ -3153,7 +3356,8 @@ function renderProfile(container) {
         '<label>رقم الهاتف</label><input id="prof-phone" value="' + (currentUser.phone || '') + '">' +
         '<label>نبذة عني</label><textarea id="prof-bio" placeholder="اكتب نبذة قصيرة...">' + (currentUser.bio || '') + '</textarea>' +
         '<button class="btn btn-primary" style="margin-top:12px;" onclick="saveProfile()"><i class="fas fa-save"></i> حفظ التغييرات</button></div>' +
-        '<div class="card" style="text-align:center;color:var(--text-muted);"><p>📅 انضم بتاريخ: ' + joinDate + '</p><p>🆔 المعرف: ' + currentUser.id + '</p></div></div>';
+        renderSharePanel() +
+        '<div class="card" style="text-align:center;color:var(--text-muted);"><p>📅 انضم بتاريخ: ' + escapeHtml(joinDate) + '</p><p>🆔 المعرف: ' + escapeHtml(currentUser.id) + '</p></div></div>';
 }
 
 function saveProfile() {
@@ -3239,7 +3443,7 @@ function renderSupport(container) {
             return '<div style="border-bottom:1px solid var(--border);padding:12px 0;cursor:pointer;" onclick="toggleFaq(' + i + ')">' +
                 '<div style="display:flex;justify-content:space-between;align-items:center;"><b>' + q.q + '</b><i class="fas fa-chevron-down" id="faq-icon-' + i + '"></i></div>' +
                 '<div id="faq-ans-' + i + '" style="display:none;color:var(--text-muted);margin-top:8px;font-size:0.9rem;">' + q.a + '</div></div>';
-        }).join('') + '</div>' +
+        }).join('') + '</div>' + renderSharePanel() +
         '<div class="card"><h4 style="margin-bottom:12px;">💬 محادثة مع الدعم</h4>' +
         '<div id="support-chat" style="height:300px;overflow-y:auto;display:flex;flex-direction:column;padding:10px;background:rgba(0,0,0,0.4);border-radius:16px;margin-bottom:12px;">' +
         '<div class="chat-bubble bubble-right" style="align-self:flex-start;background:var(--card-hover);border:1px solid var(--border);"><b>🤖 بوت زلطن:</b> أهلاً بك! كيف يمكنني مساعدتك اليوم؟ يمكنك اختيار سؤال من الأعلى أو كتابة استفسارك هنا.</div></div>' +
@@ -3272,6 +3476,7 @@ function sendSupportMsg() {
 
 function getBotReply(msg) {
     msg = msg.toLowerCase();
+    if (msg.indexOf('زلطن شوب') !== -1 || msg.indexOf('مشتريات') !== -1 || msg.indexOf('shopping') !== -1) return 'في زلطن شوب اكتب قائمة الأغراض والسوق الذي تريد الشراء منه، وحدد سقف ميزانية المشتريات ثم أرسل طلبك مع عنوان وموقع التوصيل.';
     if (msg.indexOf('طلب') !== -1 || msg.indexOf('order') !== -1) return 'للطلب: اختر المتجر، أضف المنتجات للسلة، ثم أكد الطلب.';
     if (msg.indexOf('سائق') !== -1 || msg.indexOf('driver') !== -1) return 'للتسجيل كسائق: سجل حسابك كسائق ثم فعل وضع السائق من قائمة التوصيل.';
     if (msg.indexOf('متجر') !== -1 || msg.indexOf('store') !== -1) return 'لفتح متجر: سجل كتاجر ثم اضغط على متجري في القائمة.';
@@ -3446,7 +3651,8 @@ function renderSuperAdminPanel() {
     var ordersHtml = '<div class="dev-list" id="dev-list">' + db.orders.slice().reverse().map(function(order) {
         var store = db.stores.find(function(item) { return item.id === order.storeId; });
         var isPending = String(order.status || '').indexOf('انتظار') !== -1;
-        return '<article class="dev-record" data-dev-searchable><div class="dev-record-main"><div class="dev-record-title"><b>طلب #' + escapeHtml(String(order.id || '').slice(-6)) + '</b><span class="dev-status-tag ' + (isPending ? 'pending' : 'normal') + '">' + escapeHtml(order.status || 'حالة غير محددة') + '</span></div><p>الزبون: ' + escapeHtml(order.userName || 'غير معروف') + ' · المتجر: ' + escapeHtml(store ? store.name : 'غير مرتبط') + '</p><small>' + escapeHtml(order.date || order.createdAt || '') + '</small></div><div class="dev-record-actions">' + (isPending ? '<button type="button" class="btn btn-sm btn-success" data-dev-action="accept-order" data-id="' + escapeHtml(order.id) + '"><i class="fas fa-check"></i> قبول</button>' : '') + '<button type="button" class="btn btn-sm btn-danger" data-dev-action="delete-order" data-id="' + escapeHtml(order.id) + '" aria-label="حذف الطلب"><i class="fas fa-trash"></i></button></div></article>';
+        var shopLabel = isZaltanShopOrder(order) ? 'زلطن شوب · سقف المشتريات ' + Number(order.budgetLimit || 0).toLocaleString('ar-LY') + ' د.ل · ' + (order.shoppingItems || []).join('، ') : '';
+        return '<article class="dev-record" data-dev-searchable><div class="dev-record-main"><div class="dev-record-title"><b>' + (isZaltanShopOrder(order) ? 'طلب زلطن شوب #' : 'طلب #') + escapeHtml(String(order.id || '').slice(-6)) + '</b><span class="dev-status-tag ' + (isPending ? 'pending' : 'normal') + '">' + escapeHtml(order.status || 'حالة غير محددة') + '</span></div><p>الزبون: ' + escapeHtml(order.userName || 'غير معروف') + ' · ' + (isZaltanShopOrder(order) ? escapeHtml(shopLabel) : 'المتجر: ' + escapeHtml(store ? store.name : 'غير مرتبط')) + '</p>' + (isZaltanShopOrder(order) && order.shoppingMarket ? '<small>السوق المفضل: ' + escapeHtml(order.shoppingMarket) + '</small>' : '') + '<small>' + escapeHtml(order.date || order.createdAt || '') + '</small></div><div class="dev-record-actions">' + (isPending ? '<button type="button" class="btn btn-sm btn-success" data-dev-action="accept-order" data-id="' + escapeHtml(order.id) + '"><i class="fas fa-check"></i> قبول</button>' : '') + '<button type="button" class="btn btn-sm btn-danger" data-dev-action="delete-order" data-id="' + escapeHtml(order.id) + '" aria-label="حذف الطلب"><i class="fas fa-trash"></i></button></div></article>';
     }).join('') + '<p id="dev-no-results" class="muted-empty" hidden>لا توجد نتائج تطابق البحث.</p></div>';
 
     var reportsHtml = '<div class="dev-list" id="dev-list">' + (db.reports || []).slice().reverse().map(function(report) {
