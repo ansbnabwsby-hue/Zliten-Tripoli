@@ -603,6 +603,44 @@ header { padding:16px 20px; display:flex; justify-content:space-between; align-i
 	.delivery-target-pin i { transform:rotate(45deg);font-size:14px; }
 	.live-distance-badge { display:inline-flex;align-items:center;gap:6px;margin:0 0 9px;padding:6px 9px;border:1px solid rgba(0,212,255,.2);border-radius:20px;background:rgba(0,212,255,.08);color:#9ceaff;font-size:.7rem;font-weight:700; }
 	.live-distance-badge i { color:var(--primary); }
+	.live-eta-card { display:flex;align-items:center;gap:11px;margin:0 0 10px;padding:12px;border:1px solid rgba(46,204,113,.24);border-radius:15px;background:linear-gradient(110deg,rgba(46,204,113,.11),rgba(0,212,255,.06)); }
+	.live-eta-icon { display:grid;place-items:center;width:42px;height:42px;flex:0 0 42px;border:1px solid rgba(46,204,113,.22);border-radius:14px;background:rgba(46,204,113,.12);color:var(--success);font-size:1.05rem; }
+	.live-eta-copy { display:flex;flex-direction:column;gap:2px;min-width:0; }
+	.live-eta-copy small { color:var(--text-muted);font-size:.66rem; }
+	.live-eta-copy strong { color:var(--text);font-size:1rem; }
+	.live-eta-copy em { color:var(--text-muted);font-size:.62rem;font-style:normal; }
+	.map-tools { display:flex;flex-wrap:wrap;gap:7px;margin:0 0 9px; }
+	.map-tools button { display:inline-flex;align-items:center;gap:6px;min-height:35px;padding:6px 9px;border:1px solid var(--border);border-radius:11px;background:rgba(255,255,255,.04);color:var(--text-muted);font:inherit;font-size:.67rem;cursor:pointer; }
+	.map-tools button:hover { border-color:rgba(0,212,255,.35);color:var(--primary); }
+	.profile-page { display:flex;flex-direction:column;gap:13px;padding-bottom:16px; }
+	.profile-hero { position:relative;display:flex;align-items:center;gap:14px;overflow:hidden;padding:18px;border:1px solid rgba(0,212,255,.25);border-radius:23px;background:radial-gradient(circle at 100% 0,rgba(0,212,255,.2),transparent 43%),linear-gradient(145deg,#10284b,#091328 75%);box-shadow:var(--shadow-sm); }
+	.profile-avatar { display:grid;place-items:center;width:68px;height:68px;flex:0 0 68px;border:2px solid rgba(255,255,255,.58);border-radius:22px;background:linear-gradient(145deg,#00c9ef,#0878df);color:#fff;font-size:1.8rem;font-weight:900;box-shadow:0 8px 22px rgba(0,212,255,.24); }
+	.profile-hero-copy { min-width:0;flex:1; }
+	.profile-hero-copy small { color:#9ceaff;font-size:.68rem;font-weight:800; }
+	.profile-hero-copy h2 { overflow:hidden;margin:2px 0;color:#fff;font-size:1.22rem;text-overflow:ellipsis;white-space:nowrap; }
+	.profile-hero-copy p { color:#bfcee0;font-size:.73rem; }
+	.profile-role-chip { display:inline-flex;align-items:center;gap:6px;margin-top:7px;padding:5px 8px;border:1px solid rgba(255,255,255,.15);border-radius:20px;background:rgba(255,255,255,.07);color:#e7f6ff;font-size:.65rem; }
+	.profile-rating { margin-top:6px;color:#ffd166;font-size:.74rem; }
+	.profile-stats { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px; }
+	.profile-stat { display:flex;flex-direction:column;gap:5px;min-width:0;padding:12px 10px;border:1px solid var(--border);border-radius:16px;background:var(--card); }
+	.profile-stat i { color:var(--primary);font-size:.87rem; }
+	.profile-stat strong { overflow:hidden;color:var(--text);font-size:1rem;text-overflow:ellipsis; }
+	.profile-stat small { color:var(--text-muted);font-size:.63rem; }
+	.profile-panel { padding:15px;border:1px solid var(--border);border-radius:19px;background:var(--card);box-shadow:var(--shadow-sm); }
+	.profile-panel-heading { display:flex;align-items:center;gap:9px;margin-bottom:12px; }
+	.profile-panel-icon { display:grid;place-items:center;width:35px;height:35px;border-radius:12px;background:rgba(0,212,255,.1);color:var(--primary); }
+	.profile-panel-heading h3 { margin:0;font-size:.92rem; }
+	.profile-panel-heading p { margin-top:2px;color:var(--text-muted);font-size:.66rem; }
+	.profile-fields { display:grid;grid-template-columns:1fr 1fr;gap:0 10px; }
+	.profile-fields label { display:block;margin:4px 0;color:var(--text-muted);font-size:.7rem; }
+	.profile-fields textarea,.profile-fields .profile-field-full { grid-column:1/-1; }
+	.profile-actions { display:flex;gap:8px;flex-wrap:wrap;margin-top:12px; }
+	.profile-actions .btn { flex:1;min-width:140px; }
+	.profile-meta { display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--text-muted);font-size:.66rem; }
+	:root.light .profile-hero { background:radial-gradient(circle at 100% 0,rgba(0,212,255,.19),transparent 43%),linear-gradient(145deg,#e3f6ff,#f6faff 75%); }
+	:root.light .profile-hero-copy h2 { color:#142033; }
+	:root.light .profile-hero-copy p,:root.light .profile-role-chip { color:#4a5a70; }
+	@media(max-width:420px) { .profile-hero { padding:15px; }.profile-avatar { width:58px;height:58px;flex-basis:58px;border-radius:19px; }.profile-stats { gap:6px; }.profile-stat { padding:10px 8px; }.profile-stat strong { font-size:.9rem; }.profile-fields { grid-template-columns:1fr; }.profile-fields textarea,.profile-fields .profile-field-full { grid-column:auto; } }
 	.orders-hero { background:linear-gradient(135deg,rgba(0,212,255,.18),rgba(14,31,75,.9)); border:1px solid rgba(0,212,255,.25); border-radius:22px; padding:20px; margin-bottom:14px; position:relative; overflow:hidden; }
 	.orders-hero::after { content:'📦'; position:absolute; left:18px; bottom:-18px; font-size:5rem; opacity:.12; transform:rotate(-12deg); }
 	.orders-hero h2 { margin:0 0 6px; font-size:1.35rem; }
@@ -804,6 +842,7 @@ let selectedRating = 0, appliedCoupon = null;
 let isLightTheme = localStorage.getItem('z_theme') === 'light';
 let activeLocationWatchId = null, activeLocationOrderId = null, liveLocationRef = null, liveLocationListener = null;
 let liveMap = null, liveMarker = null, liveTargetMarker = null, liveGuideLine = null, liveDirectionMarker = null, liveMapOrderId = null;
+let etaLastRequestAt = 0, etaLastDriverPoint = null, etaRequestInFlight = false, etaRequestSerial = 0;
 let deferredInstallPrompt = null;
 let appInstalledThisSession = false;
 let authMode = 'email';
@@ -2972,6 +3011,54 @@ function centerLiveMapOnDelivery() {
     if (points.length > 1) liveMap.fitBounds(L.latLngBounds(points).pad(0.22), { animate:true, maxZoom:16 });
     else if (points.length) liveMap.setView(points[0], 16, { animate:true });
 }
+function formatEtaDuration(seconds) {
+    var minutes = Math.max(1, Math.round(Number(seconds) / 60));
+    if (minutes < 60) return minutes + ' دقيقة';
+    var hours = Math.floor(minutes / 60), remainder = minutes % 60;
+    return hours + ' ساعة' + (remainder ? ' و' + remainder + ' د' : '');
+}
+function updateEtaCard(durationSeconds, routeDistanceKm, isFallback) {
+    var etaEl = document.getElementById('live-eta-value-' + liveMapOrderId);
+    var distanceEl = document.getElementById('live-distance-' + liveMapOrderId);
+    var noteEl = document.getElementById('live-eta-note-' + liveMapOrderId);
+    if (!etaEl) return;
+    var arrival = new Date(Date.now() + durationSeconds * 1000);
+    etaEl.textContent = 'حوالي ' + formatEtaDuration(durationSeconds) + ' · ' + arrival.toLocaleTimeString('ar-LY', { hour:'numeric', minute:'2-digit' });
+    if (noteEl) noteEl.textContent = isFallback ? 'تقدير تقريبي من المسافة المباشرة، تعذر جلب طريق القيادة' : 'حسب طريق القيادة · لا يشمل الازدحام أو التوقف';
+    if (distanceEl && routeDistanceKm > 0) distanceEl.innerHTML = '<i class="fas fa-route"></i> مسافة الطريق: ' + (routeDistanceKm < 1 ? Math.round(routeDistanceKm * 1000) + ' م' : routeDistanceKm.toFixed(1) + ' كم');
+}
+function requestDeliveryETA(location, destination) {
+    if (!location || !destination || !liveMapOrderId) return;
+    var from = { lat:Number(location.lat), lng:Number(location.lng) }, to = { lat:Number(destination.lat), lng:Number(destination.lng) };
+    var movedEnough = !etaLastDriverPoint || liveDistanceKm(etaLastDriverPoint, from) >= 0.18;
+    if (etaRequestInFlight || (!movedEnough && Date.now() - etaLastRequestAt < 45000)) return;
+    etaRequestInFlight = true;
+    etaLastRequestAt = Date.now();
+    etaLastDriverPoint = from;
+    var serial = ++etaRequestSerial, mapOrder = String(liveMapOrderId);
+    var etaEl = document.getElementById('live-eta-value-' + mapOrder);
+    if (etaEl && !etaEl.dataset.ready) etaEl.textContent = 'جارٍ حساب الطريق...';
+    var url = 'https://router.project-osrm.org/route/v1/driving/' + from.lng + ',' + from.lat + ';' + to.lng + ',' + to.lat + '?overview=full&geometries=geojson&steps=false';
+    fetch(url, { method:'GET', mode:'cors', cache:'no-store' }).then(function(response) {
+        if (!response.ok) throw new Error('Route service HTTP ' + response.status);
+        return response.json();
+    }).then(function(result) {
+        if (serial !== etaRequestSerial || mapOrder !== String(liveMapOrderId)) return;
+        var route = result && result.code === 'Ok' && result.routes && result.routes[0];
+        if (!route || !Number.isFinite(route.duration) || !Number.isFinite(route.distance)) throw new Error('No driving route');
+        if (liveMap && route.geometry && Array.isArray(route.geometry.coordinates)) {
+            var path = route.geometry.coordinates.map(function(pair) { return [Number(pair[1]), Number(pair[0])]; });
+            if (liveGuideLine) liveGuideLine.setLatLngs(path);
+            else liveGuideLine = L.polyline(path, { color:'#00d4ff', weight:5, opacity:.9, lineCap:'round', lineJoin:'round' }).addTo(liveMap);
+        }
+        updateEtaCard(route.duration, route.distance / 1000, false);
+        if (etaEl) etaEl.dataset.ready = '1';
+    }).catch(function() {
+        if (serial !== etaRequestSerial || mapOrder !== String(liveMapOrderId)) return;
+        var directKm = liveDistanceKm(from, to), approxSeconds = (directKm * 1.45 / 22) * 3600;
+        if (directKm > 0) updateEtaCard(approxSeconds, directKm * 1.45, true);
+    }).finally(function() { if (serial === etaRequestSerial) etaRequestInFlight = false; });
+}
 
 function updateLiveMap(location) {
     if (!location || !Number.isFinite(Number(location.lat)) || !Number.isFinite(Number(location.lng))) return;
@@ -2991,6 +3078,7 @@ function updateLiveMap(location) {
         var km = liveDistanceKm({ lat:Number(location.lat), lng:Number(location.lng) }, destination);
         var distanceEl = document.getElementById('live-distance-' + liveMapOrderId);
         if (distanceEl) distanceEl.innerHTML = '<i class="fas fa-route"></i> المسافة المباشرة إلى التسليم: ' + (km < 1 ? Math.round(km * 1000) + ' م' : km.toFixed(1) + ' كم');
+        requestDeliveryETA(location, destination);
     }
     if (liveMap && !liveMap._hasDriverLocation) { centerLiveMapOnDelivery(); liveMap._hasDriverLocation = true; }
     var status = document.getElementById('live-location-status');
@@ -3002,6 +3090,7 @@ function initLiveMap(orderId, isDriver) {
     if (!holder || typeof L === 'undefined') return;
     if (liveMap) { liveMap.remove(); liveMap = null; liveMarker = null; liveTargetMarker = null; liveGuideLine = null; liveDirectionMarker = null; }
     liveMapOrderId = orderId;
+    etaRequestSerial++; etaLastRequestAt = 0; etaLastDriverPoint = null; etaRequestInFlight = false;
     liveMap = L.map(holder, { zoomControl:true, attributionControl:true, maxBounds:ZALTAN_MAP_BOUNDS, maxBoundsViscosity:0.9, minZoom:11, maxZoom:18 }).setView(ZALTAN_CENTER, 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap' }).addTo(liveMap);
     var order = db.orders.find(function(item) { return String(item.id) === String(orderId); });
@@ -3099,7 +3188,7 @@ function renderOrderTracking(container, orderId) {
         (order.total ? '<p><b>المبلغ:</b> <span style="color:var(--success);font-weight:700;">' + order.total + ' د.ل</span></p>' : '') +
         (order.deliveryProof ? '<div style="margin-top:10px;"><b>📸 إثبات التسليم:</b><br><img src="' + order.deliveryProof + '" style="max-width:100%;border-radius:12px;margin-top:8px;"></div>' : '') +
         '</div>' +
-        (driver && !step4 ? '<div class="card live-map-card"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px"><h4 style="margin:0">📍 تتبّع السائق ونقطة التسليم</h4><button type="button" class="btn btn-outline btn-sm" style="width:auto" onclick="centerLiveMapOnDelivery()"><i class="fas fa-crosshairs"></i> توسيط</button></div><div id="live-location-status" class="live-location-status"><span class="live-dot waiting"></span><span>جاري الاتصال بموقع السائق...</span></div><div id="live-distance-' + order.id + '" class="live-distance-badge"><i class="fas fa-route"></i> بانتظار موقع السائق</div><div id="live-map-' + order.id + '" class="live-map"></div><div class="live-privacy">السهم الأزرق يشير من موقع السائق نحو دبوس التسليم. الخط المتقطع إرشادي مباشر وليس مسار شوارع؛ افتح الملاحة للحصول على طريق القيادة.</div></div>' : '') +
+        (driver && !step4 ? '<div class="card live-map-card"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px"><h4 style="margin:0">📍 تتبّع السائق ونقطة التسليم</h4><button type="button" class="btn btn-outline btn-sm" style="width:auto" onclick="centerLiveMapOnDelivery()"><i class="fas fa-crosshairs"></i> عرض الكل</button></div><div id="live-location-status" class="live-location-status"><span class="live-dot waiting"></span><span>جاري الاتصال بموقع السائق...</span></div><div class="live-eta-card"><span class="live-eta-icon"><i class="fas fa-clock"></i></span><span class="live-eta-copy"><small>وقت الوصول المتوقع</small><strong id="live-eta-value-' + order.id + '" data-ready="">بانتظار موقع السائق</strong><em id="live-eta-note-' + order.id + '">يُحسب تلقائياً بعد مشاركة الموقع</em></span></div><div id="live-distance-' + order.id + '" class="live-distance-badge"><i class="fas fa-route"></i> بانتظار موقع السائق</div><div class="map-tools"><button type="button" onclick="centerLiveMapOnDelivery()"><i class="fas fa-expand"></i> إظهار السائق والتسليم</button><a class="btn btn-outline btn-sm" style="width:auto" href="' + mapLink + '" target="_blank" rel="noopener"><i class="fas fa-location-arrow"></i> ملاحة</a></div><div id="live-map-' + order.id + '" class="live-map"></div><div class="live-privacy">يُحسب الوقت من طريق قيادة بين الإحداثيات ولا يشمل الازدحام؛ إذا تعذر جلب الطريق يظهر تقدير تقريبي. المؤشر والخريطة يتحدّثان عند وصول موقع جديد.</div></div>' : '') +
         '<div class="card">' +
         '<h4 style="margin-bottom:12px;">💬 دردشة الطلب (مشتركة)</h4>' +
         '<div id="track-chat-box" style="height:250px;overflow-y:auto;display:flex;flex-direction:column;padding:8px;background:rgba(0,0,0,0.4);border-radius:12px;">' + chatHtml + '</div>' +
@@ -3386,26 +3475,18 @@ function deleteChat(cid) {
 // ==================== الملف الشخصي ====================
 function renderProfile(container) {
     let joinDate = currentUser.createdAt || 'غير معروف';
-    let profileRatingSummary = getDriverRatingSummary(currentUser);
-    let avgRating = profileRatingSummary.count ? profileRatingSummary.average.toFixed(1) : 'جديد';
-    container.innerHTML = '<div class="animate-fade">' +
-        '<h3 style="margin-bottom:16px;">👤 الملف الشخصي</h3>' +
-        '<div class="card" style="text-align:center;">' +
-        '<div style="width:100px;height:100px;border-radius:50%;background:var(--gradient-1);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:900;">' + currentUser.name.charAt(0) + '</div>' +
-        '<h2 style="color:var(--primary);">' + currentUser.name + '</h2>' +
-        '<p style="color:var(--text-muted);">' + (currentUser.type === 'store_owner' ? '🏪 تاجر' : currentUser.type === 'driver' ? '🛵 سائق' : '👤 زبون') + '</p>' +
-        (currentUser.type === 'driver' ? '<div class="rating-stars" style="font-size:1.3rem;">⭐ ' + avgRating + ' (' + profileRatingSummary.count + ' تقييم)</div>' : '') +
-        '<div class="grid-3" style="margin-top:16px;">' +
-        '<div class="stat-card"><div class="stat-value">' + (db.orders.filter(function(o){return o.userId===currentUser.id;}).length) + '</div><div class="stat-label">📦 طلبات</div></div>' +
-        '<div class="stat-card"><div class="stat-value">' + favorites.length + '</div><div class="stat-label">❤️ مفضلة</div></div>' +
-        '<div class="stat-card"><div class="stat-value">' + (currentUser.wallet || 0) + '</div><div class="stat-label">💰 محفظة</div></div></div></div>' +
-        '<div class="card"><h4 style="margin-bottom:12px;">⚙️ الإعدادات</h4>' +
-        '<label>الاسم</label><input id="prof-name" value="' + currentUser.name + '">' +
-        '<label>رقم الهاتف</label><input id="prof-phone" value="' + (currentUser.phone || '') + '">' +
-        '<label>نبذة عني</label><textarea id="prof-bio" placeholder="اكتب نبذة قصيرة...">' + (currentUser.bio || '') + '</textarea>' +
-        '<button class="btn btn-primary" style="margin-top:12px;" onclick="saveProfile()"><i class="fas fa-save"></i> حفظ التغييرات</button></div>' +
+    let rating = getDriverRatingSummary(currentUser);
+    let role = currentUser.type === 'store_owner' ? 'تاجر' : currentUser.type === 'driver' ? 'سائق توصيل' : currentUser.type === 'developer' || currentUser.role === 'developer' ? 'إدارة التطبيق' : 'زبون';
+    let roleIcon = currentUser.type === 'store_owner' ? 'fa-store' : currentUser.type === 'driver' ? 'fa-motorcycle' : 'fa-user';
+    let ordersCount = db.orders.filter(function(order) { return String(order.userId) === String(currentUser.id) || String(order.driverId) === String(currentUser.id); }).length;
+    let quickActions = currentUser.type === 'driver' ? '<button type="button" class="btn btn-outline" onclick="navigate(\'driver\')"><i class="fas fa-motorcycle"></i> مهام التوصيل</button>' : currentUser.type === 'store_owner' ? '<button type="button" class="btn btn-outline" onclick="navigate(\'my-store\')"><i class="fas fa-store"></i> إدارة متجري</button>' : '<button type="button" class="btn btn-outline" onclick="navigate(\'orders\')"><i class="fas fa-box"></i> طلباتي</button><button type="button" class="btn btn-outline" onclick="navigate(\'zaltan-shop\')"><i class="fas fa-basket-shopping"></i> زلطن شوب</button>';
+    container.innerHTML = '<div class="animate-fade profile-page">' +
+        '<section class="profile-hero"><div class="profile-avatar" aria-hidden="true">' + escapeHtml(String(currentUser.name || 'مستخدم').trim().charAt(0) || 'م') + '</div><div class="profile-hero-copy"><small>حسابك في زلطن تريبول</small><h2>' + escapeHtml(currentUser.name || 'مستخدم') + '</h2><p>' + escapeHtml(currentUser.email || currentUser.phone || 'أهلاً بك في مجتمع زلطن') + '</p><span class="profile-role-chip"><i class="fas ' + roleIcon + '"></i> ' + role + '</span>' + (currentUser.type === 'driver' ? '<div class="profile-rating">★ ' + (rating.count ? rating.average.toFixed(1) : 'جديد') + ' <span style="color:#bfcee0">(' + rating.count + ' تقييم)</span></div>' : '') + '</div></section>' +
+        '<section class="profile-stats" aria-label="ملخص الحساب"><div class="profile-stat"><i class="fas fa-box-open"></i><strong>' + ordersCount + '</strong><small>الطلبات</small></div><div class="profile-stat"><i class="fas fa-heart"></i><strong>' + favorites.length + '</strong><small>المفضلة</small></div><div class="profile-stat"><i class="fas fa-wallet"></i><strong>' + Number(currentUser.wallet || 0).toLocaleString('ar-LY') + '</strong><small>المحفظة · د.ل</small></div></section>' +
+        '<section class="profile-panel"><div class="profile-panel-heading"><span class="profile-panel-icon"><i class="fas fa-bolt"></i></span><div><h3>وصول سريع</h3><p>أهم صفحات حسابك في متناولك</p></div></div><div class="profile-actions">' + quickActions + '<button type="button" class="btn btn-outline" onclick="navigate(\'favorites\')"><i class="fas fa-heart"></i> المفضلة</button><button type="button" class="btn btn-outline" onclick="navigate(\'addresses\')"><i class="fas fa-location-dot"></i> عناويني</button></div></section>' +
+        '<section class="profile-panel"><div class="profile-panel-heading"><span class="profile-panel-icon"><i class="fas fa-user-pen"></i></span><div><h3>بيانات الحساب</h3><p>حدّث معلومات التواصل الظاهرة في طلباتك</p></div></div><div class="profile-fields"><div><label for="prof-name">الاسم</label><input id="prof-name" autocomplete="name" maxlength="80" value="' + escapeHtml(currentUser.name || '') + '"></div><div><label for="prof-phone">رقم الهاتف</label><input id="prof-phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="30" value="' + escapeHtml(currentUser.phone || '') + '"></div><div class="profile-field-full"><label for="prof-bio">نبذة عني</label><textarea id="prof-bio" maxlength="300" rows="3" placeholder="اكتب نبذة قصيرة عنك (اختياري)">' + escapeHtml(currentUser.bio || '') + '</textarea></div></div><div class="profile-actions"><button type="button" class="btn btn-primary" onclick="saveProfile()"><i class="fas fa-floppy-disk"></i> حفظ البيانات</button></div></section>' +
         renderSharePanel() +
-        '<div class="card" style="text-align:center;color:var(--text-muted);"><p>📅 انضم بتاريخ: ' + escapeHtml(joinDate) + '</p><p>🆔 المعرف: ' + escapeHtml(currentUser.id) + '</p></div></div>';
+        '<section class="profile-panel profile-meta"><span><i class="fas fa-calendar-plus"></i> عضو منذ ' + escapeHtml(joinDate) + '</span><span><i class="fas fa-fingerprint"></i> رقم الحساب: ' + escapeHtml(currentUser.id) + '</span></section></div>';
 }
 
 function saveProfile() {
