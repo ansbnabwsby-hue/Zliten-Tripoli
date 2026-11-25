@@ -711,6 +711,27 @@ header { padding:16px 20px; display:flex; justify-content:space-between; align-i
 	.checkout-field input,.checkout-field textarea,.checkout-field select,.checkout-coupon-input { width:100%; min-height:45px; padding:11px 12px; border:1px solid var(--border); border-radius:12px; color:var(--text); background:var(--dark); }
 	.checkout-field textarea { min-height:84px; resize:vertical; }
 	.checkout-field input:focus,.checkout-field textarea:focus,.checkout-field select:focus,.checkout-coupon-input:focus { border-color:var(--primary); outline:2px solid rgba(0,212,255,.16); }
+	.delivery-area-picker { display:grid; gap:11px; margin:0 0 14px; }
+	.delivery-area-picker-title { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; margin-bottom:2px; }
+	.delivery-area-picker-title strong { font-size:.88rem; }
+	.delivery-area-picker-title small,.delivery-area-zone-head small { display:block; margin-top:3px; color:var(--text-muted); font-size:.68rem; line-height:1.5; }
+	.delivery-area-zone { --area-color:#00d4ff; --area-tint:rgba(0,212,255,.08); padding:11px; border:1px solid var(--border); border-radius:16px; background:var(--area-tint); }
+	.delivery-area-zone[data-zone="zone_1"] { --area-color:#2dd4bf; --area-tint:rgba(45,212,191,.08); }
+	.delivery-area-zone[data-zone="zone_2"] { --area-color:#f5a524; --area-tint:rgba(245,165,36,.08); }
+	.delivery-area-zone[data-zone="zone_3"] { --area-color:#a78bfa; --area-tint:rgba(167,139,250,.09); }
+	.delivery-area-zone-head { display:flex; align-items:center; gap:9px; margin-bottom:9px; }
+	.delivery-area-zone-head>i { display:grid; place-items:center; width:32px; height:32px; flex:none; border-radius:11px; background:var(--area-tint); color:var(--area-color); }
+	.delivery-area-zone-head strong { font-size:.79rem; }
+	.delivery-area-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(138px,1fr)); gap:7px; }
+	.delivery-area-card { display:flex; align-items:center; gap:8px; min-width:0; padding:9px; border:1px solid var(--border); border-radius:12px; background:var(--card); color:var(--text); text-align:right; cursor:pointer; transition:background .18s,border-color .18s,transform .18s; }
+	.delivery-area-card:hover,.delivery-area-card.is-selected { border-color:var(--area-color); background:var(--area-tint); }
+	.delivery-area-card:active { transform:scale(.985); }
+	.delivery-area-card-mark { display:grid; place-items:center; width:25px; height:25px; flex:none; border-radius:9px; background:var(--area-tint); color:var(--area-color); font-size:.7rem; }
+	.delivery-area-card-copy { min-width:0; flex:1; }
+	.delivery-area-card-copy strong { display:block; overflow:hidden; font-size:.72rem; text-overflow:ellipsis; white-space:nowrap; }
+	.delivery-area-card-copy small { display:block; margin-top:3px; color:var(--area-color); font-size:.64rem; font-weight:800; }
+	.delivery-area-map-note { margin:0; padding:9px 10px; border-radius:11px; background:rgba(255,255,255,.035); color:var(--text-muted); font-size:.69rem; line-height:1.55; }
+	.delivery-area-map-pin { display:grid; place-items:center; width:34px; height:40px; color:var(--pin-color,#00d4ff); font-size:30px; filter:drop-shadow(0 2px 3px rgba(0,0,0,.48)); }
 	.checkout-summary { position:sticky; top:84px; }
 	.checkout-summary h3 { margin-bottom:12px; }
 	.checkout-summary-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 0; color:var(--text-muted); border-bottom:1px solid var(--border); }
@@ -854,8 +875,34 @@ let locationPermissionState = 'unknown';
 
 const ZALTAN_CENTER = [32.95, 11.86583];
 const ZALTAN_SERVICE_RADIUS_KM = 20;
-const ZALTAN_MAP_BOUNDS = [[32.75, 11.61583], [33.15, 12.11583]];
-const ZALTAN_AREAS = ['مدينة زلطن فقط'];
+const ZALTAN_MAP_BOUNDS = [[32.45, 11.15], [33.45, 12.6]];
+const ZALTAN_CUSTOMER_MAP_BOUNDS = [[32.45, 11.15], [33.45, 12.6]];
+const ZALTAN_AREA_ZONES = {
+    zone_1: { name:'وسط زلطن', icon:'fa-city', color:'#2dd4bf', radiusKm:20 },
+    zone_2: { name:'الأحياء المحلية', icon:'fa-compass', color:'#f5a524', radiusKm:20 },
+    zone_3: { name:'المناطق البعيدة', icon:'fa-route', color:'#a78bfa', radiusKm:50 }
+};
+const ZALTAN_AREAS = [
+    { id:'zaltan_center', name:'زلطن الوسط', zone:'zone_1', fee:10, color:'#2dd4bf' },
+    { id:'al_hay', name:'الحي / حي التسوق', zone:'zone_1', fee:12, color:'#34d399' },
+    { id:'al_bazdi', name:'البزدى', zone:'zone_2', fee:11, color:'#f5a524' },
+    { id:'barqaya', name:'البرقاية', zone:'zone_2', fee:11, color:'#fb923c' },
+    { id:'tawila', name:'الطويلة', zone:'zone_2', fee:11, color:'#facc15' },
+    { id:'shuhub', name:'شهوب', zone:'zone_2', fee:11, color:'#eab308' },
+    { id:'sbanin', name:'سبانين', zone:'zone_2', fee:11, color:'#f97316' },
+    { id:'manq_haddad', name:'منق حداد', zone:'zone_2', fee:11, color:'#ea580c' },
+    { id:'wlad_abdel_samad', name:'جهة ولاد عبد الصمد وولاد الحاج', zone:'zone_2', fee:11, color:'#84cc16' },
+    { id:'buhayra', name:'البحيرة', zone:'zone_2', fee:10, color:'#06b6d4' },
+    { id:'awtad', name:'الأوتاد', zone:'zone_2', fee:11, color:'#22c55e' },
+    { id:'wlad_zayed_chicago', name:'ولاد زايد (شيكاغو)', zone:'zone_2', fee:11, color:'#38bdf8' },
+    { id:'qutufa', name:'قطوفة', zone:'zone_2', fee:11, color:'#a3e635' },
+    { id:'jihat_tawergha', name:'جهة تاورغاء', zone:'zone_2', fee:11, color:'#ec4899' },
+    { id:'al_ghaba', name:'الغابة', zone:'zone_2', fee:11, color:'#14b8a6' },
+    { id:'abu_kammash', name:'أبو كماش', zone:'zone_3', fee:13, color:'#a78bfa' },
+    { id:'ras_ajdir', name:'رأس اجدير', zone:'zone_3', fee:13, color:'#c084fc' },
+    { id:'tawilat_ghazala', name:'طويلة غزالة', zone:'zone_3', fee:13, color:'#8b5cf6' }
+];
+let selectedDeliveryAreaId = '';
 
 database.ref('.info/connected').on('value', function(snapshot) {
     firebaseConnected = !!snapshot.val();
@@ -2088,32 +2135,35 @@ function getCurrentLocation(callback) {
     if (!navigator.geolocation) return showToast('متصفحك لا يدعم تحديد الموقع', 'error');
     showToast('سيطلب الهاتف إذن الموقع الآن؛ وافق لإكمال الطلب', 'info', 4500);
     navigator.geolocation.getCurrentPosition(
-        function(pos) { locationPermissionState = 'granted'; currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy }; updateCustomerMap(currentLocation); let el = document.getElementById('location-status'); if (el) el.innerHTML = isInsideZaltan(currentLocation) ? '✅ داخل نطاق زلطن • دقة ' + Math.round(pos.coords.accuracy) + 'م' : '⚠️ الموقع خارج نطاق زلطن'; if (callback) callback(); },
+        function(pos) { locationPermissionState = 'granted'; currentLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy }; updateCustomerMap(currentLocation); updateCustomerLocationStatus(); if (callback) callback(); },
         function(err) { locationPermissionState = err && err.code === 1 ? 'denied' : 'error'; let el = document.getElementById('location-status'); if (el) el.innerHTML = '⚠️ يجب السماح بالموقع من أذونات الهاتف'; showModal('تفعيل الموقع مطلوب', '<div style="line-height:1.9">لا يمكن إرسال طلب توصيل بدون تحديد الموقع.<br><br><b>اضغط السماح أثناء ظهور نافذة الهاتف.</b><br>إذا اخترت الرفض سابقاً: افتح إعدادات الهاتف ← أذونات التطبيق ← الموقع، واختر السماح أثناء الاستخدام، ثم اضغط إعادة المحاولة.</div>', 'confirm', function(){ getCurrentLocation(callback); }); },
         { enableHighAccuracy:true, timeout:12000, maximumAge:30000 }
     );
 }
 
-function isInsideZaltan(location) {
+function isInsideZaltan(location, areaId) {
     if (!location || !Number.isFinite(Number(location.lat)) || !Number.isFinite(Number(location.lng))) return false;
     var lat1 = Number(location.lat) * Math.PI / 180, lng1 = Number(location.lng) * Math.PI / 180;
     var lat2 = ZALTAN_CENTER[0] * Math.PI / 180, lng2 = ZALTAN_CENTER[1] * Math.PI / 180;
     var dLat = lat1 - lat2, dLng = lng1 - lng2;
     var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
     var distanceKm = 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return distanceKm <= ZALTAN_SERVICE_RADIUS_KM;
+    var area = getDeliveryArea(areaId);
+    var zone = area ? ZALTAN_AREA_ZONES[area.zone] : null;
+    return distanceKm <= (zone ? zone.radiusKm : ZALTAN_SERVICE_RADIUS_KM);
 }
 
-let customerMap = null, customerMarker = null, customerAccuracyCircle = null;
+let customerMap = null, customerMarker = null, customerAccuracyCircle = null, customerServiceCircle = null;
 function initCustomerMap() {
     var holder = document.getElementById('customer-map');
     if (!holder || typeof L === 'undefined') return;
-    if (customerMap) { customerMap.remove(); customerMap = null; customerMarker = null; customerAccuracyCircle = null; }
+    if (customerMap) { customerMap.remove(); customerMap = null; customerMarker = null; customerAccuracyCircle = null; customerServiceCircle = null; }
     var fallback = ZALTAN_CENTER;
     var start = currentLocation ? [currentLocation.lat, currentLocation.lng] : fallback;
-    customerMap = L.map(holder, { zoomControl:true, attributionControl:true, maxBounds:ZALTAN_MAP_BOUNDS, maxBoundsViscosity:0.9, minZoom:11, maxZoom:18 }).setView(start, currentLocation ? 16 : 13);
+    customerMap = L.map(holder, { zoomControl:true, attributionControl:true, maxBounds:ZALTAN_CUSTOMER_MAP_BOUNDS, maxBoundsViscosity:0.9, minZoom:9, maxZoom:18 }).setView(start, currentLocation ? 16 : 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap' }).addTo(customerMap);
-    L.circle(ZALTAN_CENTER, { radius:ZALTAN_SERVICE_RADIUS_KM * 1000, color:'#00d4ff', weight:1, dashArray:'6 7', fillColor:'#00d4ff', fillOpacity:.045 }).addTo(customerMap).bindTooltip('نطاق التوصيل داخل مدينة زلطن', { sticky:true });
+    customerServiceCircle = L.circle(ZALTAN_CENTER, { radius:ZALTAN_SERVICE_RADIUS_KM * 1000, color:'#00d4ff', weight:2, dashArray:'6 7', fillColor:'#00d4ff', fillOpacity:.06 }).addTo(customerMap).bindTooltip('نطاق تحقق تقريبي، وليس حدود الأحياء', { sticky:true });
+    updateCustomerServiceCircle();
     if (currentLocation) updateCustomerMap(currentLocation);
     customerMap.on('click', function(event) { setCustomerMapSelection(event.latlng); });
     setTimeout(function(){ if (customerMap) customerMap.invalidateSize(); }, 200);
@@ -2121,24 +2171,107 @@ function initCustomerMap() {
 function setCustomerMapSelection(point) {
     currentLocation = { lat:Number(point.lat), lng:Number(point.lng), accuracy:0 };
     updateCustomerMap(currentLocation);
-    var message = isInsideZaltan(currentLocation) ? 'تم تحديد نقطة التسليم يدوياً داخل نطاق زلطن' : 'النقطة المختارة خارج نطاق التوصيل';
-    ['location-status','zaltan-shop-location-status'].forEach(function(id) { var status = document.getElementById(id); if (status) status.textContent = message; });
+    updateCustomerLocationStatus();
+    var shopStatus = document.getElementById('zaltan-shop-location-status');
+    if (shopStatus) shopStatus.textContent = isInsideZaltan(currentLocation) ? 'تم تحديد الموقع داخل نطاق زلطن' : 'الموقع المحدد خارج نطاق زلطن';
 }
 function updateCustomerMap(location) {
     if (!customerMap || !location) return;
     var point = [Number(location.lat), Number(location.lng)];
     if (!customerMarker) {
-        customerMarker = L.marker(point, { draggable:true }).addTo(customerMap).bindPopup('موقع التسليم');
+        customerMarker = L.marker(point, { draggable:true, icon:createDeliveryMapIcon(getCustomerMapAreaId()) }).addTo(customerMap).bindPopup('موقع التسليم');
         customerMarker.on('dragend', function(event) { setCustomerMapSelection(event.target.getLatLng()); });
     }
-    else customerMarker.setLatLng(point);
+    else customerMarker.setLatLng(point).setIcon(createDeliveryMapIcon(getCustomerMapAreaId()));
     if (customerAccuracyCircle) customerAccuracyCircle.setLatLng(point).setRadius(Number(location.accuracy || 30));
     else customerAccuracyCircle = L.circle(point, { radius:Number(location.accuracy || 30), color:'#00d4ff', fillColor:'#00d4ff', fillOpacity:.12 }).addTo(customerMap);
     customerMap.setView(point, 16, { animate:true });
 }
 
+function getDeliveryArea(areaId) {
+    return ZALTAN_AREAS.find(function(area) { return area.id === areaId; }) || null;
+}
+
+function getDeliveryFee(areaId) {
+    var area = getDeliveryArea(areaId);
+    return area ? Number(area.fee || 0) : 0;
+}
+
+function calculateOrderTotal(subtotal, discount, areaId) {
+    return Number(subtotal || 0) - Number(discount || 0) + getDeliveryFee(areaId);
+}
+
+function getStoreNetOrderAmount(order) {
+    if (!order) return 0;
+    var total = Number(order.total || 0);
+    if (Number.isFinite(Number(order.subtotal))) return Math.max(0, Number(order.subtotal) - Number(order.discount || 0));
+    return Math.max(0, total - Number(order.deliveryFee || 0));
+}
+
+function getCustomerMapAreaId() {
+    return activePage === 'cart' ? selectedDeliveryAreaId : '';
+}
+
+function createDeliveryMapIcon(areaId) {
+    var area = getDeliveryArea(areaId);
+    var zone = area ? ZALTAN_AREA_ZONES[area.zone] : null;
+    var color = area ? area.color : (zone ? zone.color : '#00d4ff');
+    return L.divIcon({ className:'', html:'<span class="delivery-area-map-pin" style="--pin-color:' + color + '"><i class="fas fa-location-dot"></i></span>', iconSize:[34,40], iconAnchor:[17,39] });
+}
+
+function updateCustomerServiceCircle() {
+    if (!customerMap || !customerServiceCircle) return;
+    var area = getDeliveryArea(getCustomerMapAreaId());
+    var zone = area ? ZALTAN_AREA_ZONES[area.zone] : null;
+    var color = area ? area.color : (zone ? zone.color : '#00d4ff');
+    customerServiceCircle.setRadius((zone ? zone.radiusKm : ZALTAN_SERVICE_RADIUS_KM) * 1000);
+    customerServiceCircle.setStyle({ color:color, fillColor:color });
+    customerServiceCircle.setTooltipContent(area ? 'نطاق تحقق تقريبي لمنطقة ' + escapeHtml(area.name) + '، وليس حدودها الجغرافية' : 'نطاق تحقق تقريبي، وليس حدود الأحياء');
+    if (customerMarker) customerMarker.setIcon(createDeliveryMapIcon(area ? area.id : ''));
+    var badge = document.getElementById('map-range-badge');
+    if (badge) badge.textContent = area ? area.name + ' • نطاق تقريبي' : 'اختر المنطقة';
+}
+
+function updateCustomerLocationStatus() {
+    var status = document.getElementById('location-status');
+    if (!status) return;
+    var areaId = getCustomerMapAreaId();
+    var area = getDeliveryArea(areaId);
+    if (!currentLocation) { status.textContent = 'لم يتم التحديد بعد'; return; }
+    if (activePage === 'cart' && !area) { status.textContent = 'تم تحديد النقطة؛ اختر منطقتك للتحقق من النطاق'; return; }
+    status.textContent = isInsideZaltan(currentLocation, areaId) ? 'الموقع داخل نطاق التحقق التقريبي' : 'الموقع خارج نطاق الخدمة المحدد';
+}
+
+function renderDeliveryAreaPicker() {
+    var zonesHtml = Object.keys(ZALTAN_AREA_ZONES).map(function(zoneId) {
+        var zone = ZALTAN_AREA_ZONES[zoneId];
+        var areasHtml = ZALTAN_AREAS.filter(function(area) { return area.zone === zoneId; }).map(function(area) {
+            var selected = selectedDeliveryAreaId === area.id;
+            return '<button type="button" class="delivery-area-card' + (selected ? ' is-selected' : '') + '" data-area-id="' + area.id + '" aria-pressed="' + selected + '" style="--area-color:' + area.color + '" onclick="selectDeliveryArea(\'' + area.id + '\')"><span class="delivery-area-card-mark"><i class="fas fa-location-dot"></i></span><span class="delivery-area-card-copy"><strong>' + escapeHtml(area.name) + '</strong><small>' + area.fee + ' د.ل توصيل</small></span></button>';
+        }).join('');
+        return '<section class="delivery-area-zone" data-zone="' + zoneId + '"><div class="delivery-area-zone-head"><i class="fas ' + zone.icon + '"></i><div><strong>' + escapeHtml(zone.name) + '</strong><small>' + (zoneId === 'zone_3' ? 'تحقق تقريبي حتى 50 كم من مركز زلطن' : 'تحقق تقريبي ضمن نطاق 20 كم') + '</small></div></div><div class="delivery-area-grid">' + areasHtml + '</div></section>';
+    }).join('');
+    return '<div class="delivery-area-picker"><div class="delivery-area-picker-title"><div><strong>اختر منطقة التوصيل</strong><small>تتغير أجرة التوصيل ولون نطاق الخريطة حسب اختيارك.</small></div></div>' + zonesHtml + '<p class="delivery-area-map-note"><i class="fas fa-circle-info"></i> الدائرة الملوّنة نطاق تحقق تقريبي وليست حدود الحي. يمكن إضافة الحدود الدقيقة عند توفير إحداثيات المناطق.</p></div>';
+}
+
+function selectDeliveryArea(areaId) {
+    var area = getDeliveryArea(areaId);
+    if (!area) return;
+    selectedDeliveryAreaId = area.id;
+    document.querySelectorAll('.delivery-area-card').forEach(function(button) {
+        var selected = button.getAttribute('data-area-id') === area.id;
+        button.classList.toggle('is-selected', selected);
+        button.setAttribute('aria-pressed', String(selected));
+    });
+    updateCustomerServiceCircle();
+    updateCustomerLocationStatus();
+    updateCheckoutSummary();
+    if (customerMap && !currentLocation && area.zone === 'zone_3' && customerServiceCircle) customerMap.fitBounds(customerServiceCircle.getBounds(), { padding:[12,12], maxZoom:12 });
+}
+
 function renderCart(container) {
     if (!cart.length) {
+        selectedDeliveryAreaId = '';
         container.innerHTML = '<div class="empty-state animate-fade" style="text-align:center;padding:48px 18px;"><i class="fas fa-shopping-basket fa-4x" style="color:var(--primary)"></i><h3 style="margin:16px 0 6px;">سلتك فارغة حالياً</h3><p style="color:var(--text-muted);margin-bottom:18px;">اختر ما تحتاجه من المتاجر ثم ارجع لإكمال الطلب.</p><button class="btn btn-primary" onclick="navigate(\'home\')">تصفح المتاجر</button></div>';
         return;
     }
@@ -2152,10 +2285,10 @@ function renderCart(container) {
     let total = cart.reduce(function(s, i) { return s + Number(i.price || 0); }, 0);
     let discount = 0;
     if (appliedCoupon) discount = Math.round(total * (appliedCoupon.discount / 100));
-    let finalTotal = total - discount;
+    let finalTotal = calculateOrderTotal(total, discount, selectedDeliveryAreaId);
     let addrs = currentUser.addresses || [];
     let addrOptions = addrs.map(function(a, i) { return '<option value="' + i + '">' + escapeHtml(a.label || 'عنوان') + ' — ' + escapeHtml((a.text || '').substring(0, 36)) + '</option>'; }).join('');
-    let locationText = !currentLocation ? 'لم يتم التحديد بعد' : (isInsideZaltan(currentLocation) ? 'الموقع محدد داخل نطاق زلطن' : 'الموقع خارج نطاق التوصيل');
+    let locationText = !currentLocation ? 'لم يتم التحديد بعد' : (!selectedDeliveryAreaId ? 'تم تحديد النقطة؛ اختر منطقتك للتحقق من النطاق' : (isInsideZaltan(currentLocation, selectedDeliveryAreaId) ? 'الموقع داخل نطاق التحقق التقريبي' : 'الموقع خارج نطاق الخدمة المحدد'));
 
     container.innerHTML = '<div class="checkout-page animate-fade">' + cartWarning +
         '<div class="checkout-head"><div><span class="checkout-eyebrow">إتمام الطلب</span><h2>راجع طلبك وأكمل بيانات التوصيل</h2><p>خطوات واضحة وآمنة قبل إرسال الطلب إلى المتجر.</p></div>' +
@@ -2169,6 +2302,7 @@ function renderCart(container) {
                 '<button type="button" class="checkout-remove" aria-label="إزالة ' + escapeHtml(item.name || 'المنتج') + ' من السلة" onclick="cart.splice(' + idx + ',1);updateCartBadge();navigate(\'cart\')"><i class="fas fa-trash"></i><span>إزالة</span></button></article>';
         }).join('') + '</div></section>' +
         '<section class="checkout-panel" aria-labelledby="checkout-delivery-title"><div class="checkout-section-head"><span class="checkout-section-icon"><i class="fas fa-truck-fast"></i></span><div><h3 id="checkout-delivery-title">بيانات التوصيل</h3><p class="checkout-section-note">أدخل معلومات تساعد المتجر والسائق على إيصال طلبك.</p></div></div>' +
+        renderDeliveryAreaPicker() +
         '<div class="checkout-fields">' +
         (addrOptions ? '<div class="checkout-field full"><label for="addr-select">عنوان محفوظ</label><select id="addr-select" onchange="fillAddressFromSelect(this.value)"><option value="">اختر عنواناً محفوظاً (اختياري)</option>' + addrOptions + '</select></div>' : '') +
         '<div class="checkout-field full"><label for="order-address">العنوان بالتفصيل <span style="color:var(--danger)">*</span></label><textarea id="order-address" autocomplete="street-address" placeholder="الحي، الشارع، أقرب علامة مميزة..."></textarea></div>' +
@@ -2176,11 +2310,11 @@ function renderCart(container) {
         '<div class="checkout-field"><label for="delivery-time">وقت التوصيل</label><select id="delivery-time"><option value="now">الآن — أسرع وقت متاح</option><option value="30">خلال 30 دقيقة</option><option value="60">خلال ساعة</option><option value="120">خلال ساعتين</option></select></div>' +
         '<div class="checkout-field full"><label for="order-notes">ملاحظات للمتجر أو السائق <span class="checkout-section-note">(اختياري)</span></label><textarea id="order-notes" placeholder="مثال: بدون بصل، أو التوصيل أمام الباب..."></textarea></div>' +
         '</div></section>' +
-        '<section class="checkout-panel" aria-labelledby="checkout-location-title"><div class="checkout-section-head"><span class="checkout-section-icon"><i class="fas fa-map-location-dot"></i></span><div><h3 id="checkout-location-title">موقع التسليم</h3><p class="checkout-section-note">حدد نقطة التسليم بدقة؛ التوصيل متاح داخل زلطن.</p></div></div>' +
+        '<section class="checkout-panel" aria-labelledby="checkout-location-title"><div class="checkout-section-head"><span class="checkout-section-icon"><i class="fas fa-map-location-dot"></i></span><div><h3 id="checkout-location-title">موقع التسليم</h3><p class="checkout-section-note">حدد نقطة التسليم ثم اختر منطقتك لإظهار نطاق التحقق المناسب.</p></div></div>' +
         '<div style="display:flex;justify-content:flex-start;margin:0 0 10px"><button type="button" class="btn btn-outline btn-sm" style="width:auto" onclick="getCurrentLocation()"><i class="fas fa-crosshairs"></i> استخدام موقعي الحالي</button></div>' +
-        '<div class="customer-map-card"><div class="customer-map-head"><div class="customer-map-title"><i class="fas fa-map-location-dot"></i><div><strong>اختر نقطة التسليم على الخريطة</strong><small>اضغط على الخريطة أو اسحب الدبوس إلى موقعك.</small></div></div><span class="map-range-badge"><i class="fas fa-circle-check"></i> زلطن فقط</span></div>' +
+        '<div class="customer-map-card"><div class="customer-map-head"><div class="customer-map-title"><i class="fas fa-map-location-dot"></i><div><strong>اختر نقطة التسليم على الخريطة</strong><small>اضغط على الخريطة أو اسحب الدبوس إلى موقعك.</small></div></div><span class="map-range-badge" id="map-range-badge">' + (selectedDeliveryAreaId ? escapeHtml(getDeliveryArea(selectedDeliveryAreaId).name) + ' • نطاق تقريبي' : 'اختر المنطقة') + '</span></div>' +
         '<div class="map-location-status"><span><i class="fas fa-location-crosshairs"></i> حالة الموقع</span><span id="location-status">' + locationText + '</span></div>' +
-        '<div id="customer-map" class="customer-map"></div><div class="customer-map-footer"><i class="fas fa-shield-halved"></i><span>يُرفق الموقع بالطلب لتحديد إمكانية التوصيل ومساعدة السائق على الوصول إلى نقطة التسليم.</span></div></div></section>' +
+        '<div id="customer-map" class="customer-map"></div><div class="customer-map-footer"><i class="fas fa-shield-halved"></i><span>الدائرة الملوّنة توضح نطاق تحقق تقريبي حسب المنطقة، وليست حدود الأحياء الجغرافية.</span></div></div></section>' +
         '<section class="checkout-panel" aria-labelledby="checkout-consent-title"><div class="checkout-section-head"><span class="checkout-section-icon"><i class="fas fa-file-signature"></i></span><div><h3 id="checkout-consent-title">الإقرار والموافقة</h3><p class="checkout-section-note">اقرأ سياسة الاستخدام قبل الموافقة على إرسال الطلب.</p></div></div>' +
         '<div class="checkout-consent"><input id="checkout-consent" type="checkbox"><div><label for="checkout-consent">' + escapeHtml(ORDER_CONSENT_TEXT) + '</label><div><button type="button" class="checkout-policy-link" onclick="showPolicy()">قراءة سياسة الاستخدام</button></div></div></div>' +
         '<p class="checkout-consent-help">الموافقة والتوقيع مرتبطان بهذا الطلب فقط. اعرض السياسة الحالية عبر الرابط قبل الإرسال.</p>' +
@@ -2190,8 +2324,9 @@ function renderCart(container) {
         '<div class="signature-typed"><label for="order-signature-name">الاسم كتوقيع بديل (اختياري عند الرسم)</label><input id="order-signature-name" type="text" autocomplete="name" maxlength="80" placeholder="اكتب اسمك إذا لم تتمكن من الرسم"></div></div></section>' +
         '</div><aside class="checkout-summary" aria-labelledby="checkout-summary-title"><h3 id="checkout-summary-title"><i class="fas fa-receipt" style="color:var(--primary);margin-left:6px"></i> ملخص الطلب</h3>' +
         '<div class="checkout-summary-row"><span>قيمة المنتجات</span><strong id="checkout-subtotal">' + total + ' د.ل</strong></div>' +
+        '<div class="checkout-summary-row"><span>أجرة التوصيل</span><strong id="checkout-delivery-fee">' + (selectedDeliveryAreaId ? getDeliveryFee(selectedDeliveryAreaId) + ' د.ل' : 'اختر المنطقة') + '</strong></div>' +
         '<div class="checkout-summary-row discount" id="checkout-discount-row" style="display:' + (appliedCoupon ? 'flex' : 'none') + '"><span>الخصم</span><strong id="checkout-discount">-' + discount + ' د.ل</strong></div>' +
-        '<div class="checkout-summary-row total"><span>الإجمالي</span><strong id="checkout-total">' + finalTotal + ' د.ل</strong></div>' +
+        '<div class="checkout-summary-row total"><span>الإجمالي</span><strong id="checkout-total">' + (selectedDeliveryAreaId ? finalTotal + ' د.ل' : 'اختر المنطقة') + '</strong></div>' +
         '<div class="checkout-coupon"><label for="coupon-code">كود الخصم <span class="checkout-section-note">(اختياري)</span></label><div class="checkout-coupon-controls"><input id="coupon-code" class="checkout-coupon-input" placeholder="أدخل الكود" autocomplete="off"><button type="button" class="btn btn-warning" onclick="applyCoupon()">تطبيق</button></div>' +
         '<div id="checkout-coupon-status" class="checkout-coupon-status">' + (appliedCoupon ? 'تم تطبيق الكود ' + escapeHtml(appliedCoupon.code) + ' <button type="button" class="checkout-coupon-clear" onclick="clearAppliedCoupon()">إزالة</button>' : '') + '</div></div>' +
         '<button type="button" id="confirm-order-button" class="btn btn-primary checkout-submit" onclick="confirmOrder()"><i class="fas fa-paper-plane"></i> إرسال الطلب</button>' +
@@ -2282,15 +2417,19 @@ function fillAddressFromSelect(val) {
 function updateCheckoutSummary() {
     var total = cart.reduce(function(sum, item) { return sum + Number(item.price || 0); }, 0);
     var discount = appliedCoupon ? Math.round(total * (Number(appliedCoupon.discount || 0) / 100)) : 0;
+    var selectedArea = getDeliveryArea(selectedDeliveryAreaId);
+    var deliveryFee = selectedArea ? Number(selectedArea.fee || 0) : 0;
     var subtotalEl = document.getElementById('checkout-subtotal');
+    var deliveryFeeEl = document.getElementById('checkout-delivery-fee');
     var discountRow = document.getElementById('checkout-discount-row');
     var discountEl = document.getElementById('checkout-discount');
     var totalEl = document.getElementById('checkout-total');
     var couponStatus = document.getElementById('checkout-coupon-status');
     if (subtotalEl) subtotalEl.textContent = total + ' د.ل';
+    if (deliveryFeeEl) deliveryFeeEl.textContent = selectedArea ? deliveryFee + ' د.ل' : 'اختر المنطقة';
     if (discountRow) discountRow.style.display = appliedCoupon ? 'flex' : 'none';
     if (discountEl) discountEl.textContent = '-' + discount + ' د.ل';
-    if (totalEl) totalEl.textContent = (total - discount) + ' د.ل';
+    if (totalEl) totalEl.textContent = selectedArea ? calculateOrderTotal(total, discount, selectedDeliveryAreaId) + ' د.ل' : 'اختر المنطقة';
     if (couponStatus) couponStatus.innerHTML = appliedCoupon ? 'تم تطبيق الكود ' + escapeHtml(appliedCoupon.code) + ' <button type="button" class="checkout-coupon-clear" onclick="clearAppliedCoupon()">إزالة</button>' : '';
 }
 
@@ -2317,8 +2456,10 @@ function confirmOrder() {
     let time = document.getElementById('delivery-time') ? document.getElementById('delivery-time').value : 'now';
     if (!cart.length) return showToast('السلة فارغة؛ أضف منتجاً قبل إرسال الطلب.', 'error');
     if (!addr.trim() || !phone.trim()) return showToast('أكمل عنوان التوصيل ورقم الهاتف قبل المتابعة.', 'error');
+    let deliveryArea = getDeliveryArea(selectedDeliveryAreaId);
+    if (!deliveryArea) return showToast('اختر منطقة التوصيل حتى تظهر الأجرة الصحيحة.', 'error', 5000);
     if (!currentLocation) return showToast('اضغط «تحديد موقعي» واسمح بإذن الموقع أولاً', 'error', 5000);
-    if (!isInsideZaltan(currentLocation)) return showToast('التوصيل متاح داخل مدينة زلطن فقط', 'error', 5000);
+    if (!isInsideZaltan(currentLocation, deliveryArea.id)) return showToast('الموقع خارج نطاق التحقق التقريبي لمنطقة ' + deliveryArea.name + '.', 'error', 5000);
     let storeId = cart[0].sid;
     if (cart.some(function(item) { return String(item.sid) !== String(storeId); })) return showToast('السلة تحتوي منتجات من متاجر مختلفة. أزل منتجات أحد المتاجر قبل المتابعة.', 'error', 5000);
     let store = db.stores.find(function(item) { return String(item.id) === String(storeId); });
@@ -2333,6 +2474,8 @@ function confirmOrder() {
     if (!customerAuthUid) return showToast('سجّل الدخول بحساب موثّق قبل إرسال الطلب.', 'error');
     let total = cart.reduce(function(s, i) { return s + Number(i.price || 0); }, 0);
     let discount = appliedCoupon ? Math.round(total * (appliedCoupon.discount / 100)) : 0;
+    let deliveryFee = Number(deliveryArea.fee || 0);
+    let finalTotal = calculateOrderTotal(total, discount, deliveryArea.id);
     let consentAcceptedAt = Date.now();
     let signatureImage = hasDrawnSignature ? signatureCanvas.toDataURL('image/png') : '';
     let order = {
@@ -2340,7 +2483,9 @@ function confirmOrder() {
         storeId: storeId, items: JSON.parse(JSON.stringify(cart)), location: addr, phone: phone, notes: notes,
         status: 'قيد الانتظار ⏳', createdAt: new Date().toLocaleString('ar-LY'),
         driverId: null, coordinates: currentLocation, orderChat: [],
-        coupon: appliedCoupon ? appliedCoupon.code : null, discount: discount, total: total - discount,
+        coupon: appliedCoupon ? appliedCoupon.code : null, subtotal: total, discount: discount,
+        deliveryAreaId: deliveryArea.id, deliveryAreaName: deliveryArea.name, deliveryZone: deliveryArea.zone,
+        deliveryFee: deliveryFee, total: finalTotal,
         deliveryTime: time, deliveryProof: null,
         customerConsent: {
             accepted: true, acceptedAt: consentAcceptedAt, consentVersion: 'checkout-consent-v1',
@@ -2371,7 +2516,7 @@ function confirmOrder() {
             usedCoupons.push(appliedCoupon.code);
             try { localStorage.setItem('z_used_coupons', JSON.stringify(usedCoupons)); } catch (storageError) {}
         }
-        cart = []; appliedCoupon = null; currentLocation = null;
+        cart = []; appliedCoupon = null; currentLocation = null; selectedDeliveryAreaId = '';
         orderSubmitInProgress = false;
         updateCartBadge();
         showToast('تم إرسال الطلب بنجاح! 🎉');
@@ -2548,6 +2693,7 @@ function renderOrders(container) {
         let items = o.items || [], itemCount = items.reduce(function(sum, item) { return sum + (Number(item.quantity) || 1); }, 0);
         let shoppingDetailsHtml = isShopOrder ? '<div class="shop-order-details"><b><i class="fas fa-basket-shopping"></i> قائمة المشتريات</b><ul>' + (o.shoppingItems || []).map(function(item) { return '<li>' + escapeHtml(item) + '</li>'; }).join('') + '</ul>' + (o.shoppingMarket ? '<small>السوق المفضل: ' + escapeHtml(o.shoppingMarket) + '</small>' : '') + '<small>سقف المشتريات: ' + Number(o.budgetLimit || 0).toLocaleString('ar-LY') + ' د.ل</small></div>' : '';
         let timeLabel = o.deliveryTime === 'now' ? 'الآن' : o.deliveryTime === '30' ? 'خلال 30 دقيقة' : o.deliveryTime === '60' ? 'خلال ساعة' : 'خلال ساعتين';
+        let deliveryAreaHtml = !isShopOrder && o.deliveryAreaName ? '<div class="order-info-row"><i class="fas fa-map-location-dot"></i><span>المنطقة: ' + escapeHtml(o.deliveryAreaName) + ' • أجرة التوصيل ' + Number(o.deliveryFee || 0) + ' د.ل</span></div>' : '';
         let shortId = String(o.id || '').slice(-6);
         let orderIndex = db.orders.indexOf(o);
         let storeReviewAction = isShopOrder || meta.key !== 'done' ? '' : (o.storeReview ? '<span class="tag tag-success">تم تقييم المتجر</span>' : (canReviewOrder(o, 'store', o.storeId) ? '<button class="btn btn-sm btn-warning" data-rate-store-index="' + orderIndex + '"><i class="fas fa-star"></i> تقييم المتجر</button>' : ''));
@@ -2558,6 +2704,7 @@ function renderOrders(container) {
             '<div class="order-info-row"><i class="fas fa-box"></i><span>' + itemCount + ' ' + (itemCount === 1 ? 'غرض' : 'أغراض') + '</span><span>•</span><span>' + timeLabel + '</span></div>' +
             shoppingDetailsHtml +
             '<div class="order-info-row"><i class="fas fa-location-dot"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escapeHtml(o.location || 'عنوان التوصيل محفوظ') + '</span></div>' +
+            deliveryAreaHtml +
             '<div class="order-total-box"><small>' + (isShopOrder ? 'سقف المشتريات' : 'إجمالي الطلب') + '</small><strong>' + (isShopOrder ? Number(o.budgetLimit || 0) : Number(o.total || 0)).toLocaleString('ar-LY') + ' د.ل</strong></div>' +
             '<div class="order-card-actions"><button class="btn btn-sm btn-outline" onclick="navigate(\'track\',\'' + o.id + '\')"><i class="fas fa-map-marked-alt"></i> تتبع الطلب</button>' +
             storeReviewAction + driverReviewAction +
@@ -2609,7 +2756,7 @@ function renderStoreOwnerPanel(container) {
         return;
     }
     let storeOrders = db.orders.filter(function(o) { return o.storeId === myStore.id; }).reverse();
-    let totalRevenue = storeOrders.filter(function(o) { return o.status.indexOf('تسليم') !== -1; }).reduce(function(s, o) { return s + (o.total || 0); }, 0);
+    let totalRevenue = storeOrders.filter(function(o) { return o.status.indexOf('تسليم') !== -1; }).reduce(function(s, o) { return s + getStoreNetOrderAmount(o); }, 0);
     let pendingCount = storeOrders.filter(function(o) { return o.status.indexOf('انتظار') !== -1; }).length;
     let todayOrders = storeOrders.filter(function(o) { return o.createdAt && o.createdAt.indexOf(new Date().toLocaleDateString('ar-LY')) !== -1; });
     let weekOrders = storeOrders.filter(function(o) { return o.createdAt && new Date().getTime() - new Date(o.createdAt).getTime() < 7 * 24 * 60 * 60 * 1000; });
@@ -2618,7 +2765,7 @@ function renderStoreOwnerPanel(container) {
     let dailySales = {};
     storeOrders.filter(function(o) { return o.status.indexOf('تسليم') !== -1; }).forEach(function(o) {
         let d = o.createdAt ? o.createdAt.split(' ')[0] : 'غير معروف';
-        dailySales[d] = (dailySales[d] || 0) + (o.total || 0);
+        dailySales[d] = (dailySales[d] || 0) + getStoreNetOrderAmount(o);
     });
     let chartDays = Object.keys(dailySales).slice(-7);
     let maxSale = Math.max.apply(null, Object.values(dailySales).concat([1]));
@@ -2633,6 +2780,7 @@ function renderStoreOwnerPanel(container) {
             '<b>' + o.userName + '</b><span class="status-badge ' + (o.status.indexOf('انتظار') !== -1 ? 'status-pending' : o.status.indexOf('قبول') !== -1 ? 'status-accepted' : o.status.indexOf('توصيل') !== -1 ? 'status-delivery' : 'status-done') + '">' + o.status + '</span></div>' +
             '<small style="color:var(--text-muted)">' + o.items.map(function(i){return i.name;}).join(', ') + '</small><br>' +
             '<small>📍 ' + o.location + ' | 📞 ' + o.phone + '</small>' +
+            (o.deliveryAreaName ? '<br><small style="color:var(--primary)"><i class="fas fa-map-location-dot"></i> ' + escapeHtml(o.deliveryAreaName) + ' • أجرة التوصيل ' + Number(o.deliveryFee || 0) + ' د.ل</small>' : '') +
             (o.status === 'قيد الانتظار ⏳' ? '<button class="btn btn-sm btn-success" style="margin-top:8px" onclick="acceptOrder(\'' + o.id + '\')"><i class="fas fa-check"></i> قبول الطلب</button>' : '') +
             '<button class="btn btn-sm btn-outline" style="margin-top:5px" onclick="navigate(\'track\',\'' + o.id + '\')"><i class="fas fa-eye"></i> تتبع</button></div>';
     }).join('');
@@ -2806,7 +2954,8 @@ function renderDriver(container) {
     let renderOrderDetails = function(order) {
         let items = Array.isArray(order.items) ? order.items.length : 0;
         let amountLabel = isZaltanShopOrder(order) ? 'سقف الشراء حتى ' + money(order.budgetLimit) + ' د.ل' : money(order.total) + ' د.ل';
-        return '<div class="driver-detail-chips"><span><i class="fas fa-money-bill-wave"></i> ' + safe(amountLabel) + '</span><span><i class="fas fa-box"></i> ' + items + (isZaltanShopOrder(order) ? ' أغراض' : ' منتجات') + '</span><span><i class="fas fa-clock"></i> ' + safe(timeLabel(order.deliveryTime)) + '</span></div>';
+        let areaLabel = !isZaltanShopOrder(order) && order.deliveryAreaName ? '<span><i class="fas fa-map-location-dot"></i> ' + safe(order.deliveryAreaName) + ' • توصيل ' + money(order.deliveryFee) + ' د.ل</span>' : '';
+        return '<div class="driver-detail-chips"><span><i class="fas fa-money-bill-wave"></i> ' + safe(amountLabel) + '</span>' + areaLabel + '<span><i class="fas fa-box"></i> ' + items + (isZaltanShopOrder(order) ? ' أغراض' : ' منتجات') + '</span><span><i class="fas fa-clock"></i> ' + safe(timeLabel(order.deliveryTime)) + '</span></div>';
     };
     let renderShoppingDetails = function(order) {
         if (!isZaltanShopOrder(order)) return '';
@@ -3091,7 +3240,7 @@ function initLiveMap(orderId, isDriver) {
     if (liveMap) { liveMap.remove(); liveMap = null; liveMarker = null; liveTargetMarker = null; liveGuideLine = null; liveDirectionMarker = null; }
     liveMapOrderId = orderId;
     etaRequestSerial++; etaLastRequestAt = 0; etaLastDriverPoint = null; etaRequestInFlight = false;
-    liveMap = L.map(holder, { zoomControl:true, attributionControl:true, maxBounds:ZALTAN_MAP_BOUNDS, maxBoundsViscosity:0.9, minZoom:11, maxZoom:18 }).setView(ZALTAN_CENTER, 13);
+    liveMap = L.map(holder, { zoomControl:true, attributionControl:true, maxBounds:ZALTAN_MAP_BOUNDS, maxBoundsViscosity:0.9, minZoom:9, maxZoom:18 }).setView(ZALTAN_CENTER, 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap' }).addTo(liveMap);
     var order = db.orders.find(function(item) { return String(item.id) === String(orderId); });
     if (order && order.coordinates && Number.isFinite(Number(order.coordinates.lat)) && Number.isFinite(Number(order.coordinates.lng))) {
@@ -4168,25 +4317,25 @@ function renderDriverStats(container) {
     if (currentUser.type !== 'driver') return navigate('driver');
     let driverRatingSummary = getDriverRatingSummary(currentUser);
     let myDeliveries = db.orders.filter(function(o) { return o.driverId === currentUser.id && o.status.indexOf('تسليم') !== -1; });
-    let monthlyRevenue = {};
+    let monthlyOrderValue = {};
     myDeliveries.forEach(function(o) {
         let month = o.createdAt ? o.createdAt.split('/')[1] + '/' + o.createdAt.split('/')[2] : 'غير معروف';
-        monthlyRevenue[month] = (monthlyRevenue[month] || 0) + (o.total || 0);
+        monthlyOrderValue[month] = (monthlyOrderValue[month] || 0) + (o.total || 0);
     });
     let totalDeliveries = myDeliveries.length;
-    let totalEarnings = myDeliveries.reduce(function(s, o) { return s + (o.total || 0); }, 0);
-    let avgPerDelivery = totalDeliveries ? (totalEarnings / totalDeliveries).toFixed(1) : 0;
+    let totalOrderValue = myDeliveries.reduce(function(s, o) { return s + (o.total || 0); }, 0);
+    let avgOrderValue = totalDeliveries ? (totalOrderValue / totalDeliveries).toFixed(1) : 0;
 
     container.innerHTML = '<div class="animate-fade"><h3 style="margin-bottom:16px;">📊 إحصائياتي</h3>' +
         '<div class="grid-2" style="margin-bottom:16px;">' +
         '<div class="stat-card"><div class="stat-value">' + totalDeliveries + '</div><div class="stat-label">📦 إجمالي التوصيلات</div></div>' +
-        '<div class="stat-card"><div class="stat-value">' + totalEarnings + '</div><div class="stat-label">💰 إجمالي الأرباح</div></div>' +
-        '<div class="stat-card"><div class="stat-value">' + avgPerDelivery + '</div><div class="stat-label">📊 متوسط الطلب</div></div>' +
+        '<div class="stat-card"><div class="stat-value">' + totalOrderValue + '</div><div class="stat-label">💰 قيمة الطلبات المكتملة</div></div>' +
+        '<div class="stat-card"><div class="stat-value">' + avgOrderValue + '</div><div class="stat-label">📊 متوسط قيمة الطلب</div></div>' +
         '<div class="stat-card"><div class="stat-value">' + driverRatingSummary.count + '</div><div class="stat-label">⭐ عدد التقييمات</div></div></div>' +
-        '<div class="card"><h4 style="margin-bottom:12px;">📈 الأرباح الشهرية</h4>' +
-        Object.keys(monthlyRevenue).map(function(m) {
+        '<div class="card"><h4 style="margin-bottom:12px;">📈 قيمة الطلبات الشهرية</h4>' +
+        Object.keys(monthlyOrderValue).map(function(m) {
             return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">' +
-                '<span>' + m + '</span><span style="color:var(--success);font-weight:700;">' + monthlyRevenue[m] + ' د.ل</span></div>';
+                '<span>' + m + '</span><span style="color:var(--success);font-weight:700;">' + monthlyOrderValue[m] + ' د.ل</span></div>';
         }).join('') || '<p style="color:var(--text-muted)">لا بيانات كافية</p>' +
         '</div></div>';
 }
