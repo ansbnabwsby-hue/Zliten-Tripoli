@@ -195,8 +195,22 @@ header { padding:16px 20px; display:flex; justify-content:space-between; align-i
 @media(max-width:400px){.auth-types{gap:5px}.auth-type{font-size:.68rem}}
 
 .live-map-card { padding:14px; }
-	.live-map { height:260px; width:100%; border-radius:16px; overflow:hidden; background:#0b1730; border:1px solid var(--border); }
-	.customer-map { height:220px; width:100%; border-radius:16px; overflow:hidden; background:#0b1730; border:1px solid var(--border); margin-top:10px; }
+	.live-map { height:260px; width:100%; border-radius:16px; overflow:hidden; background:#0b1730; border:1px solid var(--border); position:relative; isolation:isolate; transform-style:preserve-3d; transition:border-color .22s ease,box-shadow .22s ease; }
+	.customer-map { height:260px; width:100%; border-radius:16px; overflow:hidden; background:#0b1730; border:1px solid var(--border); margin-top:10px; position:relative; isolation:isolate; transform-style:preserve-3d; transition:border-color .22s ease,box-shadow .22s ease; }
+	.map-area-control { width:min(164px,46vw); max-height:220px; overflow:hidden; border:1px solid rgba(0,212,255,.35); border-radius:12px; background:rgba(7,18,38,.94); color:#f3f8ff; box-shadow:0 8px 22px rgba(0,0,0,.38); direction:rtl; backdrop-filter:blur(8px); }
+	.map-area-control-title { padding:7px 9px 6px; border-bottom:1px solid rgba(255,255,255,.12); color:#8beaff; font-size:.71rem; font-weight:800; }
+	.map-area-control-note { padding:5px 9px; color:#b8c6d9; font-size:.59rem; line-height:1.45; }
+	.map-area-control-list { max-height:166px; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:rgba(0,212,255,.45) transparent; }
+	.map-area-option { display:flex; align-items:center; gap:7px; width:100%; min-height:29px; padding:5px 8px; border:0; border-top:1px solid rgba(255,255,255,.07); background:transparent; color:inherit; text-align:right; cursor:pointer; }
+	.map-area-option:hover,.map-area-option[aria-pressed="true"] { background:rgba(0,212,255,.13); }
+	.map-area-swatch { width:9px; height:9px; flex:none; border-radius:50%; background:var(--area-color); box-shadow:0 0 8px var(--area-color); }
+	.map-area-option-name { flex:1; min-width:0; overflow:hidden; font-size:.62rem; text-overflow:ellipsis; white-space:nowrap; }
+	.map-area-option-fee { flex:none; color:var(--area-color); font-size:.58rem; font-weight:800; white-space:nowrap; }
+	.customer-map::after,.live-map::after { content:''; position:absolute; inset:0; z-index:650; pointer-events:none; border-radius:inherit; opacity:0; background:linear-gradient(145deg,rgba(255,255,255,.12),transparent 38%,rgba(0,212,255,.08)); box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -18px 28px rgba(0,0,0,.22); }
+	.customer-map.map-is-moving,.live-map.map-is-moving { border-color:rgba(0,212,255,.72); box-shadow:0 16px 30px rgba(0,0,0,.34),0 0 24px rgba(0,212,255,.17); }
+	.customer-map.map-is-moving::after,.live-map.map-is-moving::after { opacity:1; animation:map-depth-glide .42s ease-out both; }
+	@keyframes map-depth-glide { 0% { transform:perspective(900px) rotateX(0deg) translateY(5px); opacity:.1; } 55% { transform:perspective(900px) rotateX(2deg) translateY(-2px); opacity:1; } 100% { transform:perspective(900px) rotateX(0deg) translateY(0); opacity:.9; } }
+	@media(prefers-reduced-motion:reduce) { .customer-map,.live-map { transition:none; } .customer-map.map-is-moving::after,.live-map.map-is-moving::after { animation:none; } }
 .live-map .leaflet-control-attribution { font-size:9px; }
 	.live-location-status { display:flex;align-items:center;gap:8px;margin-bottom:10px;color:var(--text-muted);font-size:.8rem; }
 	.live-dot { width:9px;height:9px;border-radius:50%;background:var(--success);box-shadow:0 0 0 4px rgba(46,204,113,.14); }
@@ -873,10 +887,11 @@ let loadedAuthUid = '';
 let seenNotificationIds = {};
 let locationPermissionState = 'unknown';
 
-const ZALTAN_CENTER = [32.95, 11.86583];
+const ZALTAN_CENTER = [32.9461461, 11.8668040];
 const ZALTAN_SERVICE_RADIUS_KM = 20;
 const ZALTAN_MAP_BOUNDS = [[32.45, 11.15], [33.45, 12.6]];
-const ZALTAN_CUSTOMER_MAP_BOUNDS = [[32.45, 11.15], [33.45, 12.6]];
+// Navigation viewport around the city, not an administrative or neighborhood boundary.
+const ZALTAN_CUSTOMER_MAP_BOUNDS = [[32.918, 11.827], [32.974, 11.908]];
 const ZALTAN_AREA_ZONES = {
     zone_1: { name:'وسط زلطن', icon:'fa-city', color:'#2dd4bf', radiusKm:20 },
     zone_2: { name:'الأحياء المحلية', icon:'fa-compass', color:'#f5a524', radiusKm:20 },
@@ -2153,17 +2168,33 @@ function isInsideZaltan(location, areaId) {
     return distanceKm <= (zone ? zone.radiusKm : ZALTAN_SERVICE_RADIUS_KM);
 }
 
-let customerMap = null, customerMarker = null, customerAccuracyCircle = null, customerServiceCircle = null;
+let customerMap = null, customerMarker = null, customerAccuracyCircle = null;
+function bindMapDepthMotion(map, holder) {
+    if (!map || !holder) return;
+    var settleTimer = null;
+    function startMotion() {
+        if (settleTimer) clearTimeout(settleTimer);
+        holder.classList.add('map-is-moving');
+    }
+    function finishMotion() {
+        if (settleTimer) clearTimeout(settleTimer);
+        settleTimer = setTimeout(function() { holder.classList.remove('map-is-moving'); }, 180);
+    }
+    map.on('movestart zoomstart', startMotion);
+    map.on('moveend zoomend', finishMotion);
+}
+
 function initCustomerMap() {
     var holder = document.getElementById('customer-map');
     if (!holder || typeof L === 'undefined') return;
-    if (customerMap) { customerMap.remove(); customerMap = null; customerMarker = null; customerAccuracyCircle = null; customerServiceCircle = null; }
+    if (customerMap) { customerMap.remove(); customerMap = null; customerMarker = null; customerAccuracyCircle = null; }
     var fallback = ZALTAN_CENTER;
     var start = currentLocation ? [currentLocation.lat, currentLocation.lng] : fallback;
-    customerMap = L.map(holder, { zoomControl:true, attributionControl:true, maxBounds:ZALTAN_CUSTOMER_MAP_BOUNDS, maxBoundsViscosity:0.9, minZoom:9, maxZoom:18 }).setView(start, currentLocation ? 16 : 13);
+    customerMap = L.map(holder, { zoomControl:true, attributionControl:true, maxBounds:ZALTAN_CUSTOMER_MAP_BOUNDS, maxBoundsViscosity:1, minZoom:13, maxZoom:18 }).setView(start, currentLocation ? 16 : 14);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap' }).addTo(customerMap);
-    customerServiceCircle = L.circle(ZALTAN_CENTER, { radius:ZALTAN_SERVICE_RADIUS_KM * 1000, color:'#00d4ff', weight:2, dashArray:'6 7', fillColor:'#00d4ff', fillOpacity:.06 }).addTo(customerMap).bindTooltip('نطاق تحقق تقريبي، وليس حدود الأحياء', { sticky:true });
-    updateCustomerServiceCircle();
+    addDeliveryAreaMapControl(customerMap);
+    bindMapDepthMotion(customerMap, holder);
+    updateCustomerMapAreaDisplay();
     if (currentLocation) updateCustomerMap(currentLocation);
     customerMap.on('click', function(event) { setCustomerMapSelection(event.latlng); });
     setTimeout(function(){ if (customerMap) customerMap.invalidateSize(); }, 200);
@@ -2179,13 +2210,14 @@ function updateCustomerMap(location) {
     if (!customerMap || !location) return;
     var point = [Number(location.lat), Number(location.lng)];
     if (!customerMarker) {
-        customerMarker = L.marker(point, { draggable:true, icon:createDeliveryMapIcon(getCustomerMapAreaId()) }).addTo(customerMap).bindPopup('موقع التسليم');
+    customerMarker = L.marker(point, { draggable:true, icon:createDeliveryMapIcon(getCustomerMapAreaId()) }).addTo(customerMap).bindPopup('موقع التسليم');
         customerMarker.on('dragend', function(event) { setCustomerMapSelection(event.target.getLatLng()); });
     }
     else customerMarker.setLatLng(point).setIcon(createDeliveryMapIcon(getCustomerMapAreaId()));
     if (customerAccuracyCircle) customerAccuracyCircle.setLatLng(point).setRadius(Number(location.accuracy || 30));
     else customerAccuracyCircle = L.circle(point, { radius:Number(location.accuracy || 30), color:'#00d4ff', fillColor:'#00d4ff', fillOpacity:.12 }).addTo(customerMap);
     customerMap.setView(point, 16, { animate:true });
+    updateCustomerMapAreaDisplay();
 }
 
 function getDeliveryArea(areaId) {
@@ -2219,17 +2251,33 @@ function createDeliveryMapIcon(areaId) {
     return L.divIcon({ className:'', html:'<span class="delivery-area-map-pin" style="--pin-color:' + color + '"><i class="fas fa-location-dot"></i></span>', iconSize:[34,40], iconAnchor:[17,39] });
 }
 
-function updateCustomerServiceCircle() {
-    if (!customerMap || !customerServiceCircle) return;
+function addDeliveryAreaMapControl(map) {
+    if (!map || typeof L === 'undefined') return;
+    var control = L.control({ position:'topright' });
+    control.onAdd = function() {
+        var container = L.DomUtil.create('div', 'map-area-control');
+        var options = ZALTAN_AREAS.map(function(area) {
+            var selected = selectedDeliveryAreaId === area.id;
+            return '<button type="button" class="map-area-option' + (selected ? ' is-selected' : '') + '" data-area-id="' + area.id + '" aria-pressed="' + selected + '" style="--area-color:' + area.color + '"><span class="map-area-swatch"></span><span class="map-area-option-name">' + escapeHtml(area.name) + '</span><span class="map-area-option-fee">' + area.fee + ' د.ل</span></button>';
+        }).join('');
+        container.innerHTML = '<div class="map-area-control-title">مناطق زلطن ورسومها</div><div class="map-area-control-note">قائمة اختيار فقط؛ لا تمثل حدوداً جغرافية.</div><div class="map-area-control-list">' + options + '</div>';
+        L.DomEvent.disableClickPropagation(container);
+        L.DomEvent.disableScrollPropagation(container);
+        container.addEventListener('click', function(event) {
+            var button = event.target.closest('.map-area-option');
+            if (button) selectDeliveryArea(button.getAttribute('data-area-id'));
+        });
+        return container;
+    };
+    control.addTo(map);
+}
+
+function updateCustomerMapAreaDisplay() {
     var area = getDeliveryArea(getCustomerMapAreaId());
-    var zone = area ? ZALTAN_AREA_ZONES[area.zone] : null;
-    var color = area ? area.color : (zone ? zone.color : '#00d4ff');
-    customerServiceCircle.setRadius((zone ? zone.radiusKm : ZALTAN_SERVICE_RADIUS_KM) * 1000);
-    customerServiceCircle.setStyle({ color:color, fillColor:color });
-    customerServiceCircle.setTooltipContent(area ? 'نطاق تحقق تقريبي لمنطقة ' + escapeHtml(area.name) + '، وليس حدودها الجغرافية' : 'نطاق تحقق تقريبي، وليس حدود الأحياء');
     if (customerMarker) customerMarker.setIcon(createDeliveryMapIcon(area ? area.id : ''));
     var badge = document.getElementById('map-range-badge');
-    if (badge) badge.textContent = area ? area.name + ' • نطاق تقريبي' : 'اختر المنطقة';
+    if (badge) badge.textContent = area ? area.name + ' • ' + area.fee + ' د.ل' : 'اختر المنطقة';
+    if (customerMarker) customerMarker.setPopupContent(area ? 'موقع التسليم — ' + escapeHtml(area.name) + ' • أجرة ' + area.fee + ' د.ل' : 'موقع التسليم');
 }
 
 function updateCustomerLocationStatus() {
@@ -2243,30 +2291,21 @@ function updateCustomerLocationStatus() {
 }
 
 function renderDeliveryAreaPicker() {
-    var zonesHtml = Object.keys(ZALTAN_AREA_ZONES).map(function(zoneId) {
-        var zone = ZALTAN_AREA_ZONES[zoneId];
-        var areasHtml = ZALTAN_AREAS.filter(function(area) { return area.zone === zoneId; }).map(function(area) {
-            var selected = selectedDeliveryAreaId === area.id;
-            return '<button type="button" class="delivery-area-card' + (selected ? ' is-selected' : '') + '" data-area-id="' + area.id + '" aria-pressed="' + selected + '" style="--area-color:' + area.color + '" onclick="selectDeliveryArea(\'' + area.id + '\')"><span class="delivery-area-card-mark"><i class="fas fa-location-dot"></i></span><span class="delivery-area-card-copy"><strong>' + escapeHtml(area.name) + '</strong><small>' + area.fee + ' د.ل توصيل</small></span></button>';
-        }).join('');
-        return '<section class="delivery-area-zone" data-zone="' + zoneId + '"><div class="delivery-area-zone-head"><i class="fas ' + zone.icon + '"></i><div><strong>' + escapeHtml(zone.name) + '</strong><small>' + (zoneId === 'zone_3' ? 'تحقق تقريبي حتى 50 كم من مركز زلطن' : 'تحقق تقريبي ضمن نطاق 20 كم') + '</small></div></div><div class="delivery-area-grid">' + areasHtml + '</div></section>';
-    }).join('');
-    return '<div class="delivery-area-picker"><div class="delivery-area-picker-title"><div><strong>اختر منطقة التوصيل</strong><small>تتغير أجرة التوصيل ولون نطاق الخريطة حسب اختيارك.</small></div></div>' + zonesHtml + '<p class="delivery-area-map-note"><i class="fas fa-circle-info"></i> الدائرة الملوّنة نطاق تحقق تقريبي وليست حدود الحي. يمكن إضافة الحدود الدقيقة عند توفير إحداثيات المناطق.</p></div>';
+    return '<p class="delivery-area-map-note"><i class="fas fa-circle-info"></i> اختر المنطقة ورسومها من القائمة داخل خريطة زلطن. لا تتوفر إحداثيات موثقة لرسم مواقع الأحياء أو حدودها.</p>';
 }
 
 function selectDeliveryArea(areaId) {
     var area = getDeliveryArea(areaId);
     if (!area) return;
     selectedDeliveryAreaId = area.id;
-    document.querySelectorAll('.delivery-area-card').forEach(function(button) {
+    document.querySelectorAll('.map-area-option, .delivery-area-card').forEach(function(button) {
         var selected = button.getAttribute('data-area-id') === area.id;
         button.classList.toggle('is-selected', selected);
         button.setAttribute('aria-pressed', String(selected));
     });
-    updateCustomerServiceCircle();
+    updateCustomerMapAreaDisplay();
     updateCustomerLocationStatus();
     updateCheckoutSummary();
-    if (customerMap && !currentLocation && area.zone === 'zone_3' && customerServiceCircle) customerMap.fitBounds(customerServiceCircle.getBounds(), { padding:[12,12], maxZoom:12 });
 }
 
 function renderCart(container) {
@@ -2310,11 +2349,11 @@ function renderCart(container) {
         '<div class="checkout-field"><label for="delivery-time">وقت التوصيل</label><select id="delivery-time"><option value="now">الآن — أسرع وقت متاح</option><option value="30">خلال 30 دقيقة</option><option value="60">خلال ساعة</option><option value="120">خلال ساعتين</option></select></div>' +
         '<div class="checkout-field full"><label for="order-notes">ملاحظات للمتجر أو السائق <span class="checkout-section-note">(اختياري)</span></label><textarea id="order-notes" placeholder="مثال: بدون بصل، أو التوصيل أمام الباب..."></textarea></div>' +
         '</div></section>' +
-        '<section class="checkout-panel" aria-labelledby="checkout-location-title"><div class="checkout-section-head"><span class="checkout-section-icon"><i class="fas fa-map-location-dot"></i></span><div><h3 id="checkout-location-title">موقع التسليم</h3><p class="checkout-section-note">حدد نقطة التسليم ثم اختر منطقتك لإظهار نطاق التحقق المناسب.</p></div></div>' +
+        '<section class="checkout-panel" aria-labelledby="checkout-location-title"><div class="checkout-section-head"><span class="checkout-section-icon"><i class="fas fa-map-location-dot"></i></span><div><h3 id="checkout-location-title">موقع التسليم</h3><p class="checkout-section-note">الخريطة تركز على مدينة زلطن. حدد نقطة التسليم واختر منطقتك لإظهار أجرتها.</p></div></div>' +
         '<div style="display:flex;justify-content:flex-start;margin:0 0 10px"><button type="button" class="btn btn-outline btn-sm" style="width:auto" onclick="getCurrentLocation()"><i class="fas fa-crosshairs"></i> استخدام موقعي الحالي</button></div>' +
-        '<div class="customer-map-card"><div class="customer-map-head"><div class="customer-map-title"><i class="fas fa-map-location-dot"></i><div><strong>اختر نقطة التسليم على الخريطة</strong><small>اضغط على الخريطة أو اسحب الدبوس إلى موقعك.</small></div></div><span class="map-range-badge" id="map-range-badge">' + (selectedDeliveryAreaId ? escapeHtml(getDeliveryArea(selectedDeliveryAreaId).name) + ' • نطاق تقريبي' : 'اختر المنطقة') + '</span></div>' +
+        '<div class="customer-map-card"><div class="customer-map-head"><div class="customer-map-title"><i class="fas fa-map-location-dot"></i><div><strong>اختر نقطة التسليم على الخريطة</strong><small>اضغط على الخريطة أو اسحب الدبوس إلى موقعك.</small></div></div><span class="map-range-badge" id="map-range-badge">' + (selectedDeliveryAreaId ? escapeHtml(getDeliveryArea(selectedDeliveryAreaId).name) + ' • ' + getDeliveryFee(selectedDeliveryAreaId) + ' د.ل' : 'اختر المنطقة') + '</span></div>' +
         '<div class="map-location-status"><span><i class="fas fa-location-crosshairs"></i> حالة الموقع</span><span id="location-status">' + locationText + '</span></div>' +
-        '<div id="customer-map" class="customer-map"></div><div class="customer-map-footer"><i class="fas fa-shield-halved"></i><span>الدائرة الملوّنة توضح نطاق تحقق تقريبي حسب المنطقة، وليست حدود الأحياء الجغرافية.</span></div></div></section>' +
+        '<div id="customer-map" class="customer-map"></div><div class="customer-map-footer"><i class="fas fa-shield-halved"></i><span>عرض المدينة هنا تقريبي وليس حداً إدارياً. لا تتوفر في الملف إحداثيات موثقة لرسم حدود الأحياء.</span></div></div></section>' +
         '<section class="checkout-panel" aria-labelledby="checkout-consent-title"><div class="checkout-section-head"><span class="checkout-section-icon"><i class="fas fa-file-signature"></i></span><div><h3 id="checkout-consent-title">الإقرار والموافقة</h3><p class="checkout-section-note">اقرأ سياسة الاستخدام قبل الموافقة على إرسال الطلب.</p></div></div>' +
         '<div class="checkout-consent"><input id="checkout-consent" type="checkbox"><div><label for="checkout-consent">' + escapeHtml(ORDER_CONSENT_TEXT) + '</label><div><button type="button" class="checkout-policy-link" onclick="showPolicy()">قراءة سياسة الاستخدام</button></div></div></div>' +
         '<p class="checkout-consent-help">الموافقة والتوقيع مرتبطان بهذا الطلب فقط. اعرض السياسة الحالية عبر الرابط قبل الإرسال.</p>' +
@@ -3241,6 +3280,7 @@ function initLiveMap(orderId, isDriver) {
     liveMapOrderId = orderId;
     etaRequestSerial++; etaLastRequestAt = 0; etaLastDriverPoint = null; etaRequestInFlight = false;
     liveMap = L.map(holder, { zoomControl:true, attributionControl:true, maxBounds:ZALTAN_MAP_BOUNDS, maxBoundsViscosity:0.9, minZoom:9, maxZoom:18 }).setView(ZALTAN_CENTER, 13);
+    bindMapDepthMotion(liveMap, holder);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap' }).addTo(liveMap);
     var order = db.orders.find(function(item) { return String(item.id) === String(orderId); });
     if (order && order.coordinates && Number.isFinite(Number(order.coordinates.lat)) && Number.isFinite(Number(order.coordinates.lng))) {
